@@ -1,4 +1,4 @@
-name: Lint & test
+name: Install and build
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-  run-tests:
+  install-and-build:
     runs-on: ubuntu-latest
     needs: cancel-previous
     steps:
@@ -36,4 +36,3 @@ jobs:
 
     - name: Build application
       run: node common/scripts/install-run-rush.js rebuild --verbose
-
