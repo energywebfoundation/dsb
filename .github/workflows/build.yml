@@ -1,4 +1,4 @@
-name: Lint & test
+name: Install and build
 
 on:
   pull_request:
