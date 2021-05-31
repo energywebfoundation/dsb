@@ -10,3 +10,24 @@
 <p align="center">
   <img src="https://github.com/energywebfoundation/dsb/actions/workflows/build.yml/badge.svg" />
 </p>
+
+## Preparation
+
+1. Make sure you are using Node 14.x.x
+2. Make sure have latest `@microsoft/rush` package manager installed.
+
+```shell
+npm install -g @microsoft/rush
+```
+
+## Installation
+
+```shell
+rush update
+```
+
+## Build
+
+```shell
+rush build
+```
