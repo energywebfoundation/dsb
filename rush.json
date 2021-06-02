@@ -382,7 +382,15 @@
     "projects": [
         {
             "packageName": "@energyweb/dsb-message-broker",
-            "projectFolder": "apps/message-broker"
+            "projectFolder": "apps/dsb-message-broker"
+        },
+        {
+            "packageName": "@energyweb/dsb-transport-core",
+            "projectFolder": "libs/dsb-transport-core"
+        },
+        {
+            "packageName": "@energyweb/dsb-transport-nats-js",
+            "projectFolder": "libs/dsb-transport-nats-js"
         }
         // {
         //   /**
