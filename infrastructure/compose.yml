@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+    nats_1:
+        image: 'nats:latest'
+        command: '-js -n nats_1 --cluster nats://0.0.0.0:6222 --cluster_name ewf --routes nats://nats_1:6222'
+        ports:
+            - '4222:4222'
+    nats_2:
+        image: 'nats:latest'
+        command: '-js -n nats_2 --cluster nats://0.0.0.0:6222 --cluster_name ewf --routes nats://nats_1:6222'
+        depends_on:
+            - 'nats_1'
+        ports:
+            - '4223:4222'
+    nats_3:
+        image: 'nats:latest'
+        command: '-js -n nats_3 --cluster nats://0.0.0.0:6222 --cluster_name ewf --routes nats://nats_1:6222'
+        ports:
+            - '4224:4222'
+        depends_on:
+            - 'nats_1'
