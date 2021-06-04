@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "declaration": true,
+        "module": "ES2020",
+        "moduleResolution": "node",
+        "target": "ES2020",
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "pretty": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
+    }
+}
