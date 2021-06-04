@@ -20,6 +20,12 @@
 npm install -g @microsoft/rush
 ```
 
+## NATS Jetstream cluster
+
+```shell
+docker-compose -f infrastructure/compose.yml  up
+```
+
 ## Installation
 
 ```shell
