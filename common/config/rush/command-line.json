@@ -27,6 +27,15 @@
       "enableParallelism": true,
       "ignoreMissingScript": true,
       "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "name": "test:e2e",
+      "commandKind": "bulk",
+      "summary": "Run e2e tests in all packages",
+      "safeForSimultaneousRushProcesses": false,
+      "enableParallelism": false,
+      "ignoreMissingScript": true,
+      "allowWarningsInSuccessfulBuild": true
     }
     // {
     //   /**

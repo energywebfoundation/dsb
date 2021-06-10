@@ -1,0 +1,60 @@
+openapi: '3.0.0'
+info:
+    title: 'Origin Organization I-REC API'
+    description: 'Swagger documentation for the DSB'
+    version: '0.1'
+    contact: {}
+tags: []
+servers: []
+components:
+    securitySchemes:
+        access-token:
+            scheme: 'bearer'
+            bearerFormat: 'JWT'
+            type: 'http'
+    schemas:
+        PublishMessageDto:
+            type: 'object'
+            properties:
+                fqcn:
+                    type: 'string'
+                    description: 'Fully qualified channel name (fcqn)'
+                    example: 'test.channels.testapp.apps.testorganization.iam.ewc'
+                payload:
+                    type: 'string'
+                    description: 'Any stringified payload like JSON, BASE64 etc'
+                    example: '{"data": "test"}'
+                signature:
+                    type: 'string'
+                    description: 'Compacted EcdsaSecp256k1Signature2019'
+            required:
+                - 'fqcn'
+                - 'payload'
+                - 'signature'
+        CreateChannelDto:
+            type: 'object'
+            properties:
+                fqcn:
+                    type: 'string'
+                    description: 'Fully qualified channel name (fcqn)'
+                    example: 'test.channels.testapp.apps.testorganization.iam.ewc'
+            required:
+                - 'fqcn'
+paths:
+    /message:
+        post:
+            operationId: 'ChannelController_create'
+            parameters: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateChannelDto'
+            responses:
+                202:
+                    description: 'Creates a channel'
+                    content:
+                        application/json:
+                            schema:
+                                type: 'string'

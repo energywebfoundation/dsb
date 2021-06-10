@@ -3,7 +3,7 @@
         "sourceMap": true,
         "noImplicitAny": true,
         "declaration": true,
-        "module": "ES2020",
+        "module": "CommonJS",
         "moduleResolution": "node",
         "target": "ES2020",
         "allowSyntheticDefaultImports": true,
