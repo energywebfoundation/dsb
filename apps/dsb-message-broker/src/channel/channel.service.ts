@@ -1,10 +1,12 @@
 import { ITransport } from '@energyweb/dsb-transport-core';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { PublishMessageDto } from './dto/publish-message.dto';
+
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { RemoveChannelDto } from './dto/remove-channel.dto';
 
 @Injectable()
-export class MessageService implements OnModuleInit {
+export class ChannelService implements OnModuleInit {
     private transport: ITransport;
 
     constructor(private readonly moduleRef: ModuleRef) {}
@@ -15,7 +17,11 @@ export class MessageService implements OnModuleInit {
         });
     }
 
-    public async publish({ fqcn, payload, signature }: PublishMessageDto): Promise<string> {
-        return this.transport.publish(fqcn, payload);
+    public async create({ fqcn }: CreateChannelDto): Promise<string> {
+        return this.transport.createChannel(fqcn);
+    }
+
+    public async remove({ fqcn }: RemoveChannelDto): Promise<string> {
+        return this.transport.removeChannel(fqcn);
     }
 }

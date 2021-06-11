@@ -2,18 +2,18 @@ import { ITransport } from '@energyweb/dsb-transport-core';
 import { NATSJetstreamTransport } from '@energyweb/dsb-transport-nats-js';
 import { Module } from '@nestjs/common';
 
-import { MessageController } from './message.controller';
-import { MessageService } from './message.service';
+import { ChannelController } from './channel.controller';
+import { ChannelService } from './channel.service';
 
 @Module({
-    imports: [],
-    controllers: [MessageController],
+    controllers: [ChannelController],
     providers: [
         {
             provide: ITransport,
             useValue: new NATSJetstreamTransport(['nats://localhost:4222'])
         },
-        MessageService
-    ]
+        ChannelService
+    ],
+    exports: [ChannelService]
 })
-export class MessageModule {}
+export class ChannelModule {}
