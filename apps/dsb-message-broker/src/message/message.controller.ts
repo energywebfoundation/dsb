@@ -4,6 +4,7 @@ import {
     Body,
     ClassSerializerInterceptor,
     Controller,
+    Get,
     HttpStatus,
     InternalServerErrorException,
     Logger,
@@ -33,7 +34,8 @@ export class MessageController {
     })
     public async publish(@Body() message: PublishMessageDto): Promise<string> {
         try {
-            const id = await this.messageService.publish(message);
+            //TODO: change sender to authenticated DID of the sender
+            const id = await this.messageService.publish('sender1', message);
             return id;
         } catch (error) {
             this.logger.error(error.message);

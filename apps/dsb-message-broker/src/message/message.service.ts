@@ -15,7 +15,10 @@ export class MessageService implements OnModuleInit {
         });
     }
 
-    public async publish({ fqcn, payload, signature }: PublishMessageDto): Promise<string> {
-        return this.transport.publish(fqcn, payload);
+    public async publish(
+        sender: string,
+        { fqcn, payload, signature }: PublishMessageDto
+    ): Promise<string> {
+        return this.transport.publish(fqcn, JSON.stringify({ sender, payload, signature }));
     }
 }
