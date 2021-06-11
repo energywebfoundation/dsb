@@ -8,12 +8,15 @@ import {
     HttpStatus,
     InternalServerErrorException,
     Logger,
+    Param,
     Post,
+    Query,
     UseInterceptors,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { MessageDTO } from './dto/message.dto';
 
 import { PublishMessageDto } from './dto/publish-message.dto';
 import { MessageService } from './message.service';
@@ -22,8 +25,10 @@ import { MessageService } from './message.service';
 @UsePipes(ValidationPipe)
 @Controller('message')
 export class MessageController {
-    constructor(private readonly messageService: MessageService) {}
     private readonly logger = new Logger(MessageController.name);
+    private readonly DEFAULT_AMOUNT = 100;
+
+    constructor(private readonly messageService: MessageService) {}
 
     @Post()
     @ApiBody({ type: PublishMessageDto })
@@ -47,5 +52,30 @@ export class MessageController {
                 message: `Unable to publish a message due an unknown error`
             });
         }
+    }
+
+    @Get()
+    @ApiQuery({
+        name: 'fqcn',
+        required: true,
+        description: 'Fully qualified channel name (fqcn)',
+        example: 'test.channels.testapp.apps.testorganization.iam.ewc'
+    })
+    @ApiQuery({
+        name: 'amount',
+        required: false,
+        description: 'Amount of messages to be returned in the request, default value is 100',
+        example: '1000'
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: [MessageDTO],
+        description: 'Pull and returns messages from given channel'
+    })
+    public async getNewFromChannel(
+        @Query('fqcn') fqcn: string,
+        @Query('amount') amount: string
+    ): Promise<MessageDTO[]> {
+        return this.messageService.pull(fqcn, 'client1', parseInt(amount) ?? this.DEFAULT_AMOUNT);
     }
 }

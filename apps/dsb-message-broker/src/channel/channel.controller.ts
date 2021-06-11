@@ -19,7 +19,7 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
-@Controller('message')
+@Controller('channel')
 export class ChannelController {
     constructor(private readonly channelService: ChannelService) {}
     private readonly logger = new Logger(ChannelController.name);
