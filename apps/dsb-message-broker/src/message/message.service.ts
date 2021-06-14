@@ -1,6 +1,7 @@
 import { ITransport } from '@energyweb/dsb-transport-core';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { MessageDTO } from './dto/message.dto';
 import { PublishMessageDto } from './dto/publish-message.dto';
 
 @Injectable()
@@ -15,7 +16,16 @@ export class MessageService implements OnModuleInit {
         });
     }
 
-    public async publish({ fqcn, payload, signature }: PublishMessageDto): Promise<string> {
-        return this.transport.publish(fqcn, payload);
+    public async publish(
+        sender: string,
+        { fqcn, payload, signature }: PublishMessageDto
+    ): Promise<string> {
+        return this.transport.publish(fqcn, JSON.stringify({ sender, payload, signature }));
+    }
+
+    public async pull(fqcn: string, clientId: string, amount: number): Promise<MessageDTO[]> {
+        const messages = await this.transport.pull(fqcn, clientId, amount);
+
+        return messages.map((message) => JSON.parse(message) as MessageDTO);
     }
 }

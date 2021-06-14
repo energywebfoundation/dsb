@@ -6,6 +6,8 @@ import { AppModule } from '../src/app.module';
 import { request } from './request';
 import { ChannelManagerService } from './channel-manager.service';
 import { ChannelService } from '../src/channel/channel.service';
+import { MessageDTO } from '../src/message/dto/message.dto';
+import { expect } from 'chai';
 
 describe('AppController (e2e)', () => {
     let app: INestApplication;
@@ -55,5 +57,127 @@ describe('AppController (e2e)', () => {
         };
 
         await request(app).post('/message').send(message).expect(HttpStatus.BAD_REQUEST);
+    });
+
+    it('should be able to receive no messages if channel is empty', async () => {
+        const fqcn = 'test1.channel.test.apps.test.iam.ewc';
+        await channelManagerService.create({ fqcn });
+
+        await request(app)
+            .get(`/message/new?fqcn=${fqcn}&amount=10`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDTO[];
+
+                expect(messages).to.have.lengthOf(0);
+            });
+    });
+
+    it('should be able to receive a message that was previously published', async () => {
+        const fqcn = 'test2.channel.test.apps.test.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig'
+        };
+
+        await channelManagerService.create({ fqcn });
+        await request(app).post('/message').send(message).expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message/new?fqcn=${fqcn}&amount=10`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDTO[];
+
+                expect(messages).to.have.lengthOf(1);
+
+                expect(messages[0].payload).to.be.equal(message.payload);
+                expect(messages[0].signature).to.be.equal(message.signature);
+                expect(messages[0].sender).to.be.equal('sender1');
+            });
+    });
+
+    it('should be able to receive multiple messages that were previously published in FIFO order', async () => {
+        const fqcn = 'test3.channel.test.apps.test.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig'
+        };
+
+        await channelManagerService.create({ fqcn });
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '1' })
+            .expect(HttpStatus.CREATED);
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '2' })
+            .expect(HttpStatus.CREATED);
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '3' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message/new?fqcn=${fqcn}&amount=3`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDTO[];
+
+                expect(messages).to.have.lengthOf(3);
+                expect(messages[0].payload).to.be.equal('1');
+                expect(messages[2].payload).to.be.equal('3');
+            });
+    });
+
+    it('should be able to receive multiple messages that were previously published in FIFO order using 2 pull requests', async () => {
+        const fqcn = 'test4.channel.test.apps.test.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig'
+        };
+
+        await channelManagerService.create({ fqcn });
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '1' })
+            .expect(HttpStatus.CREATED);
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '2' })
+            .expect(HttpStatus.CREATED);
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '3' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message/new?fqcn=${fqcn}&amount=1`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDTO[];
+
+                expect(messages).to.have.lengthOf(1);
+                expect(messages[0].payload).to.be.equal('1');
+            });
+
+        await request(app)
+            .get(`/message/new?fqcn=${fqcn}&amount=2`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDTO[];
+
+                expect(messages).to.have.lengthOf(2);
+                expect(messages[0].payload).to.be.equal('2');
+                expect(messages[1].payload).to.be.equal('3');
+            });
     });
 });
