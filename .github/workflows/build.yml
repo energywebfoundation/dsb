@@ -17,6 +17,13 @@ jobs:
 
   install-and-build:
     runs-on: ubuntu-latest
+    services:
+      jetstream:
+        image: piotrkosinski/nats-jetstream:2.2.6
+        ports:
+          - 4222:4222
+    env:
+      NATS_JS_URL: 'nats://localhost:4222'
     needs: cancel-previous
     steps:
     - uses: actions/checkout@v2
@@ -36,3 +43,6 @@ jobs:
 
     - name: Build application
       run: node common/scripts/install-run-rush.js rebuild --verbose
+
+    - name: Run e2e tests
+      run: node common/scripts/install-run-rush.js test:e2e --verbose
