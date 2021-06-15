@@ -64,7 +64,7 @@ describe('AppController (e2e)', () => {
         await channelManagerService.create({ fqcn });
 
         await request(app)
-            .get(`/message/new?fqcn=${fqcn}&amount=10`)
+            .get(`/message?fqcn=${fqcn}&amount=10`)
             .expect(HttpStatus.OK)
             .expect((res) => {
                 const messages = res.body as MessageDTO[];
@@ -86,7 +86,7 @@ describe('AppController (e2e)', () => {
         await request(app).post('/message').send(message).expect(HttpStatus.CREATED);
 
         await request(app)
-            .get(`/message/new?fqcn=${fqcn}&amount=10`)
+            .get(`/message?fqcn=${fqcn}&amount=10`)
             .expect(HttpStatus.OK)
             .expect((res) => {
                 const messages = res.body as MessageDTO[];
@@ -124,7 +124,7 @@ describe('AppController (e2e)', () => {
             .expect(HttpStatus.CREATED);
 
         await request(app)
-            .get(`/message/new?fqcn=${fqcn}&amount=3`)
+            .get(`/message?fqcn=${fqcn}&amount=3`)
             .expect(HttpStatus.OK)
             .expect((res) => {
                 const messages = res.body as MessageDTO[];
@@ -160,7 +160,7 @@ describe('AppController (e2e)', () => {
             .expect(HttpStatus.CREATED);
 
         await request(app)
-            .get(`/message/new?fqcn=${fqcn}&amount=1`)
+            .get(`/message?fqcn=${fqcn}&amount=1`)
             .expect(HttpStatus.OK)
             .expect((res) => {
                 const messages = res.body as MessageDTO[];
@@ -170,7 +170,7 @@ describe('AppController (e2e)', () => {
             });
 
         await request(app)
-            .get(`/message/new?fqcn=${fqcn}&amount=2`)
+            .get(`/message?fqcn=${fqcn}&amount=2`)
             .expect(HttpStatus.OK)
             .expect((res) => {
                 const messages = res.body as MessageDTO[];

@@ -37,3 +37,9 @@ rush update
 ```shell
 rush build
 ```
+
+### Tests
+
+```shell
+rush test:e2e
+```

@@ -6,8 +6,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     const options = new DocumentBuilder()
-        .setTitle('Origin Organization I-REC API')
-        .setDescription('Swagger documentation for the DSB Organization I-REC API')
+        .setTitle('DSB Message Broker API')
+        .setDescription('Swagger documentation for the DSB Message Broker API')
         .setVersion('0.1')
         .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
         .build();

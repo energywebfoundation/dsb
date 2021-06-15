@@ -1,6 +1,7 @@
 dependencies:
   '@nestjs/cli': 7.6.0
   '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
+  '@nestjs/config': 0.6.3_225ac98fdd24b5acb2f93f3183a8a3cd
   '@nestjs/core': 7.6.15_60f3fb667852b108e677974b0828c928
   '@nestjs/platform-express': 7.6.15_99e41279900f6d635b651e8415289a12
   '@nestjs/schematics': 7.3.0_typescript@4.3.2
@@ -714,6 +715,24 @@ packages:
         optional: true
     resolution:
       integrity: sha512-RHvD32FxfV7yDWX9GPmn0ZSv7ka5kLeVamU5ZpoXSTUjkGqWFt3MTyIP+HUQD2778kDqT+CgEtVJ1fxDG5Oh9g==
+  /@nestjs/config/0.6.3_225ac98fdd24b5acb2f93f3183a8a3cd:
+    dependencies:
+      '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
+      dotenv: 8.2.0
+      dotenv-expand: 5.1.0
+      lodash.get: 4.4.2
+      lodash.has: 4.5.2
+      lodash.set: 4.3.2
+      reflect-metadata: 0.1.13
+      rxjs: 6.6.6
+      uuid: 8.3.2
+    dev: false
+    peerDependencies:
+      '@nestjs/common': ^6.10.0 || ^7.0.0
+      reflect-metadata: ^0.1.12
+      rxjs: ^6.0.0
+    resolution:
+      integrity: sha512-JxvvUpmH0/WOrTB+zh8dEkxSUQXhB7V3d/qeQXyCnMiEFjaq89+fNFztpWjz4DlOfdS4/eYTzIEy9PH2uGnfzA==
   /@nestjs/core/7.6.15_60f3fb667852b108e677974b0828c928:
     dependencies:
       '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
@@ -2385,6 +2404,16 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-yxJ2mFy/sibVQlu5qHjOkf9J3K6zgmCxgJ94u2EdvDOV09H+32LtRswEcUsmUWN72pVLOEnTSRaIVVzVQgS0dg==
+  /dotenv-expand/5.1.0:
+    dev: false
+    resolution:
+      integrity: sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
+  /dotenv/8.2.0:
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
   /ee-first/1.1.1:
     dev: false
     resolution:
@@ -4350,10 +4379,22 @@ packages:
     dev: false
     resolution:
       integrity: sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=
+  /lodash.get/4.4.2:
+    dev: false
+    resolution:
+      integrity: sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=
+  /lodash.has/4.5.2:
+    dev: false
+    resolution:
+      integrity: sha1-0Z9NwQlQWMzL4rDN9O4P5Ko3yGI=
   /lodash.merge/4.6.2:
     dev: false
     resolution:
       integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
+  /lodash.set/4.3.2:
+    dev: false
+    resolution:
+      integrity: sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=
   /lodash.toarray/4.4.0:
     dev: false
     resolution:
@@ -6746,6 +6787,7 @@ packages:
     dependencies:
       '@nestjs/cli': 7.6.0
       '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
+      '@nestjs/config': 0.6.3_225ac98fdd24b5acb2f93f3183a8a3cd
       '@nestjs/core': 7.6.15_60f3fb667852b108e677974b0828c928
       '@nestjs/platform-express': 7.6.15_99e41279900f6d635b651e8415289a12
       '@nestjs/schematics': 7.3.0_typescript@4.3.2
@@ -6783,7 +6825,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-v1clGGRyziZp48RBMXHDV0kgVnPPyqXbFqQQycH4fnnJUq7kA28vpQ7F3YaWmxUcdigEeC8LM9lZuqgeFXhE/Q==
+      integrity: sha512-p5Iubh/JZqSJS1VjE0bK5Lq9PRixuel2WgxiA/xKTBeaGDyN7rVqWs78FiDTcoykWVomso7W6wOVyUjqNZnvsg==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -6822,6 +6864,7 @@ registry: ''
 specifiers:
   '@nestjs/cli': 7.6.0
   '@nestjs/common': 7.6.17
+  '@nestjs/config': 0.6.3
   '@nestjs/core': 7.6.15
   '@nestjs/platform-express': 7.6.15
   '@nestjs/schematics': 7.3.0
