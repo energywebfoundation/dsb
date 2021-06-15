@@ -15,8 +15,8 @@ export const bootstrap = async () => {
     const app = moduleFixture.createNestApplication();
 
     const options = new DocumentBuilder()
-        .setTitle('Origin Organization I-REC API')
-        .setDescription('Swagger documentation for the DSB')
+        .setTitle('DSB Message Broker API')
+        .setDescription('Swagger documentation for the DSB Message Broker API')
         .setVersion('0.1')
         .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
         .build();
