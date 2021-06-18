@@ -36,6 +36,15 @@
       "enableParallelism": false,
       "ignoreMissingScript": true,
       "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "name": "build:container",
+      "commandKind": "bulk",
+      "summary": "Builds all containers",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true,
+      "ignoreMissingScript": true,
+      "allowWarningsInSuccessfulBuild": true
     }
     // {
     //   /**

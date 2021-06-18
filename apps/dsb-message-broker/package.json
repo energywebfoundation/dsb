@@ -5,8 +5,16 @@
     "author": "",
     "private": true,
     "license": "UNLICENSED",
+    "bin": {
+        "dsb-message-broker": "./bin/dsb-message-broker"
+    },
+    "files": [
+        "dist",
+        "bin"
+    ],
     "scripts": {
-        "build": "tsc",
+        "build": "rimraf dist && tsc",
+        "build:container": "make build-container",
         "generate:schema": "ts-node src/generateSchema.ts ../../specs/schema.yaml",
         "start": "nest start",
         "start:dev": "nest start --watch",
@@ -29,7 +37,8 @@
         "swagger-ui-express": "4.1.6",
         "reflect-metadata": "0.1.13",
         "rimraf": "3.0.2",
-        "rxjs": "6.6.6"
+        "rxjs": "6.6.6",
+        "@hapi/joi": "17.1.1"
     },
     "devDependencies": {
         "@nestjs/cli": "7.6.0",
@@ -40,6 +49,7 @@
         "@types/node": "14.14.36",
         "@types/supertest": "2.0.10",
         "@types/chai": "4.2.18",
+        "@types/hapi__joi": "17.1.6",
         "@typescript-eslint/eslint-plugin": "4.19.0",
         "@typescript-eslint/parser": "4.19.0",
         "eslint": "7.27.0",
