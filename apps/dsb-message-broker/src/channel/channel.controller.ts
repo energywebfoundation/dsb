@@ -8,23 +8,29 @@ import {
     InternalServerErrorException,
     Logger,
     Post,
+    UseGuards,
     UseInterceptors,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from '../auth/jwt.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('channel')
 export class ChannelController {
     constructor(private readonly channelService: ChannelService) {}
     private readonly logger = new Logger(ChannelController.name);
 
     @Post()
+    @Roles('channel-creation.roles.dsb.apps.energyweb.iam.ewc')
     @ApiBody({ type: CreateChannelDto })
     @ApiResponse({
         status: HttpStatus.ACCEPTED,

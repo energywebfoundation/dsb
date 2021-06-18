@@ -65,29 +65,15 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
-        const { stream, subject } = fqcnToStream(fqcn);
+        await this.ensureConsumerExists(fqcn, clientId);
 
-        try {
-            await jetstreamManager.consumers.info(stream, clientId);
-        } catch (e) {
-            this.logger.log(
-                `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
-            );
-            //TODO: NatsError: consumer not found
-            await jetstreamManager.consumers.add(stream, {
-                name: clientId,
-                durable_name: clientId,
-                ack_policy: AckPolicy.Explicit
-            });
-        }
-
+        const { stream } = fqcnToStream(fqcn);
         const jetstream = (await this.connection).jetstream();
 
         let counter = amount;
         const res: Message[] = [];
 
-        //TODO: consider implementing this using p-map https://github.com/sindresorhus/p-map
+        //TODO: consider using fetch with batch size
         while (counter--) {
             try {
                 const message = await jetstream.pull(stream, clientId);
@@ -96,16 +82,49 @@ export class NATSJetstreamTransport implements ITransport {
                 res.push(
                     new Message(message.seq.toString(), this.stringCodec.decode(message.data))
                 );
-            } catch (error) {
-                this.logger.error(error.toString());
+            } catch (e) {
+                this.logger.error(e);
 
-                if (error.toString().includes('no messages')) {
+                if (e.toString().includes('no messages')) {
                     this.logger.log(`All messages from stream ${stream} has been pulled.`);
                     break;
+                }
+
+                if (e.toString().includes('stream not found')) {
+                    throw new ChannelNotFoundError(fqcn);
                 }
             }
         }
 
         return res;
+    }
+
+    private async ensureConsumerExists(fqcn: string, clientId: string) {
+        const jetstreamManager = await (await this.connection).jetstreamManager();
+        const { stream } = fqcnToStream(fqcn);
+        let consumerInfo;
+
+        try {
+            consumerInfo = await jetstreamManager.consumers.info(stream, clientId);
+        } catch (e) {
+        } finally {
+            if (!consumerInfo) {
+                this.logger.log(
+                    `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
+                );
+                try {
+                    await jetstreamManager.consumers.add(stream, {
+                        name: clientId,
+                        durable_name: clientId,
+                        ack_policy: AckPolicy.Explicit
+                    });
+                } catch (e) {
+                    this.logger.error(e);
+                    if (e.toString().includes('stream not found')) {
+                        throw new ChannelNotFoundError(fqcn);
+                    }
+                }
+            }
+        }
     }
 }

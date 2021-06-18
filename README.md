@@ -66,6 +66,8 @@ NATS_JS_URL = (optional string, default "nats://localhost:4222") NATS Jetstream 
 PORT = (optional int, default 3000) Port number to be used by DSB Message Broker to listen to
 
 WITH_SWAGGER = (optional bool, default true) Boolean that enables or disables hosting Swagger API documentation alongside DSB Message Broker endpoints, if true then http://localhost:{PORT}/swagger is available
+
+JWT_SECRET = (required string) JWT authentication token secret
 ```
 
 You can define custom values by using `apps/dsb-message-broker/.env` file or passing them directly for e.g `PORT=5000 rush start --verbose`

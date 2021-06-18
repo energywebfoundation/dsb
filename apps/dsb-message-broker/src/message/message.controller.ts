@@ -8,21 +8,26 @@ import {
     HttpStatus,
     InternalServerErrorException,
     Logger,
-    Param,
     Post,
     Query,
     UseInterceptors,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
+    UseGuards
 } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { MessageDTO } from './dto/message.dto';
+import { JwtAuthGuard } from '../auth/jwt.guard';
 
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { UserDecorator } from '../auth/user.decorator';
+import { MessageDTO } from './dto/message.dto';
 import { PublishMessageDto } from './dto/publish-message.dto';
 import { MessageService } from './message.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('message')
 export class MessageController {
     private readonly logger = new Logger(MessageController.name);
@@ -31,16 +36,19 @@ export class MessageController {
     constructor(private readonly messageService: MessageService) {}
 
     @Post()
+    @Roles('user.roles.dsb.apps.energyweb.iam.ewc')
     @ApiBody({ type: PublishMessageDto })
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
         type: String,
         description: 'Message id that is local to fqcn'
     })
-    public async publish(@Body() message: PublishMessageDto): Promise<string> {
+    public async publish(
+        @UserDecorator() user: any,
+        @Body() message: PublishMessageDto
+    ): Promise<string> {
         try {
-            //TODO: change sender to authenticated DID of the sender
-            const id = await this.messageService.publish('sender1', message);
+            const id = await this.messageService.publish(user.did, message);
             return `msg-#${id}`;
         } catch (error) {
             this.logger.error(error.message);
@@ -55,6 +63,7 @@ export class MessageController {
     }
 
     @Get()
+    @Roles('user.roles.dsb.apps.energyweb.iam.ewc')
     @ApiQuery({
         name: 'fqcn',
         required: true,
@@ -65,7 +74,7 @@ export class MessageController {
         name: 'amount',
         required: false,
         description: 'Amount of messages to be returned in the request, default value is 100',
-        example: '1000'
+        example: '100'
     })
     @ApiResponse({
         status: HttpStatus.OK,
@@ -73,9 +82,22 @@ export class MessageController {
         description: 'Pull and returns messages from given channel'
     })
     public async getNewFromChannel(
+        @UserDecorator() user: any,
         @Query('fqcn') fqcn: string,
         @Query('amount') amount: string
     ): Promise<MessageDTO[]> {
-        return this.messageService.pull(fqcn, 'client1', parseInt(amount) ?? this.DEFAULT_AMOUNT);
+        try {
+            const result = await this.messageService.pull(
+                fqcn,
+                user.did,
+                parseInt(amount) ?? this.DEFAULT_AMOUNT
+            );
+            return result;
+        } catch (error) {
+            this.logger.error(error.message);
+            if (error instanceof ChannelNotFoundError) {
+                throw new BadRequestException({ message: error.message });
+            }
+        }
     }
 }
