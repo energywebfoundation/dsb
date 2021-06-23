@@ -12,7 +12,11 @@ import * as Joi from '@hapi/joi';
         ConfigModule.forRoot({
             cache: true,
             isGlobal: true,
-            validationSchema: Joi.object({ NATS_JS_URL: Joi.string().required() })
+            validationSchema: Joi.object({
+                NATS_JS_URL: Joi.string().optional().default('nats://localhost:4222'),
+                PORT: Joi.number().optional().default(3000),
+                WITH_SWAGGER: Joi.boolean().optional().default(true)
+            })
         })
     ]
 })

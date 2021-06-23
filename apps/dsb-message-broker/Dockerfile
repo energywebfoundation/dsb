@@ -5,4 +5,4 @@ COPY ./ /var/deployment
 
 WORKDIR /var/deployment/apps/dsb-message-broker
 
-CMD ["/bin/sh", "-c", "bin/dsb-message-broker"]
+ENTRYPOINT bin/dsb-message-broker
