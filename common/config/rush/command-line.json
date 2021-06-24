@@ -45,7 +45,16 @@
       "enableParallelism": true,
       "ignoreMissingScript": true,
       "allowWarningsInSuccessfulBuild": true
-    }
+    },
+    {
+    "name": "start",
+    "commandKind": "bulk",
+    "summary": "Starts DSB Message broker",
+    "safeForSimultaneousRushProcesses": true,
+    "enableParallelism": true,
+    "ignoreMissingScript": true,
+    "allowWarningsInSuccessfulBuild": true,
+  }
     // {
     //   /**
     //    * (Required) Determines the type of custom command.
