@@ -35,7 +35,7 @@ export class MessageController {
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
         type: String,
-        description: 'Publish message'
+        description: 'Message id that is local to fqcn'
     })
     public async publish(@Body() message: PublishMessageDto): Promise<string> {
         try {

@@ -3,6 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class MessageDTO {
     @ApiProperty({
         type: String,
+        description: 'Message id',
+        example: '1'
+    })
+    id: string;
+
+    @ApiProperty({
+        type: String,
         description: 'Any stringified payload like JSON, BASE64 etc',
         example: '{"data": "test"}'
     })

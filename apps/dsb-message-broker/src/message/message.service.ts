@@ -26,6 +26,8 @@ export class MessageService implements OnModuleInit {
     public async pull(fqcn: string, clientId: string, amount: number): Promise<MessageDTO[]> {
         const messages = await this.transport.pull(fqcn, clientId, amount);
 
-        return messages.map((message) => JSON.parse(message) as MessageDTO);
+        return messages.map(
+            (message) => ({ ...JSON.parse(message.data), id: message.id } as MessageDTO)
+        );
     }
 }

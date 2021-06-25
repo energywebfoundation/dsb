@@ -1,9 +1,11 @@
+import * as Joi from '@hapi/joi';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 import { ChannelModule } from './channel/channel.module';
+import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
 import { MessageModule } from './message/message.module';
-import * as Joi from '@hapi/joi';
 
 @Module({
     imports: [
@@ -18,6 +20,7 @@ import * as Joi from '@hapi/joi';
                 WITH_SWAGGER: Joi.boolean().optional().default(true)
             })
         })
-    ]
+    ],
+    providers: [{ provide: APP_INTERCEPTOR, useClass: HTTPLoggingInterceptor }]
 })
 export class AppModule {}

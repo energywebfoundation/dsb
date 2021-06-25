@@ -1,7 +1,8 @@
 import {
     ChannelAlreadyCreatedError,
     ChannelNotFoundError,
-    ITransport
+    ITransport,
+    Message
 } from '@energyweb/dsb-transport-core';
 import { Logger } from '@nestjs/common';
 import { AckPolicy, connect, NatsConnection, StringCodec } from 'nats';
@@ -63,7 +64,7 @@ export class NATSJetstreamTransport implements ITransport {
         return stream;
     }
 
-    public async pull(fqcn: string, clientId: string, amount: number): Promise<string[]> {
+    public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
         const jetstreamManager = await (await this.connection).jetstreamManager();
         const { stream, subject } = fqcnToStream(fqcn);
 
@@ -84,7 +85,7 @@ export class NATSJetstreamTransport implements ITransport {
         const jetstream = (await this.connection).jetstream();
 
         let counter = amount;
-        const res: string[] = [];
+        const res: Message[] = [];
 
         //TODO: consider implementing this using p-map https://github.com/sindresorhus/p-map
         while (counter--) {
@@ -92,7 +93,9 @@ export class NATSJetstreamTransport implements ITransport {
                 const message = await jetstream.pull(stream, clientId);
                 message.ack();
 
-                res.push(this.stringCodec.decode(message.data));
+                res.push(
+                    new Message(message.seq.toString(), this.stringCodec.decode(message.data))
+                );
             } catch (error) {
                 this.logger.error(error.toString());
 
