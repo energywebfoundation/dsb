@@ -41,7 +41,7 @@ export class MessageController {
         try {
             //TODO: change sender to authenticated DID of the sender
             const id = await this.messageService.publish('sender1', message);
-            return id;
+            return `msg-#${id}`;
         } catch (error) {
             this.logger.error(error.message);
             if (error instanceof ChannelNotFoundError) {
