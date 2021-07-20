@@ -11,3 +11,5 @@ package-lock.json
 shrinkwrap.json
 
 .github/workflows/*.yml
+
+specs/schema.yaml

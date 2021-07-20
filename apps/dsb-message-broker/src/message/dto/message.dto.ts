@@ -4,7 +4,7 @@ export class MessageDTO {
     @ApiProperty({
         type: String,
         description: 'Message id',
-        example: '1'
+        example: 'msg-#1'
     })
     id: string;
 
@@ -18,7 +18,7 @@ export class MessageDTO {
     @ApiProperty({
         type: String,
         description: 'Sender of the message',
-        example: '{"data": "test"}'
+        example: 'did:ethr:0x57618002cF07E53De4a5abf1e8735882169f2efB'
     })
     sender: string;
 
