@@ -26,6 +26,7 @@ dependencies:
   json-to-pretty-yaml: 1.2.2
   mocha: 9.0.0
   nats: 2.0.4
+  polly-js: 1.8.2
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 6.6.6
@@ -5159,6 +5160,10 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==
+  /polly-js/1.8.2:
+    dev: false
+    resolution:
+      integrity: sha512-xLP03RU7rnczJgul5YtCbk9SRtuvE/f0hMntAoH4mMmqRoLaHBO9SXPG2UFZRBjqv0ResUCmXhQPwQXkYhBxsg==
   /posix-character-classes/0.1.1:
     dev: false
     engines:
@@ -6893,6 +6898,7 @@ packages:
       '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.2
       eslint: 7.27.0
       nats: 2.0.4
+      polly-js: 1.8.2
       typescript: 4.3.2
     dev: false
     id: file:projects/dsb-transport-nats-js.tgz
@@ -6903,7 +6909,7 @@ packages:
       reflect-metadata: '*'
       rxjs: '*'
     resolution:
-      integrity: sha512-3EfSniJ1ckehrV5uhbMWHT0cD9WSdvqVBWaCe3alKR/jK6nChJ+QP7yS4iz08I5obRvjgS3iqQ/693lj1BNY6w==
+      integrity: sha512-5umFv9OP+5r7yfg0q2vsrf2X4NbGqVp9VgKwwLvuMRZwzo9jScTLqeUYtdLESWlXduI0NnhjQpB5Ha6rCuoF7A==
       tarball: file:projects/dsb-transport-nats-js.tgz
     version: 0.0.0
 registry: ''
@@ -6935,6 +6941,7 @@ specifiers:
   json-to-pretty-yaml: 1.2.2
   mocha: 9.0.0
   nats: 2.0.4
+  polly-js: 1.8.2
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 6.6.6
