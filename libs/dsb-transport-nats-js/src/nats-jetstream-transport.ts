@@ -6,20 +6,38 @@ import {
 } from '@energyweb/dsb-transport-core';
 import { Logger } from '@nestjs/common';
 import { AckPolicy, connect, NatsConnection, StringCodec } from 'nats';
+import polly from 'polly-js';
 
 import { fqcnToStream } from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
     private readonly logger = new Logger(NATSJetstreamTransport.name);
-    private readonly connection: Promise<NatsConnection>;
+    private connection: NatsConnection;
 
-    constructor(servers: string[]) {
-        this.connection = connect({ servers });
+    constructor(private readonly servers: string[]) {}
+
+    public async connect() {
+        try {
+            await polly()
+                .waitAndRetry(5)
+                .executeForPromise(async (info: polly.Info) => {
+                    this.logger.log(`Connecting to ${this.servers} ${info.count}/5`);
+                    this.connection = await connect({ servers: this.servers });
+
+                    this.logger.log(`Successfully connected to ${this.servers}`);
+                });
+        } catch (error) {
+            this.logger.error(`Unable to connect to ${this.servers}. Error: ${error}`);
+
+            throw new Error('Unable to connect to the transport layer');
+        }
     }
 
     public async publish(fqcn: string, payload: string): Promise<string> {
-        const jetstream = (await this.connection).jetstream();
+        await this.ensureConnected();
+
+        const jetstream = this.connection.jetstream();
         try {
             const { subject } = fqcnToStream(fqcn);
             const publishAck = await jetstream.publish(subject, this.stringCodec.encode(payload));
@@ -32,7 +50,9 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async createChannel(fqcn: string): Promise<string> {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
+        await this.ensureConnected();
+
+        const jetstreamManager = await this.connection.jetstreamManager();
 
         const { stream, subject } = fqcnToStream(fqcn);
 
@@ -50,7 +70,9 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async removeChannel(fqcn: string): Promise<string> {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
+        await this.ensureConnected();
+
+        const jetstreamManager = await this.connection.jetstreamManager();
 
         const { stream } = fqcnToStream(fqcn);
 
@@ -65,7 +87,9 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
+        await this.ensureConnected();
+
+        const jetstreamManager = await this.connection.jetstreamManager();
         const { stream, subject } = fqcnToStream(fqcn);
 
         try {
@@ -107,5 +131,14 @@ export class NATSJetstreamTransport implements ITransport {
         }
 
         return res;
+    }
+
+    private async ensureConnected() {
+        if (this.connection && !this.connection.isClosed()) {
+            return;
+        }
+
+        this.logger.error('Transport connection is closed');
+        await this.connect();
     }
 }

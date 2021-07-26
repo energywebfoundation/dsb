@@ -16,7 +16,8 @@
     "dependencies": {
         "@energyweb/dsb-transport-core": "0.0.1",
         "@nestjs/common": "7.6.17",
-        "nats": "2.0.4"
+        "nats": "2.0.4",
+        "polly-js": "1.8.2"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "4.19.0",
