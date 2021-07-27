@@ -7,6 +7,7 @@ dependencies:
   '@nestjs/platform-express': 7.6.15_99e41279900f6d635b651e8415289a12
   '@nestjs/schematics': 7.3.0_typescript@4.3.2
   '@nestjs/swagger': 4.8.0_607c31e877ae723401e162935048c8a2
+  '@nestjs/terminus': 7.2.0_9ee6cf753c1e51110bb632376ef45ec0
   '@nestjs/testing': 7.6.15_ba5f4d8d026a9e713d04bfe7d31f240c
   '@rush-temp/dsb-message-broker': file:projects/dsb-message-broker.tgz
   '@rush-temp/dsb-transport-core': file:projects/dsb-transport-core.tgz
@@ -885,6 +886,22 @@ packages:
         optional: true
     resolution:
       integrity: sha512-YU+ahCOoOTZwSHrODHBiQDCqi7GWEjmSFg3Tot/lwVuQ321/3fIOz/lf+ehVQ5DFr7nVMhB7BRWFJLtE/+NhqQ==
+  /@nestjs/terminus/7.2.0_9ee6cf753c1e51110bb632376ef45ec0:
+    dependencies:
+      '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
+      '@nestjs/core': 7.6.15_60f3fb667852b108e677974b0828c928
+      check-disk-space: 2.1.0
+      deprecate: 1.1.1
+      reflect-metadata: 0.1.13
+      rxjs: 6.6.6
+    dev: false
+    peerDependencies:
+      '@nestjs/common': ^7.0.0
+      '@nestjs/core': ^7.0.0
+      reflect-metadata: ^0.1.13
+      rxjs: ^6.5.4
+    resolution:
+      integrity: sha512-aQuqpT9MkI/HUUXzFgMyN7HnKishNGCd/QOQ4s8vjz8WOfjkZrrX0yoJGVhHmLca5IXa6HnhsHC1PiVTdXlw8g==
   /@nestjs/testing/7.6.15_ba5f4d8d026a9e713d04bfe7d31f240c:
     dependencies:
       '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
@@ -1951,6 +1968,12 @@ packages:
     dev: false
     resolution:
       integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
+  /check-disk-space/2.1.0:
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha512-f0nx9oJF/AVF8nhSYlF1EBvMNnO+CXyLwKhPvN1943iOMI9TWhQigLZm80jAf0wzQhwKkzA8XXjyvuVUeGGcVQ==
   /check-error/1.0.2:
     dev: false
     resolution:
@@ -2388,6 +2411,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
+  /deprecate/1.1.1:
+    dev: false
+    resolution:
+      integrity: sha512-ZGDXefq1xknT292LnorMY5s8UVU08/WKdzDZCUT6t9JzsiMSP4uzUhgpqugffNVcT5WC6wMBiSQ+LFjlv3v7iQ==
   /destroy/1.0.4:
     dev: false
     resolution:
@@ -6842,6 +6869,7 @@ packages:
       '@nestjs/platform-express': 7.6.15_99e41279900f6d635b651e8415289a12
       '@nestjs/schematics': 7.3.0_typescript@4.3.2
       '@nestjs/swagger': 4.8.0_607c31e877ae723401e162935048c8a2
+      '@nestjs/terminus': 7.2.0_9ee6cf753c1e51110bb632376ef45ec0
       '@nestjs/testing': 7.6.15_ba5f4d8d026a9e713d04bfe7d31f240c
       '@types/chai': 4.2.18
       '@types/express': 4.17.11
@@ -6876,7 +6904,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-xYt3kuhM2xtzpH81/iC0G8w4HynVQr8zqea0EtNYgBVZBW7zMnqd+cF+up2GkX3J6Ew9YEZKA8eCp/uvF7BVwg==
+      integrity: sha512-nDxHkgsntaQ5i46D8/fQ23rEueP3IVmRUpyn3c9mcsbnbaSRl4Cwi+qYlqj+N3dOzmRJbEIPEk1TZue5CKiMKw==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -6922,6 +6950,7 @@ specifiers:
   '@nestjs/platform-express': 7.6.15
   '@nestjs/schematics': 7.3.0
   '@nestjs/swagger': 4.8.0
+  '@nestjs/terminus': 7.2.0
   '@nestjs/testing': 7.6.15
   '@rush-temp/dsb-message-broker': file:./projects/dsb-message-broker.tgz
   '@rush-temp/dsb-transport-core': file:./projects/dsb-transport-core.tgz

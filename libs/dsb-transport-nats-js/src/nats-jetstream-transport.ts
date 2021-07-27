@@ -16,9 +16,13 @@ export class NATSJetstreamTransport implements ITransport {
     private readonly logger = new Logger(NATSJetstreamTransport.name);
     private connection: NatsConnection;
 
-    private isConnected = false;
+    private isTransportConnected = false;
 
     constructor(private readonly servers: string[]) {}
+
+    public async isConnected(): Promise<boolean> {
+        return this.isTransportConnected;
+    }
 
     public async connect() {
         try {
@@ -28,7 +32,7 @@ export class NATSJetstreamTransport implements ITransport {
                     this.logger.log(`Connecting to ${this.servers} ${info.count}/5`);
                     this.connection = await connect({ servers: this.servers });
 
-                    this.isConnected = true;
+                    this.isTransportConnected = true;
                     this.logger.log(`Successfully connected to ${this.servers}`);
 
                     this.startConnectionMonitor();
@@ -152,7 +156,7 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     private async ensureConnected() {
-        if (!this.isConnected) {
+        if (!this.isTransportConnected) {
             this.logger.error('Transport layer not reachable');
             throw new TransportUnavailableError();
         }
@@ -163,14 +167,14 @@ export class NATSJetstreamTransport implements ITransport {
             switch (s.type) {
                 case 'disconnect':
                     this.logger.error(`Connection to ${s.data} has been lost`);
-                    this.isConnected = false;
+                    this.isTransportConnected = false;
                     break;
                 case 'reconnecting':
                     this.logger.log(`Reconnecting to ${s.data}`);
                     break;
                 case 'reconnect':
                     this.logger.log(`Connection to ${s.data} restored`);
-                    this.isConnected = true;
+                    this.isTransportConnected = true;
                     break;
             }
         }
