@@ -1,22 +1,26 @@
-#for now just a placeholder
+# Default values for messagebroker.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 messagebroker:
   config:
     port: 3000
-    natsClusterUrl: nats://my-nats.default.svc:4222
+    natsClusterUrl: nats://dsb-nats.dsb.svc:4222
 
 
 image:
-  repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+  # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+  repository: aemocontainerregistry.azurecr.io/dsb/messagebroker
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
+  tag: "ed8fcac4-aa59-4df4-8ddc-2bd3d2aa3585"
 
 imagePullSecrets: []
-nameOverride: "messagebroker"
-fullnameOverride: "messagebroker"
+nameOverride: "dsb-messagebroker"
+fullnameOverride: "dsb-messagebroker"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -41,15 +45,15 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 80
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: {kubernetes.io/ingress.class: "alb",alb.ingress.kubernetes.io/scheme: "internet-facing"}
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host:
+    - host: dsb-dev.energyweb.org
       paths:
       - path: /*
         backend:
@@ -72,8 +76,9 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+#not tested yet
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
