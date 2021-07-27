@@ -1,4 +1,4 @@
-import { ChannelNotFoundError } from '@energyweb/dsb-transport-core';
+import { ChannelNotFoundError, TransportUnavailableError } from '@energyweb/dsb-transport-core';
 import {
     BadRequestException,
     Body,
@@ -8,16 +8,16 @@ import {
     HttpStatus,
     InternalServerErrorException,
     Logger,
-    Param,
     Post,
     Query,
+    ServiceUnavailableException,
     UseInterceptors,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { MessageDTO } from './dto/message.dto';
 
+import { MessageDTO } from './dto/message.dto';
 import { PublishMessageDto } from './dto/publish-message.dto';
 import { MessageService } from './message.service';
 
@@ -46,6 +46,9 @@ export class MessageController {
             this.logger.error(error.message);
             if (error instanceof ChannelNotFoundError) {
                 throw new BadRequestException({ message: error.message });
+            }
+            if (error instanceof TransportUnavailableError) {
+                throw new ServiceUnavailableException();
             }
 
             throw new InternalServerErrorException({
@@ -76,6 +79,23 @@ export class MessageController {
         @Query('fqcn') fqcn: string,
         @Query('amount') amount: string
     ): Promise<MessageDTO[]> {
-        return this.messageService.pull(fqcn, 'client1', parseInt(amount) ?? this.DEFAULT_AMOUNT);
+        try {
+            const messages = await this.messageService.pull(
+                fqcn,
+                'client1',
+                parseInt(amount) ?? this.DEFAULT_AMOUNT
+            );
+            return messages;
+        } catch (error) {
+            this.logger.error(error.message);
+
+            if (error instanceof TransportUnavailableError) {
+                throw new ServiceUnavailableException();
+            }
+
+            if (error instanceof ChannelNotFoundError) {
+                throw new BadRequestException({ message: error.message });
+            }
+        }
     }
 }

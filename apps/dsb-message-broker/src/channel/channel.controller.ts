@@ -1,4 +1,7 @@
-import { ChannelAlreadyCreatedError } from '@energyweb/dsb-transport-core';
+import {
+    ChannelAlreadyCreatedError,
+    TransportUnavailableError
+} from '@energyweb/dsb-transport-core';
 import {
     BadRequestException,
     Body,
@@ -10,7 +13,8 @@ import {
     Post,
     UseInterceptors,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
+    ServiceUnavailableException
 } from '@nestjs/common';
 import { ApiBody, ApiResponse } from '@nestjs/swagger';
 
@@ -39,6 +43,10 @@ export class ChannelController {
             this.logger.error(error.message);
             if (error instanceof ChannelAlreadyCreatedError) {
                 throw new BadRequestException({ message: error.message });
+            }
+
+            if (error instanceof TransportUnavailableError) {
+                throw new ServiceUnavailableException();
             }
 
             throw new InternalServerErrorException({
