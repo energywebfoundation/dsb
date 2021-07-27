@@ -15,6 +15,7 @@ image:
   repository: aemocontainerregistry.azurecr.io/dsb/messagebroker
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
+  # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
   tag: "ed8fcac4-aa59-4df4-8ddc-2bd3d2aa3585"
 
 imagePullSecrets: []
