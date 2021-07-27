@@ -1,10 +1,10 @@
 {
     "name": "@energyweb/dsb-message-broker",
     "version": "0.0.1",
-    "description": "",
-    "author": "",
+    "description": "Decentralized Service Bus Message Broker",
+    "author": "EnergyWeb DevHub GmbH; Piotr Kosinski, piotr.kosinski@energyweb.org",
     "private": true,
-    "license": "UNLICENSED",
+    "license": "GPL-3.0-or-later",
     "bin": {
         "dsb-message-broker": "./bin/dsb-message-broker"
     },
