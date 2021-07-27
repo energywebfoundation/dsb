@@ -129,27 +129,12 @@ export class NATSJetstreamTransport implements ITransport {
         }
 
         const jetstream = this.connection.jetstream();
-
-        let counter = amount;
         const res: Message[] = [];
 
-        //TODO: consider implementing this using p-map https://github.com/sindresorhus/p-map
-        while (counter--) {
-            try {
-                const message = await jetstream.pull(stream, clientId);
-                message.ack();
-
-                res.push(
-                    new Message(message.seq.toString(), this.stringCodec.decode(message.data))
-                );
-            } catch (error) {
-                this.logger.error(error.toString());
-
-                if (error.toString().includes('no messages')) {
-                    this.logger.log(`All messages from stream ${stream} has been pulled.`);
-                    break;
-                }
-            }
+        const messageIterator = jetstream.fetch(stream, clientId, { batch: amount, no_wait: true });
+        for await (const message of messageIterator) {
+            message.ack();
+            res.push(new Message(message.seq.toString(), this.stringCodec.decode(message.data)));
         }
 
         return res;
