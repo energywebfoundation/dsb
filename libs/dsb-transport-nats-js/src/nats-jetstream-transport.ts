@@ -2,7 +2,8 @@ import {
     ChannelAlreadyCreatedError,
     ChannelNotFoundError,
     ITransport,
-    Message
+    Message,
+    TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
 import { Logger } from '@nestjs/common';
 import { AckPolicy, connect, NatsConnection, StringCodec } from 'nats';
@@ -15,6 +16,8 @@ export class NATSJetstreamTransport implements ITransport {
     private readonly logger = new Logger(NATSJetstreamTransport.name);
     private connection: NatsConnection;
 
+    private isConnected = false;
+
     constructor(private readonly servers: string[]) {}
 
     public async connect() {
@@ -25,7 +28,10 @@ export class NATSJetstreamTransport implements ITransport {
                     this.logger.log(`Connecting to ${this.servers} ${info.count}/5`);
                     this.connection = await connect({ servers: this.servers });
 
+                    this.isConnected = true;
                     this.logger.log(`Successfully connected to ${this.servers}`);
+
+                    this.startConnectionMonitor();
                 });
         } catch (error) {
             this.logger.error(`Unable to connect to ${this.servers}. Error: ${error}`);
@@ -90,23 +96,35 @@ export class NATSJetstreamTransport implements ITransport {
         await this.ensureConnected();
 
         const jetstreamManager = await this.connection.jetstreamManager();
-        const { stream, subject } = fqcnToStream(fqcn);
+        const { stream } = fqcnToStream(fqcn);
 
+        let consumer;
         try {
-            await jetstreamManager.consumers.info(stream, clientId);
-        } catch (e) {
-            this.logger.log(
-                `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
-            );
-            //TODO: NatsError: consumer not found
-            await jetstreamManager.consumers.add(stream, {
-                name: clientId,
-                durable_name: clientId,
-                ack_policy: AckPolicy.Explicit
-            });
+            consumer = await jetstreamManager.consumers.info(stream, clientId);
+        } catch (error) {
+            this.logger.log(error);
         }
 
-        const jetstream = (await this.connection).jetstream();
+        if (!consumer) {
+            try {
+                this.logger.log(
+                    `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
+                );
+
+                await jetstreamManager.consumers.add(stream, {
+                    name: clientId,
+                    durable_name: clientId,
+                    ack_policy: AckPolicy.Explicit
+                });
+            } catch (error) {
+                this.logger.log(error);
+                if (error.toString().includes('stream not found')) {
+                    throw new ChannelNotFoundError(fqcn);
+                }
+            }
+        }
+
+        const jetstream = this.connection.jetstream();
 
         let counter = amount;
         const res: Message[] = [];
@@ -134,11 +152,27 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     private async ensureConnected() {
-        if (this.connection && !this.connection.isClosed()) {
-            return;
+        if (!this.isConnected) {
+            this.logger.error('Transport layer not reachable');
+            throw new TransportUnavailableError();
         }
+    }
 
-        this.logger.error('Transport connection is closed');
-        await this.connect();
+    private async startConnectionMonitor() {
+        for await (const s of this.connection.status()) {
+            switch (s.type) {
+                case 'disconnect':
+                    this.logger.error(`Connection to ${s.data} has been lost`);
+                    this.isConnected = false;
+                    break;
+                case 'reconnecting':
+                    this.logger.log(`Reconnecting to ${s.data}`);
+                    break;
+                case 'reconnect':
+                    this.logger.log(`Connection to ${s.data} restored`);
+                    this.isConnected = true;
+                    break;
+            }
+        }
     }
 }
