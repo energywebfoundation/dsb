@@ -74,20 +74,48 @@ PRIVATE_KEY = (required string) ECDSA private key as 64(hex) characters with mes
 
 You can define custom values by using `apps/dsb-message-broker/.env` file or passing them directly for e.g `PORT=5000 rush start --verbose`
 
-#### Message Broker role configuration
+### Message Broker owner roles
 
-Each DSB Message Broker instance is required to provide `PRIVATE_KEY` as configuration item that is owning the DID with `messagebroker.roles.dsb.apps.energyweb.iam.ewc` role.
+Each DSB Message Broker owner is required to provide `PRIVATE_KEY` as configuration item that is owning the DID with `messagebroker.roles.dsb.apps.energyweb.iam.ewc` role.
 
 In order to enroll to that specific role please follow these steps:
 
--   visit EWF Switchboard management tool under https://switchboard-dev.energyweb.org/ and chose one of the available signing methods
--   make sure you are using Volta testnet
--   if you chose the account that never been used with Switchboard before you will be asked to execute transaction with will setup and create an DID document
--   next in order to enroll to `messagebroker` role please visit https://switchboard-dev.energyweb.org/enrol?app=dsb.apps.energyweb.iam.ewc&roleName=messagebroker
--   select both on-chain and off-chain checkboxes and press submit
--   you should now see the enrollment request with pending state in My Enrollments tab
--   since now the role administrator needs to approve your role please sent a short email to dsb@energyweb.org with your pending DID identifier
--   after getting confirmation from the team, please login to https://switchboard-dev.energyweb.org/ and navigate to Enrollments and then My Enrollments to sync your DID Document (using three dots next to Approved `messagebroker.roles.dsb.apps.energyweb.iam.ewc`)
+1.  visit EWF Switchboard management tool under https://switchboard-dev.energyweb.org/ and chose one of the available signing methods
+2.  make sure you are using Volta testnet
+3.  if you chose the account that never been used with Switchboard before you will be asked to execute transaction with will setup and create an DID document
+4.  next in order to enroll to `messagebroker` role please visit https://switchboard-dev.energyweb.org/enrol?app=dsb.apps.energyweb.iam.ewc&roleName=messagebroker
+5.  select both on-chain and off-chain checkboxes and press submit
+6.  you should now see the enrollment request with pending state in My Enrollments tab
+7.  since now the role administrator needs to approve your role please sent a short email to dsb@energyweb.org with your pending DID identifier
+8.  after getting confirmation from the team, please login to https://switchboard-dev.energyweb.org/ and navigate to Enrollments and then My Enrollments to sync your DID Document (using three dots next to Approved `messagebroker.roles.dsb.apps.energyweb.iam.ewc`)
+
+### Message Broker user roles
+
+Each DSB Message Broker user is required to have at least `user.roles.dsb.apps.energyweb.iam.ewc` to be able to send and receive messages to/from channels without additional roles requirements.
+
+In order to enroll to that specific role please follow these steps:
+
+1. see previous chapter
+2. see previous chapter
+3. see previous chapter
+4. next in order to enroll to `user` role please visit https://switchboard-dev.energyweb.org/enrol?app=dsb.apps.energyweb.iam.ewc&roleName=user
+5. see previous chapter
+6. see previous chapter
+7. see previous chapter
+8. after getting confirmation from the team, please login to https://switchboard-dev.energyweb.org/ and navigate to Enrollments and then My Enrollments to sync your DID Document (using three dots next to Approved `user.roles.dsb.apps.energyweb.iam.ewc`)
+
+Channel creation requires additional role defined as `channelcreation.roles.dsb.apps.energyweb.iam.ewc`.
+
+In order to enroll to that specific role please follow these steps:
+
+1. see previous chapter
+2. see previous chapter
+3. see previous chapter
+4. next in order to enroll to `channelcreation` role please visit https://switchboard-dev.energyweb.org/enrol?app=dsb.apps.energyweb.iam.ewc&roleName=channelcreation
+5. see previous chapter
+6. see previous chapter
+7. see previous chapter
+8. after getting confirmation from the team, please login to https://switchboard-dev.energyweb.org/ and navigate to Enrollments and then My Enrollments to sync your DID Document (using three dots next to Approved `channelcreation.roles.dsb.apps.energyweb.iam.ewc`)
 
 ### From repository
 

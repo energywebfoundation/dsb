@@ -34,7 +34,7 @@ export class ChannelController {
     private readonly logger = new Logger(ChannelController.name);
 
     @Post()
-    @Roles('channel-creation.roles.dsb.apps.energyweb.iam.ewc')
+    @Roles('channelcreation.roles.dsb.apps.energyweb.iam.ewc')
     @ApiBody({ type: CreateChannelDto })
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
