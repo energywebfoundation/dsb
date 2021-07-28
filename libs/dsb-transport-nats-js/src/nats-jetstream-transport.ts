@@ -2,24 +2,52 @@ import {
     ChannelAlreadyCreatedError,
     ChannelNotFoundError,
     ITransport,
-    Message
+    Message,
+    TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
 import { Logger } from '@nestjs/common';
 import { AckPolicy, connect, NatsConnection, StringCodec } from 'nats';
+import polly from 'polly-js';
 
 import { fqcnToStream } from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
     private readonly logger = new Logger(NATSJetstreamTransport.name);
-    private readonly connection: Promise<NatsConnection>;
+    private connection: NatsConnection;
 
-    constructor(servers: string[]) {
-        this.connection = connect({ servers });
+    private isTransportConnected = false;
+
+    constructor(private readonly servers: string[]) {}
+
+    public async isConnected(): Promise<boolean> {
+        return this.isTransportConnected;
+    }
+
+    public async connect() {
+        try {
+            await polly()
+                .waitAndRetry(5)
+                .executeForPromise(async (info: polly.Info) => {
+                    this.logger.log(`Connecting to ${this.servers} ${info.count}/5`);
+                    this.connection = await connect({ servers: this.servers });
+
+                    this.isTransportConnected = true;
+                    this.logger.log(`Successfully connected to ${this.servers}`);
+
+                    this.startConnectionMonitor();
+                });
+        } catch (error) {
+            this.logger.error(`Unable to connect to ${this.servers}. Error: ${error}`);
+
+            throw new Error('Unable to connect to the transport layer');
+        }
     }
 
     public async publish(fqcn: string, payload: string): Promise<string> {
-        const jetstream = (await this.connection).jetstream();
+        await this.ensureConnected();
+
+        const jetstream = this.connection.jetstream();
         try {
             const { subject } = fqcnToStream(fqcn);
             const publishAck = await jetstream.publish(subject, this.stringCodec.encode(payload));
@@ -32,7 +60,9 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async createChannel(fqcn: string): Promise<string> {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
+        await this.ensureConnected();
+
+        const jetstreamManager = await this.connection.jetstreamManager();
 
         const { stream, subject } = fqcnToStream(fqcn);
 
@@ -50,7 +80,9 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async removeChannel(fqcn: string): Promise<string> {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
+        await this.ensureConnected();
+
+        const jetstreamManager = await this.connection.jetstreamManager();
 
         const { stream } = fqcnToStream(fqcn);
 
@@ -65,65 +97,70 @@ export class NATSJetstreamTransport implements ITransport {
     }
 
     public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
-        await this.ensureConsumerExists(fqcn, clientId);
+        await this.ensureConnected();
 
+        const jetstreamManager = await this.connection.jetstreamManager();
         const { stream } = fqcnToStream(fqcn);
-        const jetstream = (await this.connection).jetstream();
 
-        let counter = amount;
-        const res: Message[] = [];
+        let consumer;
+        try {
+            consumer = await jetstreamManager.consumers.info(stream, clientId);
+        } catch (error) {
+            this.logger.log(error);
+        }
 
-        //TODO: consider using fetch with batch size
-        while (counter--) {
+        if (!consumer) {
             try {
-                const message = await jetstream.pull(stream, clientId);
-                message.ack();
-
-                res.push(
-                    new Message(message.seq.toString(), this.stringCodec.decode(message.data))
+                this.logger.log(
+                    `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
                 );
-            } catch (e) {
-                this.logger.error(e);
 
-                if (e.toString().includes('no messages')) {
-                    this.logger.log(`All messages from stream ${stream} has been pulled.`);
-                    break;
-                }
-
-                if (e.toString().includes('stream not found')) {
+                await jetstreamManager.consumers.add(stream, {
+                    name: clientId,
+                    durable_name: clientId,
+                    ack_policy: AckPolicy.Explicit
+                });
+            } catch (error) {
+                this.logger.log(error);
+                if (error.toString().includes('stream not found')) {
                     throw new ChannelNotFoundError(fqcn);
                 }
             }
         }
 
+        const jetstream = this.connection.jetstream();
+        const res: Message[] = [];
+
+        const messageIterator = jetstream.fetch(stream, clientId, { batch: amount, no_wait: true });
+        for await (const message of messageIterator) {
+            message.ack();
+            res.push(new Message(message.seq.toString(), this.stringCodec.decode(message.data)));
+        }
+
         return res;
     }
 
-    private async ensureConsumerExists(fqcn: string, clientId: string) {
-        const jetstreamManager = await (await this.connection).jetstreamManager();
-        const { stream } = fqcnToStream(fqcn);
-        let consumerInfo;
+    private async ensureConnected() {
+        if (!this.isTransportConnected) {
+            this.logger.error('Transport layer not reachable');
+            throw new TransportUnavailableError();
+        }
+    }
 
-        try {
-            consumerInfo = await jetstreamManager.consumers.info(stream, clientId);
-        } catch (e) {
-        } finally {
-            if (!consumerInfo) {
-                this.logger.log(
-                    `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
-                );
-                try {
-                    await jetstreamManager.consumers.add(stream, {
-                        name: clientId,
-                        durable_name: clientId,
-                        ack_policy: AckPolicy.Explicit
-                    });
-                } catch (e) {
-                    this.logger.error(e);
-                    if (e.toString().includes('stream not found')) {
-                        throw new ChannelNotFoundError(fqcn);
-                    }
-                }
+    private async startConnectionMonitor() {
+        for await (const s of this.connection.status()) {
+            switch (s.type) {
+                case 'disconnect':
+                    this.logger.error(`Connection to ${s.data} has been lost`);
+                    this.isTransportConnected = false;
+                    break;
+                case 'reconnecting':
+                    this.logger.log(`Reconnecting to ${s.data}`);
+                    break;
+                case 'reconnect':
+                    this.logger.log(`Connection to ${s.data} restored`);
+                    this.isTransportConnected = true;
+                    break;
             }
         }
     }

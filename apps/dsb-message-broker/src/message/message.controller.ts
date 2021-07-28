@@ -1,4 +1,4 @@
-import { ChannelNotFoundError } from '@energyweb/dsb-transport-core';
+import { ChannelNotFoundError, TransportUnavailableError } from '@energyweb/dsb-transport-core';
 import {
     BadRequestException,
     Body,
@@ -10,14 +10,15 @@ import {
     Logger,
     Post,
     Query,
+    ServiceUnavailableException,
+    UseGuards,
     UseInterceptors,
     UsePipes,
-    ValidationPipe,
-    UseGuards
+    ValidationPipe
 } from '@nestjs/common';
 import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt.guard';
 
+import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { UserDecorator } from '../auth/user.decorator';
@@ -55,6 +56,9 @@ export class MessageController {
             if (error instanceof ChannelNotFoundError) {
                 throw new BadRequestException({ message: error.message });
             }
+            if (error instanceof TransportUnavailableError) {
+                throw new ServiceUnavailableException();
+            }
 
             throw new InternalServerErrorException({
                 message: `Unable to publish a message due an unknown error`
@@ -87,14 +91,19 @@ export class MessageController {
         @Query('amount') amount: string
     ): Promise<MessageDTO[]> {
         try {
-            const result = await this.messageService.pull(
+            const messages = await this.messageService.pull(
                 fqcn,
                 user.did,
                 parseInt(amount) ?? this.DEFAULT_AMOUNT
             );
-            return result;
+            return messages;
         } catch (error) {
             this.logger.error(error.message);
+
+            if (error instanceof TransportUnavailableError) {
+                throw new ServiceUnavailableException();
+            }
+
             if (error instanceof ChannelNotFoundError) {
                 throw new BadRequestException({ message: error.message });
             }

@@ -86,16 +86,16 @@ jobs:
         docker tag ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}}
 
-    # - name: ArgoCD login
-    #   uses: clowdhaus/argo-cd-action/@main
-    #   id: argocd_login
-    #   with:
-    #     command: login ${{ secrets.ARGOCD_DEV_URL }}
-    #     options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
+    - name: ArgoCD login
+      uses: clowdhaus/argo-cd-action/@main
+      id: argocd_login
+      with:
+        command: login ${{ secrets.ARGOCD_DEV_URL }}
+        options: --insecure --password ${{ secrets.ARGOCD_DEV_PASS }} --username ${{ secrets.ARGOCD_DEV_USERNAME }}
     
-    # - name: ArgoCD overvrite values.yaml
-    #   uses: clowdhaus/argo-cd-action/@main
-    #   id: argocd_image_tag_overwrite
-    #   with:
-    #     command: app set aemo-messagebroker
-    #     options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
+    - name: ArgoCD overvrite values.yaml
+      uses: clowdhaus/argo-cd-action/@main
+      id: argocd_image_tag_overwrite
+      with:
+        command: app set dsb-messagebroker
+        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}

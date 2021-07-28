@@ -6,6 +6,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 
 import { ChannelModule } from './channel/channel.module';
+import { HealthModule } from './health/health.module';
 import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
 import { MessageModule } from './message/message.module';
 
@@ -13,6 +14,7 @@ import { MessageModule } from './message/message.module';
     imports: [
         MessageModule,
         ChannelModule,
+        HealthModule,
         ConfigModule.forRoot({
             cache: true,
             isGlobal: true,
