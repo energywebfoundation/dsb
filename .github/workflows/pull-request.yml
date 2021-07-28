@@ -45,4 +45,7 @@ jobs:
       run: node common/scripts/install-run-rush.js rebuild --verbose
 
     - name: Run e2e tests
+      env:
+        JWT_SECRET: "secret"
+        PRIVATE_KEY: ${{ secrets.MB_PRIVATE_KEY }}
       run: node common/scripts/install-run-rush.js test:e2e --verbose
