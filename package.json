@@ -1,6 +1,5 @@
 {
-  "dependencies": {
-    "@microsoft/rush": "^5.48.0",
-    "rush": "^0.0.2"
-  }
+    "dependencies": {
+        "@microsoft/rush": "^5.48.0"
+    }
 }
