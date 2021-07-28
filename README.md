@@ -68,9 +68,26 @@ PORT = (optional int, default 3000) Port number to be used by DSB Message Broker
 WITH_SWAGGER = (optional bool, default true) Boolean that enables or disables hosting Swagger API documentation alongside DSB Message Broker endpoints, if true then http://localhost:{PORT}/swagger is available
 
 JWT_SECRET = (required string) JWT authentication token secret
+
+PRIVATE_KEY = (required string) ECDSA private key as 64(hex) characters with messagebroker.roles.dsb.apps.energyweb.iam.ewc role, read more on #
 ```
 
 You can define custom values by using `apps/dsb-message-broker/.env` file or passing them directly for e.g `PORT=5000 rush start --verbose`
+
+#### Message Broker role configuration
+
+Each DSB Message Broker instance is required to provide `PRIVATE_KEY` as configuration item that is owning the DID with `messagebroker.roles.dsb.apps.energyweb.iam.ewc` role.
+
+In order to enroll to that specific role please follow these steps:
+
+-   visit EWF Switchboard management tool under https://switchboard-dev.energyweb.org/ and chose one of the available signing methods
+-   make sure you are using Volta testnet
+-   if you chose the account that never been used with Switchboard before you will be asked to execute transaction with will setup and create an DID document
+-   next in order to enroll to `messagebroker` role please visit https://switchboard-dev.energyweb.org/enrol?app=dsb.apps.energyweb.iam.ewc&roleName=messagebroker
+-   select both on-chain and off-chain checkboxes and press submit
+-   you should now see the enrollment request with pending state in My Enrollments tab
+-   since now the role administrator needs to approve your role please sent a short email to dsb@energyweb.org with your pending DID identifier
+-   after getting confirmation from the team, please login to https://switchboard-dev.energyweb.org/ and navigate to Enrollments and then My Enrollments to sync your DID Document (using three dots next to Approved `messagebroker.roles.dsb.apps.energyweb.iam.ewc`)
 
 ### From repository
 

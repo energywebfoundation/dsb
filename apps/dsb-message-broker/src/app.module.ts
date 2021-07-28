@@ -1,4 +1,4 @@
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -20,7 +20,8 @@ import { MessageModule } from './message/message.module';
                 NATS_JS_URL: Joi.string().optional().default('nats://localhost:4222'),
                 PORT: Joi.number().optional().default(3000),
                 WITH_SWAGGER: Joi.boolean().optional().default(true),
-                JWT_SECRET: Joi.string().required()
+                JWT_SECRET: Joi.string().required(),
+                PRIVATE_KEY: Joi.string().required()
             })
         }),
         AuthModule
