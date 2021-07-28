@@ -21,6 +21,8 @@ import { MessageModule } from './message/message.module';
             validationSchema: Joi.object({
                 NATS_JS_URL: Joi.string().optional().default('nats://localhost:4222'),
                 PORT: Joi.number().optional().default(3000),
+                WEB3_URL: Joi.string().default('https://volta-rpc.energyweb.org/'),
+                CACHE_SERVER_URL: Joi.string().default('https://identitycache-dev.energyweb.org'),
                 WITH_SWAGGER: Joi.boolean().optional().default(true),
                 JWT_SECRET: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required()
