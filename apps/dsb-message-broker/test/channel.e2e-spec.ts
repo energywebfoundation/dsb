@@ -21,8 +21,8 @@ describe('ChannelController (e2e)', () => {
         did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
         verifiedRoles: [
             {
-                name: 'channel-creation',
-                namespace: 'channel-creation.roles.dsb.apps.energyweb.iam.ewc'
+                name: 'channelcreation',
+                namespace: 'channelcreation.roles.dsb.apps.energyweb.iam.ewc'
             }
         ]
     };
