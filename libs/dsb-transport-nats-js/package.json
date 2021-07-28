@@ -2,9 +2,9 @@
     "name": "@energyweb/dsb-transport-nats-js",
     "version": "0.0.1",
     "description": "NATS Jetstream transport layer implementation",
-    "author": "",
+    "author": "EnergyWeb DevHub GmbH; Piotr Kosinski, piotr.kosinski@energyweb.org",
     "private": true,
-    "license": "UNLICENSED",
+    "license": "GPL-3.0-or-later",
     "main": "dist/index.js",
     "files": [
         "dist"

@@ -2,9 +2,9 @@
     "name": "@energyweb/dsb-transport-core",
     "version": "0.0.1",
     "description": "Core transport layer library",
-    "author": "",
+    "author": "EnergyWeb DevHub GmbH; Piotr Kosinski, piotr.kosinski@energyweb.org",
     "private": true,
-    "license": "UNLICENSED",
+    "license": "GPL-3.0-or-later",
     "main": "dist/index.js",
     "files": [
         "dist"
