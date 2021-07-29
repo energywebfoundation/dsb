@@ -1,9 +1,11 @@
 import { ITransport } from '@energyweb/dsb-transport-core';
 import { Controller, Get } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 
 @Controller('health')
+@ApiTags('health')
 export class HealthController {
     private transport: ITransport;
 

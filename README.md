@@ -139,17 +139,54 @@ Note that:
 
 DSB works based on two fundamental building blocks `channels` and `messages`. Channels are structures that allows publisher and subscribers to exchange message with at-least-once delivery semantics. DSB uses built-in persistency for every channel.
 
+### Login
+
+Before you can with using DSB Message Broker you need to complete login procedure and acquire `access-token`. The required `identityToken` is a JWT signed token using ES256 algorithm.
+
+Header:
+
+```json
+{
+    "alg": "ES256",
+    "typ": "JWT"
+}
+```
+
+Payload:
+
+```json
+{
+    "iss": "did:ethr:<address>",
+    "claimData": {
+        "blockNumber": 999999999
+    }
+}
+```
+
+For generating JWT token for testing purposes use our developers test tool: https://stackblitz.com/edit/js-vyf8ms
+
+```shell
+curl -X 'POST' \
+  'http://localhost:3000/auth/login' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "identityToken": "<JWT Signed Token>"
+}'
+```
+
 ### Creating channels
 
 A dedicated `POST /channel` endpoint should be used to create channel based on provided fqcn (fully qualified channel name)
 
 Example code that creates `"test.channels.testapp.apps.testorganization.iam.ewc"` channel:
 
-```
+```shell
 curl -X 'POST' \
   'http://localhost:3000/channel' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <token acquired from POST /auth/login method' \
   -d '{
   "fqcn": "test.channels.testapp.apps.testorganization.iam.ewc"
 }'
@@ -163,7 +200,7 @@ Before publishing to a channel make sure that channel described as fqcn (fully q
 
 Message DTO is defined as:
 
-```
+```shell
 {
   "fqcn": "test.channels.testapp.apps.testorganization.iam.ewc",
   "payload": "{\"data\": \"test\"}",
@@ -173,11 +210,12 @@ Message DTO is defined as:
 
 Example code
 
-```
+```shell
 curl -X 'POST' \
   'http://localhost:5000/message' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <token acquired from POST /auth/login method' \
   -d '{
   "fqcn": "test.channels.testapp.apps.testorganization.iam.ewc",
   "payload": "{\"data\": \"test\"}",
@@ -210,10 +248,11 @@ Note: Currently each node would need to use the same identity to authenticate to
 
 Example code:
 
-```
+```shell
 curl -X 'GET' \
   'http://localhost:5000/message?fqcn=test.channels.testapp.apps.testorganization.iam.ewc&amount=1000' \
-  -H 'accept: application/json'
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer <token acquired from POST /auth/login method'
 ```
 
 or use Swagger UI `http://localhost:5000/swagger/#/default/MessageController_getNewFromChannel`

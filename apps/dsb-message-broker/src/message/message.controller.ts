@@ -16,7 +16,7 @@ import {
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
-import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -30,6 +30,8 @@ import { MessageService } from './message.service';
 @UsePipes(ValidationPipe)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('message')
+@ApiTags('message')
+@ApiBearerAuth('access-token')
 export class MessageController {
     private readonly logger = new Logger(MessageController.name);
     private readonly DEFAULT_AMOUNT = 100;

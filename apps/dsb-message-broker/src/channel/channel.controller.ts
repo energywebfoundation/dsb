@@ -17,7 +17,7 @@ import {
     ValidationPipe,
     ServiceUnavailableException
 } from '@nestjs/common';
-import { ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -29,6 +29,8 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 @UsePipes(ValidationPipe)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('channel')
+@ApiTags('channel')
+@ApiBearerAuth('access-token')
 export class ChannelController {
     constructor(private readonly channelService: ChannelService) {}
     private readonly logger = new Logger(ChannelController.name);

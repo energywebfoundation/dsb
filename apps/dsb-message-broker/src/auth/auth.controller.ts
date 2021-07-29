@@ -1,4 +1,15 @@
-import { Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    Controller,
+    HttpCode,
+    HttpStatus,
+    Post,
+    Request,
+    UseGuards,
+    UseInterceptors,
+    UsePipes,
+    ValidationPipe
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 
@@ -9,6 +20,8 @@ import { LoginGuard } from './login.guard';
 @ApiTags('auth')
 @ApiBearerAuth('access-token')
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
+@UsePipes(ValidationPipe)
 export class AuthController {
     @UseGuards(LoginGuard)
     @Post('login')
