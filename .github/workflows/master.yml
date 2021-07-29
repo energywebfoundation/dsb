@@ -64,7 +64,9 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
       run: |
-        docker tag energyweb/dsb-message-broker:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
+        docker tag energyweb/dsb-message-broker:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
+        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
+        docker tag $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
         docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
     
     - name: Logout of Amazon ECR
