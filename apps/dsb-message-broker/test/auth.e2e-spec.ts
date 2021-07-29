@@ -5,7 +5,7 @@ import { Signer, utils, Wallet } from 'ethers';
 import { AppModule } from '../src/app.module';
 import { request } from './request';
 
-describe('AppController (e2e)', () => {
+describe('Auth controller (e2e)', () => {
     let app: INestApplication;
 
     const generateIdentity = async (signer: Signer) => {
@@ -37,7 +37,12 @@ describe('AppController (e2e)', () => {
         return `${encodedHeader}.${encodedPayload}.${encodedSig}`;
     };
 
-    before(async () => {
+    before(async function () {
+        const privateKey = process.env.TEST_LOGIN_PK;
+        if (!privateKey) {
+            this.skip();
+        }
+
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule]
         }).compile();
@@ -49,8 +54,13 @@ describe('AppController (e2e)', () => {
         await app.init();
     });
 
-    it('should login', async () => {
-        const user = new Wallet('2e10dd2007012a800845f11efeb488e4296bfed2e5ebc0ab61905758067410be');
+    it('should login', async function () {
+        const privateKey = process.env.TEST_LOGIN_PK;
+        if (!privateKey) {
+            this.skip();
+        }
+
+        const user = new Wallet(privateKey);
         const identityToken = await generateIdentity(user);
 
         await request(app).post('/auth/login').send({ identityToken }).expect(HttpStatus.OK);
