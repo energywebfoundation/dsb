@@ -143,6 +143,8 @@ Note that:
 
 DSB works based on two fundamental building blocks `channels` and `messages`. Channels are structures that allows publisher and subscribers to exchange message with at-least-once delivery semantics. DSB uses built-in persistency for every channel.
 
+All examples below assumes that DSB Message Broker is run and available locally under http://localhost:3000 host.
+
 ### Login
 
 Before you can start using DSB Message Broker (as a DSB user) you need to complete login procedure and acquire `access-token`. The required `identityToken` is a JWT signed token using ES256 algorithm.
@@ -219,7 +221,7 @@ Example code
 
 ```shell
 curl -X 'POST' \
-  'http://localhost:5000/message' \
+  'http://localhost:3000/message' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer <token acquired from POST /auth/login method' \
@@ -257,7 +259,7 @@ Example code:
 
 ```shell
 curl -X 'GET' \
-  'http://localhost:5000/message?fqcn=test.channels.testapp.apps.testorganization.iam.ewc&amount=1000' \
+  'http://localhost:3000/message?fqcn=test.channels.testapp.apps.testorganization.iam.ewc&amount=1000' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer <token acquired from POST /auth/login method'
 ```
