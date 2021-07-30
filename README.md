@@ -70,6 +70,10 @@ WITH_SWAGGER = (optional bool, default true) Boolean that enables or disables ho
 JWT_SECRET = (required string) JWT authentication token secret
 
 PRIVATE_KEY = (required string) ECDSA private key as 64(hex) characters with messagebroker.roles.dsb.apps.energyweb.iam.ewc role, read more on #
+
+WEB_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
+
+CACHE_SERVER_URL = (optional string, default https://identitycache-dev.energyweb.org/) An URL to Identity Cache server, more info https://github.com/energywebfoundation/iam-cache-server
 ```
 
 You can define custom values by using `apps/dsb-message-broker/.env` file or passing them directly for e.g `PORT=5000 rush start --verbose`
@@ -141,7 +145,7 @@ DSB works based on two fundamental building blocks `channels` and `messages`. Ch
 
 ### Login
 
-Before you can with using DSB Message Broker you need to complete login procedure and acquire `access-token`. The required `identityToken` is a JWT signed token using ES256 algorithm.
+Before you can start using DSB Message Broker (as a DSB user) you need to complete login procedure and acquire `access-token`. The required `identityToken` is a JWT signed token using ES256 algorithm.
 
 Header:
 
@@ -158,10 +162,13 @@ Payload:
 {
     "iss": "did:ethr:<address>",
     "claimData": {
-        "blockNumber": 999999999
+        "blockNumber": <blockNumber>
     }
 }
 ```
+
+-   `address` should be set to the address (hashed public key) of your private key
+-   `blockNumber` should be set to the current block number of the network set in the `WEB3_URL` (this has to be at most 4 blocks behind the current block read by the auth mechanism)
 
 For generating JWT token for testing purposes use our developers test tool: https://stackblitz.com/edit/js-vyf8ms
 
