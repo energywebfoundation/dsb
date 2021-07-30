@@ -20,4 +20,8 @@ export class ChannelManagerService {
 
         this.channels.push(channel.fqcn);
     }
+
+    public async remove(channel: string) {
+        await this.channelService.remove({ fqcn: channel });
+    }
 }

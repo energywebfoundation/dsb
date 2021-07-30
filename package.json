@@ -1,0 +1,5 @@
+{
+    "dependencies": {
+        "@microsoft/rush": "^5.48.0"
+    }
+}

@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PublishMessageDto } from '../src/message/dto/publish-message.dto';
@@ -8,15 +8,33 @@ import { ChannelManagerService } from './channel-manager.service';
 import { ChannelService } from '../src/channel/channel.service';
 import { MessageDTO } from '../src/message/dto/message.dto';
 import { expect } from 'chai';
+import { JwtAuthGuard } from '../src/auth/jwt.guard';
 
-describe('AppController (e2e)', () => {
+describe('MessageController (e2e)', () => {
     let app: INestApplication;
     let channelManagerService: ChannelManagerService;
+
+    const authenticatedUser = {
+        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
+        verifiedRoles: [{ name: 'user', namespace: 'user.roles.dsb.apps.energyweb.iam.ewc' }]
+    };
+
+    const authGuard: CanActivate = {
+        canActivate: (context: ExecutionContext) => {
+            const req = context.switchToHttp().getRequest();
+            req.user = authenticatedUser;
+
+            return true;
+        }
+    };
 
     before(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule]
-        }).compile();
+        })
+            .overrideGuard(JwtAuthGuard)
+            .useValue(authGuard)
+            .compile();
 
         app = moduleFixture.createNestApplication();
         const channelService = await app.resolve<ChannelService>(ChannelService);
@@ -95,7 +113,7 @@ describe('AppController (e2e)', () => {
 
                 expect(messages[0].payload).to.be.equal(message.payload);
                 expect(messages[0].signature).to.be.equal(message.signature);
-                expect(messages[0].sender).to.be.equal('sender1');
+                expect(messages[0].sender).to.be.equal(authenticatedUser.did);
             });
     });
 
