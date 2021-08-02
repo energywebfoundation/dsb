@@ -8,8 +8,16 @@
 </h1>
 
 <p align="center">
-  <img src="https://github.com/energywebfoundation/dsb/actions/workflows/build.yml/badge.svg" />
+  <img src="https://github.com/energywebfoundation/dsb/actions/workflows/master.yml/badge.svg" />
 </p>
+
+## Disclaimer
+
+This repository is currently under development and considered early *alpha* stage, changes to data structures, APIs and general way of working may occur.
+
+## Overview
+
+EW-DSB is the messaging service of the EW-DOS’s utility layer. Unlike any other centralised and managed pub/sub messaging systems, EW-DSB is designed and implemented to be fully decentralised and scalable. Messages shared on EW-DSB can be traced back to its original sender using cryptographic signatures; it adds extra security to data exchanges. One of the key benefits of the EW-DSB is to be schema agnostic, meaning any type of schema can be shared as a message between users/systems. 
 
 ## Preparation
 
