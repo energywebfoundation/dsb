@@ -10,10 +10,17 @@ export class AuthService implements OnModuleInit {
 
     public async onModuleInit(): Promise<void> {
         const privateKey = this.configService.get<string>('PRIVATE_KEY');
+        const mbDID = this.configService.get<string>('MB_DID');
         const rpcUrl = this.configService.get<string>('WEB3_URL');
 
         const iam = new IAM({ rpcUrl, privateKey });
         const init = await iam.initializeConnection({ initCacheServer: true });
+
+        if (mbDID !== init.did) {
+            throw new Error(
+                "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
+            );
+        }
 
         const claims = await iam.getUserClaims({ did: init.did });
 

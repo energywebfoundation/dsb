@@ -13,11 +13,11 @@
 
 ## Disclaimer
 
-This repository is currently under development and considered early *alpha* stage, changes to data structures, APIs and general way of working may occur.
+This repository is currently under development and considered early _alpha_ stage, changes to data structures, APIs and general way of working may occur.
 
 ## Overview
 
-EW-DSB is the messaging service of the EW-DOS’s utility layer. Unlike any other centralised and managed pub/sub messaging systems, EW-DSB is designed and implemented to be fully decentralised and scalable. Messages shared on EW-DSB can be traced back to its original sender using cryptographic signatures; it adds extra security to data exchanges. One of the key benefits of the EW-DSB is to be schema agnostic, meaning any type of schema can be shared as a message between users/systems. 
+EW-DSB is the messaging service of the EW-DOS’s utility layer. Unlike any other centralised and managed pub/sub messaging systems, EW-DSB is designed and implemented to be fully decentralised and scalable. Messages shared on EW-DSB can be traced back to its original sender using cryptographic signatures; it adds extra security to data exchanges. One of the key benefits of the EW-DSB is to be schema agnostic, meaning any type of schema can be shared as a message between users/systems.
 
 ## Preparation
 
@@ -78,6 +78,8 @@ WITH_SWAGGER = (optional bool, default true) Boolean that enables or disables ho
 JWT_SECRET = (required string) JWT authentication token secret
 
 PRIVATE_KEY = (required string) ECDSA private key as 64(hex) characters with messagebroker.roles.dsb.apps.energyweb.iam.ewc role, read more on #
+
+MB_DID = (required string) it is the DID identifier corresponding to the PRIVATE_KEY
 
 WEB_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
 
