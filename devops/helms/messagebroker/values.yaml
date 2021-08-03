@@ -8,6 +8,9 @@ messagebroker:
   config:
     port: 3000
     natsClusterUrl: nats://dsb-nats.dsb.svc:4222
+    withSwagger: "true"
+    webUrl: https://volta-rpc.energyweb.org/
+    cacheServerUrl: https://identitycache-dev.energyweb.org/
 
 
 image:
@@ -16,7 +19,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
-  tag: "ed8fcac4-aa59-4df4-8ddc-2bd3d2aa3585"
+  tag: "bd353405-2e1b-41ca-a1cd-b3950d5006a6"
 
 imagePullSecrets: []
 nameOverride: "dsb-messagebroker"
