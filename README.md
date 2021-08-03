@@ -81,7 +81,7 @@ PRIVATE_KEY = (required string) ECDSA private key as 64(hex) characters with mes
 
 MB_DID = (required string) it is the DID identifier corresponding to the PRIVATE_KEY
 
-WEB_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
+WEB3_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
 
 CACHE_SERVER_URL = (optional string, default https://identitycache-dev.energyweb.org/) An URL to Identity Cache server, more info https://github.com/energywebfoundation/iam-cache-server
 ```
