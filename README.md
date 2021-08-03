@@ -79,7 +79,7 @@ JWT_SECRET = (required string) JWT authentication token secret
 
 PRIVATE_KEY = (required string) ECDSA private key as 64(hex) characters with messagebroker.roles.dsb.apps.energyweb.iam.ewc role, read more on #
 
-WEB_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
+WEB3_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
 
 CACHE_SERVER_URL = (optional string, default https://identitycache-dev.energyweb.org/) An URL to Identity Cache server, more info https://github.com/energywebfoundation/iam-cache-server
 ```
