@@ -26,7 +26,7 @@ import { MessageModule } from './message/message.module';
                 WITH_SWAGGER: Joi.boolean().optional().default(true),
                 JWT_SECRET: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required(),
-                MB_DID: Joi.string().required()
+                MB_DID: Joi.string().required().default('did:ethr:0x')
             })
         }),
         AuthModule
