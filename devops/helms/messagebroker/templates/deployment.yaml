@@ -55,7 +55,7 @@ spec:
                 configMapKeyRef:
                   name: {{ include "messagebroker.fullname" . }}-configmap
                   key: withSwagger
-            - name: WEB_URL
+            - name: WEB3_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "messagebroker.fullname" . }}-configmap
