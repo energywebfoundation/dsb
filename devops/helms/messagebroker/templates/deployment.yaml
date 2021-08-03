@@ -50,6 +50,31 @@ spec:
                 configMapKeyRef:
                   name: {{ include "messagebroker.fullname" . }}-configmap
                   key: natsUrl
+            - name: WITH_SWAGGER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "messagebroker.fullname" . }}-configmap
+                  key: withSwagger
+            - name: WEB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "messagebroker.fullname" . }}-configmap
+                  key: webUrl
+            - name: CACHE_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "messagebroker.fullname" . }}-configmap
+                  key: cacheServerUrl
+            - name: PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "messagebroker.fullname" . }}-secret
+                  key: privateKey
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "messagebroker.fullname" . }}-secret
+                  key: jwtSecret
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
