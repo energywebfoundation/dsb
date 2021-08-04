@@ -10,3 +10,4 @@ data:
   withSwagger: {{ .Values.messagebroker.config.withSwagger | default "true" | quote }}
   webUrl: {{ .Values.messagebroker.config.webUrl | default "https://volta-rpc.energyweb.org/" | quote }}
   cacheServerUrl: {{ .Values.messagebroker.config.cacheServerUrl | default "https://identitycache-dev.energyweb.org/" | quote }}
+  mbDid: {{ .Values.messagebroker.config.mbDid | quote }}

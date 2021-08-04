@@ -11,6 +11,7 @@ messagebroker:
     withSwagger: "true"
     webUrl: https://volta-rpc.energyweb.org/
     cacheServerUrl: https://identitycache-dev.energyweb.org/
+    mbDid: "did:ethr:0x5aEa5Bf5c5b341A0BF30Cc5b51b77Fb9807F1b52"
 
 
 image:
