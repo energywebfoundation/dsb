@@ -65,6 +65,11 @@ spec:
                 configMapKeyRef:
                   name: {{ include "messagebroker.fullname" . }}-configmap
                   key: cacheServerUrl
+            - name: MB_DID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "messagebroker.fullname" . }}-configmap
+                  key: mbDid
             - name: PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
