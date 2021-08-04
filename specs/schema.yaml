@@ -68,7 +68,20 @@ components:
         - "identityToken"
     LoginReturnDataDTO:
       type: "object"
-      properties: {}
+      properties:
+        did:
+          type: "string"
+          description: "DID of messagebroker which is the DID identifier corresponding to env.PRIVATE_KEY"
+        address:
+          type: "string"
+          description: "address of the env.PRIVATE_KEY for signature recovery purposes"
+        signature:
+          type: "string"
+          description: "the compact hex signature which is ECDSA hash(address of privatekey+messagebrokerDID+userDID)"
+      required:
+        - "did"
+        - "address"
+        - "signature"
 paths:
   /message:
     post:

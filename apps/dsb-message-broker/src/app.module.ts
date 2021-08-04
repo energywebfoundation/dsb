@@ -25,7 +25,8 @@ import { MessageModule } from './message/message.module';
                 CACHE_SERVER_URL: Joi.string().default('https://identitycache-dev.energyweb.org'),
                 WITH_SWAGGER: Joi.boolean().optional().default(true),
                 JWT_SECRET: Joi.string().required(),
-                PRIVATE_KEY: Joi.string().required()
+                PRIVATE_KEY: Joi.string().required(),
+                MB_DID: Joi.string().required()
             })
         }),
         AuthModule

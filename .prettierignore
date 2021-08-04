@@ -13,3 +13,5 @@ shrinkwrap.json
 .github/workflows/*.yml
 
 specs/schema.yaml
+
+devops
