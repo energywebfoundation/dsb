@@ -59,7 +59,7 @@ describe('ChannelController (e2e)', () => {
         await channelManagerService.remove(fqcn);
     });
 
-    // it('should create a channel', async () => {
-    //     await request(app).post('/channel').send({ fqcn }).expect(HttpStatus.CREATED);
-    // });
+    it('should create a channel', async () => {
+        await request(app).post('/channel').send({ fqcn }).expect(HttpStatus.CREATED);
+    });
 });
