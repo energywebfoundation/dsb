@@ -48,6 +48,7 @@ export class NATSJetstreamTransport implements ITransport {
         await this.ensureConnected();
 
         const jetstream = this.connection.jetstream();
+
         try {
             const { subject } = fqcnToStream(fqcn);
             const publishAck = await jetstream.publish(subject, this.stringCodec.encode(payload));

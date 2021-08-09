@@ -11,6 +11,8 @@ dependencies:
   '@nestjs/swagger': 4.8.0_607c31e877ae723401e162935048c8a2
   '@nestjs/terminus': 7.2.0_9ee6cf753c1e51110bb632376ef45ec0
   '@nestjs/testing': 7.6.15_ba5f4d8d026a9e713d04bfe7d31f240c
+  '@rush-temp/dsb-address-book-core': file:projects/dsb-address-book-core.tgz
+  '@rush-temp/dsb-address-book-nats-js': file:projects/dsb-address-book-nats-js.tgz
   '@rush-temp/dsb-message-broker': file:projects/dsb-message-broker.tgz
   '@rush-temp/dsb-transport-core': file:projects/dsb-transport-core.tgz
   '@rush-temp/dsb-transport-nats-js': file:projects/dsb-transport-nats-js.tgz_72c71fae9438f0c01bf19f98b0b41cfb
@@ -9329,6 +9331,30 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+  file:projects/dsb-address-book-core.tgz:
+    dependencies:
+      '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
+      '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
+      eslint: 7.27.0
+      typescript: 4.3.5
+    dev: false
+    name: '@rush-temp/dsb-address-book-core'
+    resolution:
+      integrity: sha512-Oz8fFpvdysaoUL4ScxjCxeTIg4ij/kdapskZX5Q1VnpLtEMLt2m8imEViBeRoCYLzoEJeT+b1CbsUDeWc8Bttg==
+      tarball: file:projects/dsb-address-book-core.tgz
+    version: 0.0.0
+  file:projects/dsb-address-book-nats-js.tgz:
+    dependencies:
+      '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
+      '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
+      eslint: 7.27.0
+      typescript: 4.3.5
+    dev: false
+    name: '@rush-temp/dsb-address-book-nats-js'
+    resolution:
+      integrity: sha512-8SyFsGl7RrcLMqlZ6IHEXhEpNAVkWRr6O5PF1Pwl4GMa7zC9OkKhndHlKsS/wLMlMY5z7CeIQxxXhU4pvfiz8g==
+      tarball: file:projects/dsb-address-book-nats-js.tgz
+    version: 0.0.0
   file:projects/dsb-message-broker.tgz:
     dependencies:
       '@ew-did-registry/jwt': 0.5.2-alpha.1057.0
@@ -9375,7 +9401,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-Ct/W7OvnrNuwv25bGiBS5RVt6GYveM6mwb+VQ0bxp2a43EBSwEBTgh8RcdGg/NQKF6ee3xq/gxt0AWt8kxvuug==
+      integrity: sha512-q7oGfatIsgUVPDRITDNV5tt1yCVQV5kBechxFPueTyzKPuc1ed6JJkLvFBHUTCK1qAoE4yIrNfk6IHaZCwj0uA==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -9434,6 +9460,8 @@ specifiers:
   '@nestjs/swagger': 4.8.0
   '@nestjs/terminus': 7.2.0
   '@nestjs/testing': 7.6.15
+  '@rush-temp/dsb-address-book-core': file:./projects/dsb-address-book-core.tgz
+  '@rush-temp/dsb-address-book-nats-js': file:./projects/dsb-address-book-nats-js.tgz
   '@rush-temp/dsb-message-broker': file:./projects/dsb-message-broker.tgz
   '@rush-temp/dsb-transport-core': file:./projects/dsb-transport-core.tgz
   '@rush-temp/dsb-transport-nats-js': file:./projects/dsb-transport-nats-js.tgz
@@ -9450,7 +9478,7 @@ specifiers:
   class-transformer: 0.4.0
   class-validator: 0.13.1
   eslint: 7.27.0
-  ethers: ~5.4.3
+  ethers: 5.4.3
   iam-client-lib: 3.0.0-alpha.36
   joi: 17.4.1
   json-to-pretty-yaml: 1.2.2
