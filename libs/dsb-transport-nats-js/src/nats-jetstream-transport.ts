@@ -99,7 +99,8 @@ export class NATSJetstreamTransport implements ITransport {
             if (metadata) await this.addressBook.register(fqcn, metadata);
         } catch (error) {
             this.logger.error(error);
-            if (error !== 'User claims not initialized') throw new ChannelAlreadyCreatedError(fqcn);
+            if (error !== 'Error: User claims not initialized')
+                throw new ChannelAlreadyCreatedError(fqcn);
         }
 
         return stream;
