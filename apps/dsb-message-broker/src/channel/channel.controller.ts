@@ -11,6 +11,8 @@ import {
     InternalServerErrorException,
     Logger,
     Post,
+    Get,
+    Param,
     UseGuards,
     UseInterceptors,
     UsePipes,
@@ -24,6 +26,8 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { UserDecorator } from '../auth/user.decorator';
+import { ChannelMetadata } from '../../../../libs/dsb-address-book-core/dist';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
@@ -43,9 +47,15 @@ export class ChannelController {
         type: String,
         description: 'Creates a channel'
     })
-    public async create(@Body() channel: CreateChannelDto): Promise<string> {
+    public async create(
+        @UserDecorator() user: any,
+        @Body() channel: CreateChannelDto
+    ): Promise<string> {
         try {
-            const id = await this.channelService.create(channel);
+            const id = await this.channelService.create({
+                fqcn: channel.fqcn,
+                metadata: { ...channel.metadata, createdBy: user.did }
+            });
             return id;
         } catch (error) {
             this.logger.error(error.message);
@@ -60,6 +70,24 @@ export class ChannelController {
             throw new InternalServerErrorException({
                 message: `Unable to publish a message due an unknown error`
             });
+        }
+    }
+
+    @Get('/:fqcn')
+    @ApiOperation({
+        description: 'Returns metadata for the requested channel'
+    })
+    @ApiResponse({
+        status: HttpStatus.ACCEPTED,
+        type: ChannelMetadata,
+        description: 'Metadata for the requested channel'
+    })
+    public async getChannelMetadata(@Param() param: { fqcn: string }): Promise<ChannelMetadata> {
+        try {
+            const metadata = await this.channelService.getMetadata(param.fqcn);
+            return metadata;
+        } catch (error) {
+            console.error(error);
         }
     }
 }

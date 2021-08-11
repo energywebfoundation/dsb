@@ -5,8 +5,19 @@ import {
     Message,
     TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
+import { NatsJetstreamAddressBook, ChannelMetadata } from '@energyweb/dsb-address-book-nats-js';
 import { Logger } from '@nestjs/common';
-import { AckPolicy, connect, NatsConnection, StringCodec } from 'nats';
+import {
+    AckPolicy,
+    connect,
+    NatsConnection,
+    StringCodec,
+    ConsumerInfo,
+    JetStreamManager,
+    JetStreamClient,
+    consumerOpts,
+    createInbox
+} from 'nats';
 import polly from 'polly-js';
 
 import { fqcnToStream } from './fqcn-utils';
@@ -15,10 +26,21 @@ export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
     private readonly logger = new Logger(NATSJetstreamTransport.name);
     private connection: NatsConnection;
+    private jetstreamManager: JetStreamManager;
+    private jetstreamClient: JetStreamClient;
 
     private isTransportConnected = false;
 
-    constructor(private readonly servers: string[]) {}
+    private addressBook: NatsJetstreamAddressBook;
+
+    constructor(
+        private readonly servers: string[],
+        web3Url: string,
+        privateKey: string,
+        mbDID: string
+    ) {
+        this.addressBook = new NatsJetstreamAddressBook(this, web3Url, privateKey, mbDID);
+    }
 
     public async isConnected(): Promise<boolean> {
         return this.isTransportConnected;
@@ -31,9 +53,13 @@ export class NATSJetstreamTransport implements ITransport {
                 .executeForPromise(async (info: polly.Info) => {
                     this.logger.log(`Connecting to ${this.servers} ${info.count}/5`);
                     this.connection = await connect({ servers: this.servers });
-
+                    this.jetstreamManager = await this.connection.jetstreamManager();
+                    this.jetstreamClient = this.connection.jetstream();
                     this.isTransportConnected = true;
                     this.logger.log(`Successfully connected to ${this.servers}`);
+
+                    this.addressBook.init();
+                    this.logger.log('AddressBook is initialized!');
 
                     this.startConnectionMonitor();
                 });
@@ -46,12 +72,12 @@ export class NATSJetstreamTransport implements ITransport {
 
     public async publish(fqcn: string, payload: string): Promise<string> {
         await this.ensureConnected();
-
-        const jetstream = this.connection.jetstream();
-
         try {
             const { subject } = fqcnToStream(fqcn);
-            const publishAck = await jetstream.publish(subject, this.stringCodec.encode(payload));
+            const publishAck = await this.jetstreamClient.publish(
+                subject,
+                this.stringCodec.encode(payload)
+            );
 
             return publishAck.seq.toString();
         } catch (error) {
@@ -60,18 +86,17 @@ export class NATSJetstreamTransport implements ITransport {
         }
     }
 
-    public async createChannel(fqcn: string): Promise<string> {
+    public async createChannel(fqcn: string, metadata?: ChannelMetadata): Promise<string> {
         await this.ensureConnected();
-
-        const jetstreamManager = await this.connection.jetstreamManager();
 
         const { stream, subject } = fqcnToStream(fqcn);
 
         try {
-            await jetstreamManager.streams.add({
+            await this.jetstreamManager.streams.add({
                 name: stream,
                 subjects: [subject]
             });
+            if (metadata) await this.addressBook.register(fqcn, metadata);
         } catch (error) {
             this.logger.error(error);
             throw new ChannelAlreadyCreatedError(fqcn);
@@ -83,12 +108,10 @@ export class NATSJetstreamTransport implements ITransport {
     public async removeChannel(fqcn: string): Promise<string> {
         await this.ensureConnected();
 
-        const jetstreamManager = await this.connection.jetstreamManager();
-
         const { stream } = fqcnToStream(fqcn);
 
         try {
-            await jetstreamManager.streams.delete(stream);
+            await this.jetstreamManager.streams.delete(stream);
         } catch (error) {
             this.logger.error(error);
             throw new ChannelNotFoundError(fqcn);
@@ -97,30 +120,26 @@ export class NATSJetstreamTransport implements ITransport {
         return stream;
     }
 
-    public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
+    public async hasChannel(fqcn: string): Promise<boolean> {
         await this.ensureConnected();
-
-        const jetstreamManager = await this.connection.jetstreamManager();
         const { stream } = fqcnToStream(fqcn);
+        const streams = await this.jetstreamManager.streams.list().next();
+        return streams.some((_streamInfo) => _streamInfo.config.name === stream);
+    }
 
-        let consumer;
-        try {
-            consumer = await jetstreamManager.consumers.info(stream, clientId);
-        } catch (error) {
-            this.logger.log(error);
-        }
+    public async getChannelMetadata(fqcn: string): Promise<ChannelMetadata> {
+        return this.addressBook.findByFqcn(fqcn);
+    }
 
-        if (!consumer) {
+    public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
+        const consumerIsAvailable = await this.hasConsumer(fqcn, clientId);
+        if (!consumerIsAvailable) {
             try {
                 this.logger.log(
                     `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
                 );
 
-                await jetstreamManager.consumers.add(stream, {
-                    name: clientId,
-                    durable_name: clientId,
-                    ack_policy: AckPolicy.Explicit
-                });
+                await this.createConsumer(fqcn, clientId);
             } catch (error) {
                 this.logger.log(error);
                 if (error.toString().includes('stream not found')) {
@@ -129,16 +148,61 @@ export class NATSJetstreamTransport implements ITransport {
             }
         }
 
-        const jetstream = this.connection.jetstream();
+        const { stream } = fqcnToStream(fqcn);
         const res: Message[] = [];
 
-        const messageIterator = jetstream.fetch(stream, clientId, { batch: amount, no_wait: true });
+        const messageIterator = this.jetstreamClient.fetch(stream, clientId, {
+            batch: amount,
+            no_wait: true
+        });
         for await (const message of messageIterator) {
             message.ack();
             res.push(new Message(message.seq.toString(), this.stringCodec.decode(message.data)));
         }
 
         return res;
+    }
+
+    public async subscribe(fqcn: string, clientId: string, cb: any): Promise<void> {
+        const { subject } = fqcnToStream(fqcn);
+
+        const opts = consumerOpts();
+        opts.durable(clientId);
+        opts.manualAck();
+        opts.ackExplicit();
+        opts.deliverTo(createInbox());
+
+        const messageIterator = await this.jetstreamClient.subscribe(subject, opts);
+        for await (const message of messageIterator) {
+            message.ack();
+            cb(new Message(message.seq.toString(), this.stringCodec.decode(message.data)));
+        }
+    }
+
+    public async createConsumer(fqcn: string, clientId: string): Promise<ConsumerInfo> {
+        await this.ensureConnected();
+        const { stream } = fqcnToStream(fqcn);
+
+        return this.jetstreamManager.consumers.add(stream, {
+            name: clientId,
+            durable_name: clientId,
+            ack_policy: AckPolicy.Explicit
+        });
+    }
+
+    public async removeConsumer(fqcn: string, clientId: string): Promise<boolean> {
+        await this.ensureConnected();
+        const { stream } = fqcnToStream(fqcn);
+
+        return this.jetstreamManager.consumers.delete(stream, clientId);
+    }
+
+    public async hasConsumer(fqcn: string, consumer: string): Promise<boolean> {
+        await this.ensureConnected();
+        const { stream } = fqcnToStream(fqcn);
+
+        const consumers = await this.jetstreamManager.consumers.list(stream).next();
+        return consumers.some((consumerInfo) => consumerInfo.name === consumer);
     }
 
     private async ensureConnected() {

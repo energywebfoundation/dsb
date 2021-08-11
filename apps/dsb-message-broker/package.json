@@ -27,7 +27,7 @@
     "dependencies": {
         "class-validator": "0.13.1",
         "class-transformer": "0.4.0",
-        "@energyweb/dsb-transport-core": "0.0.1",
+        "@energyweb/dsb-transport-core": "~0.0.1",
         "@energyweb/dsb-transport-nats-js": "0.0.1",
         "@nestjs/common": "7.6.17",
         "@nestjs/config": "0.6.3",
@@ -46,7 +46,9 @@
         "@ew-did-registry/jwt": "0.5.2-alpha.1057.0",
         "@ew-did-registry/keys": "0.5.2-alpha.1057.0",
         "iam-client-lib": "3.0.0-alpha.36",
-        "ethers": "5.4.3"
+        "ethers": "5.4.3",
+        "@energyweb/dsb-address-book-core": "~0.0.1",
+        "@energyweb/dsb-address-book-nats-js": "~0.0.1"
     },
     "devDependencies": {
         "@nestjs/cli": "7.6.0",

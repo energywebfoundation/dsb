@@ -15,8 +15,8 @@
     },
     "dependencies": {
         "iam-client-lib": "3.0.0-alpha.36",
-        "@energyweb/dsb-address-book-core": "0.0.1",
-        "@energyweb/dsb-transport-nats-js": "0.0.1"
+        "@energyweb/dsb-address-book-core": "~0.0.1",
+        "@energyweb/dsb-transport-core": "~0.0.1"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "4.19.0",
