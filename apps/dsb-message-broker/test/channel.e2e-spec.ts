@@ -15,7 +15,7 @@ describe('ChannelController (e2e)', () => {
     let app: INestApplication;
     let channelManagerService: ChannelManagerService;
 
-    const fqcn = '2-test.channel.test.apps.test.iam.ewc';
+    const fqcn = '10-test.channel.test.apps.test.iam.ewc';
 
     const authenticatedUser = {
         did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
