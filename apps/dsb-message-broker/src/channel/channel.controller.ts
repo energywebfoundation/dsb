@@ -27,7 +27,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UserDecorator } from '../auth/user.decorator';
-import { ChannelMetadata } from '../../../../libs/dsb-address-book-core/dist';
+import { ChannelMetadata } from '@energyweb/dsb-address-book-core';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)

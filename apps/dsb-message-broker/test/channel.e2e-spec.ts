@@ -1,15 +1,11 @@
 import { HttpStatus, INestApplication, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { PublishMessageDto } from '../src/message/dto/publish-message.dto';
 import { AppModule } from '../src/app.module';
 import { request } from './request';
 import { ChannelManagerService } from './channel-manager.service';
 import { ChannelService } from '../src/channel/channel.service';
-import { MessageDTO } from '../src/message/dto/message.dto';
-import { expect } from 'chai';
 import { JwtAuthGuard } from '../src/auth/jwt.guard';
-import { RolesGuard } from '../src/auth/roles.guard';
 
 describe('ChannelController (e2e)', () => {
     let app: INestApplication;
