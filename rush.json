@@ -391,6 +391,14 @@
         {
             "packageName": "@energyweb/dsb-transport-nats-js",
             "projectFolder": "libs/dsb-transport-nats-js"
+        },
+        {
+            "packageName": "@energyweb/dsb-address-book-core",
+            "projectFolder": "libs/dsb-address-book-core"
+        },
+        {
+            "packageName": "@energyweb/dsb-address-book-nats-js",
+            "projectFolder": "libs/dsb-address-book-nats-js"
         }
         // {
         //   /**

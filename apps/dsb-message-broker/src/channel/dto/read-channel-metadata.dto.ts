@@ -1,8 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ChannelMetadata } from '@energyweb/dsb-address-book-core';
 
-export class CreateChannelDto {
+export class ReadChannelMetadataDto {
     @ApiProperty({
         type: String,
         description: 'Fully qualified channel name (fcqn)',
@@ -11,6 +10,4 @@ export class CreateChannelDto {
     @IsString()
     @IsNotEmpty()
     fqcn: string;
-
-    metadata?: ChannelMetadata;
 }
