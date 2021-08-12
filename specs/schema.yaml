@@ -44,11 +44,15 @@ components:
         signature:
           type: "string"
           description: "Compacted EcdsaSecp256k1Signature2019"
+        timestampNanos:
+          type: "string"
+          description: "Message published timestamp in nanoseconds"
       required:
         - "id"
         - "payload"
         - "sender"
         - "signature"
+        - "timestampNanos"
     CreateChannelDto:
       type: "object"
       properties:
@@ -58,6 +62,9 @@ components:
           example: "test.channels.testapp.apps.testorganization.iam.ewc"
       required:
         - "fqcn"
+    ChannelMetadata:
+      type: "object"
+      properties: {}
     LoginDataDTO:
       type: "object"
       properties:
@@ -151,6 +158,23 @@ paths:
             application/json:
               schema:
                 type: "string"
+      tags:
+        - "channel"
+      security:
+        - access-token: []
+  /channel/{fqcn}:
+    get:
+      operationId: "ChannelController_getChannelMetadata"
+      summary: ""
+      description: "Returns metadata for the requested channel"
+      parameters: []
+      responses:
+        202:
+          description: "Metadata for the requested channel"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChannelMetadata"
       tags:
         - "channel"
       security:
