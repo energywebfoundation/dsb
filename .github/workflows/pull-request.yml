@@ -47,7 +47,6 @@ jobs:
     - name: Run e2e tests
       env:
         JWT_SECRET: "secret"
-        NATS_JS_URL: 'nats://localhost:4222'
         WEB3_URL: 'https://volta-rpc.energyweb.org/'
         PRIVATE_KEY: ${{ secrets.MB_PRIVATE_KEY }}
         MB_DID: ${{ secrets.MB_DID }}

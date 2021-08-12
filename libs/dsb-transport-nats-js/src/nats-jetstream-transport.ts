@@ -58,7 +58,7 @@ export class NATSJetstreamTransport implements ITransport {
                     this.isTransportConnected = true;
                     this.logger.log(`Successfully connected to ${this.servers}`);
 
-                    this.addressBook.init();
+                    await this.addressBook.init();
                     this.logger.log('AddressBook is initialized!');
 
                     this.startConnectionMonitor();
@@ -99,8 +99,7 @@ export class NATSJetstreamTransport implements ITransport {
             if (metadata) await this.addressBook.register(fqcn, metadata);
         } catch (error) {
             this.logger.error(error);
-            if (error !== 'Error: User claims not initialized')
-                throw new ChannelAlreadyCreatedError(fqcn);
+            throw new ChannelAlreadyCreatedError(fqcn);
         }
 
         return stream;
