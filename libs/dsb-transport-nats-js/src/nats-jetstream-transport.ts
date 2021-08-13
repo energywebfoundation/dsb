@@ -157,7 +157,13 @@ export class NATSJetstreamTransport implements ITransport {
         });
         for await (const message of messageIterator) {
             message.ack();
-            res.push(new Message(message.seq.toString(), this.stringCodec.decode(message.data)));
+            res.push(
+                new Message(
+                    message.seq.toString(),
+                    this.stringCodec.decode(message.data),
+                    message.info.timestampNanos
+                )
+            );
         }
 
         return res;
@@ -175,7 +181,13 @@ export class NATSJetstreamTransport implements ITransport {
         const messageIterator = await this.jetstreamClient.subscribe(subject, opts);
         for await (const message of messageIterator) {
             message.ack();
-            cb(new Message(message.seq.toString(), this.stringCodec.decode(message.data)));
+            cb(
+                new Message(
+                    message.seq.toString(),
+                    this.stringCodec.decode(message.data),
+                    message.info.timestampNanos
+                )
+            );
         }
     }
 

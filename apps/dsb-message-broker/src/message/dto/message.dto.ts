@@ -24,4 +24,7 @@ export class MessageDTO {
 
     @ApiProperty({ type: String, description: 'Compacted EcdsaSecp256k1Signature2019' })
     signature: string;
+
+    @ApiProperty({ type: String, description: 'Message published timestamp in nanoseconds' })
+    timestampNanos: number;
 }
