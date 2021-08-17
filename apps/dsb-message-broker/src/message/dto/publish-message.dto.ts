@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PublishMessageDto {
@@ -10,6 +10,14 @@ export class PublishMessageDto {
     @IsString()
     @IsNotEmpty()
     fqcn: string;
+
+    @ApiProperty({
+        type: String,
+        description: 'Topic name for the message (default value is "default")'
+    })
+    @IsString()
+    @IsOptional()
+    topic?: string;
 
     @ApiProperty({
         type: String,

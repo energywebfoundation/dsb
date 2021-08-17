@@ -47,7 +47,6 @@
         "@ew-did-registry/keys": "0.5.2-alpha.1057.0",
         "iam-client-lib": "3.0.0-alpha.36",
         "ethers": "5.4.3",
-        "@energyweb/dsb-address-book-core": "~0.0.1",
         "@energyweb/dsb-address-book-nats-js": "~0.0.1"
     },
     "devDependencies": {

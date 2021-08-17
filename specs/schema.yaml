@@ -15,6 +15,9 @@ components:
           type: "string"
           description: "Fully qualified channel name (fcqn)"
           example: "test.channels.testapp.apps.testorganization.iam.ewc"
+        topic:
+          type: "string"
+          description: "Topic name for the message (default value is \"default\")"
         payload:
           type: "string"
           description: "Any stringified payload like JSON, BASE64 etc"
@@ -24,6 +27,7 @@ components:
           description: "Compacted EcdsaSecp256k1Signature2019"
       required:
         - "fqcn"
+        - "topic"
         - "payload"
         - "signature"
     MessageDTO:
@@ -33,6 +37,10 @@ components:
           type: "string"
           description: "Message id"
           example: "msg-#1"
+        topic:
+          type: "string"
+          description: "Message topic"
+          example: "default"
         payload:
           type: "string"
           description: "Any stringified payload like JSON, BASE64 etc"
@@ -49,6 +57,7 @@ components:
           description: "Message published timestamp in nanoseconds"
       required:
         - "id"
+        - "topic"
         - "payload"
         - "sender"
         - "signature"
@@ -60,11 +69,32 @@ components:
           type: "string"
           description: "Fully qualified channel name (fcqn)"
           example: "test.channels.testapp.apps.testorganization.iam.ewc"
+        topics:
+          type: "object"
+          description: "Array of topics that is available in the channel"
+        publishers:
+          description: "Array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          type: "array"
+          items:
+            type: "string"
+        subscribers:
+          description: "Array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          type: "array"
+          items:
+            type: "string"
+        maxMsgAge:
+          type: "number"
+          description: "Maximum age of any message in the channel, expressed in nanoseconds."
+        maxMsgSize:
+          type: "number"
+          description: "Maximum size of any message in the channel, expressed in bytes."
       required:
         - "fqcn"
-    ChannelMetadata:
-      type: "object"
-      properties: {}
+        - "topics"
+        - "publishers"
+        - "subscribers"
+        - "maxMsgAge"
+        - "maxMsgSize"
     LoginDataDTO:
       type: "object"
       properties:
@@ -144,6 +174,8 @@ paths:
   /channel:
     post:
       operationId: "ChannelController_create"
+      summary: ""
+      description: "Creates a channel"
       parameters: []
       requestBody:
         required: true
@@ -153,7 +185,7 @@ paths:
               $ref: "#/components/schemas/CreateChannelDto"
       responses:
         202:
-          description: "Creates a channel"
+          description: "Created channel's name"
           content:
             application/json:
               schema:
@@ -162,19 +194,41 @@ paths:
         - "channel"
       security:
         - access-token: []
-  /channel/{fqcn}:
+  /channel/pubsub:
     get:
-      operationId: "ChannelController_getChannelMetadata"
+      operationId: "ChannelController_getAvailableChannels"
       summary: ""
-      description: "Returns metadata for the requested channel"
+      description: "Return a list of available channels for the requestor user to publish or subscribe"
       parameters: []
       responses:
-        202:
-          description: "Metadata for the requested channel"
+        200:
+          description: "Array of channels with their options"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChannelMetadata"
+                type: "array"
+      tags:
+        - "channel"
+      security:
+        - access-token: []
+  /channel/{fqcn}:
+    get:
+      operationId: "ChannelController_getChannel"
+      summary: ""
+      description: "Returns the requested channel's options"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "Channel options"
+          content:
+            application/json:
+              schema:
+                type: "object"
       tags:
         - "channel"
       security:

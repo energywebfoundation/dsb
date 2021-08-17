@@ -1,14 +1,8 @@
 import {
-    ChannelAlreadyCreatedError,
-    TransportUnavailableError
-} from '@energyweb/dsb-transport-core';
-import {
-    BadRequestException,
     Body,
     ClassSerializerInterceptor,
     Controller,
     HttpStatus,
-    InternalServerErrorException,
     Logger,
     Post,
     Get,
@@ -16,78 +10,96 @@ import {
     UseGuards,
     UseInterceptors,
     UsePipes,
-    ValidationPipe,
-    ServiceUnavailableException
+    ValidationPipe
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-
+import { Channel } from '@energyweb/dsb-transport-core';
 import { JwtAuthGuard } from '../auth/jwt.guard';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { Role } from '../auth/role.decorator';
+import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UserDecorator } from '../auth/user.decorator';
-import { ChannelMetadata } from '@energyweb/dsb-address-book-core';
+import { channelErrorHandler } from './error.handler';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, DynamicRolesGuard)
 @Controller('channel')
 @ApiTags('channel')
 @ApiBearerAuth('access-token')
 export class ChannelController {
-    constructor(private readonly channelService: ChannelService) {}
     private readonly logger = new Logger(ChannelController.name);
 
+    constructor(private readonly channelService: ChannelService) {}
+
     @Post()
-    @Roles('channelcreation.roles.dsb.apps.energyweb.iam.ewc')
+    @Role('channelCreator') // refers to role type for each org in organizations.ts
     @ApiBody({ type: CreateChannelDto })
+    @ApiOperation({
+        description: 'Creates a channel'
+    })
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
         type: String,
-        description: 'Creates a channel'
+        description: "Created channel's name"
     })
     public async create(
         @UserDecorator() user: any,
-        @Body() channel: CreateChannelDto
+        @Body() createDto: CreateChannelDto
     ): Promise<string> {
         try {
-            const id = await this.channelService.create({
-                fqcn: channel.fqcn,
-                metadata: { ...channel.metadata, createdBy: user.did }
+            const channelName = await this.channelService.create({
+                ...createDto,
+                createdBy: user.did,
+                createdDateTime: new Date().toISOString()
             });
-            return id;
+            return channelName;
         } catch (error) {
             this.logger.error(error.message);
-            if (error instanceof ChannelAlreadyCreatedError) {
-                throw new BadRequestException({ message: error.message });
-            }
+            channelErrorHandler(error);
+        }
+    }
 
-            if (error instanceof TransportUnavailableError) {
-                throw new ServiceUnavailableException();
-            }
-
-            throw new InternalServerErrorException({
-                message: `Unable to publish a message due an unknown error`
-            });
+    @Get('/pubsub')
+    @ApiOperation({
+        description:
+            'Return a list of available channels for the requestor user to publish or subscribe'
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: Array,
+        description: 'Array of channels with their options'
+    })
+    public async getAvailableChannels(@UserDecorator() user: any): Promise<Channel[]> {
+        try {
+            const channels = await this.channelService.getAvailableChannels(
+                user.did,
+                user.verifiedRoles.map((role: any) => role.namespace)
+            );
+            return channels;
+        } catch (error) {
+            this.logger.error(error.message);
+            channelErrorHandler(error);
         }
     }
 
     @Get('/:fqcn')
     @ApiOperation({
-        description: 'Returns metadata for the requested channel'
+        description: "Returns the requested channel's options"
     })
     @ApiResponse({
-        status: HttpStatus.ACCEPTED,
-        type: ChannelMetadata,
-        description: 'Metadata for the requested channel'
+        status: HttpStatus.OK,
+        type: Object,
+        description: 'Channel options'
     })
-    public async getChannelMetadata(@Param() param: { fqcn: string }): Promise<ChannelMetadata> {
+    public async getChannel(@Param('fqcn') fqcn: string): Promise<Channel> {
         try {
-            const metadata = await this.channelService.getMetadata(param.fqcn);
+            const metadata = await this.channelService.getChannel(fqcn);
             return metadata;
         } catch (error) {
-            console.error(error);
+            this.logger.error(error.message);
+            channelErrorHandler(error);
         }
     }
 }

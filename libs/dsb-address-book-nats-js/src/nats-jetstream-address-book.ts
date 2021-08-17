@@ -1,11 +1,11 @@
-import { ChannelMetadata, IAddressBook } from '@energyweb/dsb-address-book-core';
-import { ITransport } from '@energyweb/dsb-transport-core';
+import { IAddressBook } from '@energyweb/dsb-address-book-core';
+import { ITransport, Channel } from '@energyweb/dsb-transport-core';
 import { IAM } from 'iam-client-lib';
 
-export { IAddressBook, ChannelMetadata };
+export { IAddressBook };
 export class NatsJetstreamAddressBook implements IAddressBook {
     private readonly addressBookChannel = 'channels.dsb.apps.energyweb.iam.ewc';
-    private readonly cache = new Map<string, ChannelMetadata>();
+    private readonly cache = new Map<string, Channel>();
     private iam: IAM;
 
     constructor(
@@ -21,7 +21,13 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         await this.iam.initializeConnection({ initCacheServer: false });
 
         const abChannelIsAvailable = await this.transport.hasChannel(this.addressBookChannel);
-        if (!abChannelIsAvailable) await this.transport.createChannel(this.addressBookChannel);
+        if (!abChannelIsAvailable)
+            await this.transport.createChannel(
+                {
+                    fqcn: this.addressBookChannel
+                },
+                false
+            );
 
         const adConsumerIsAvaiable = await this.transport.hasConsumer(
             this.addressBookChannel,
@@ -36,16 +42,54 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         });
     }
 
-    public async findByFqcn(fqcn: string): Promise<ChannelMetadata> {
+    public findByFqcn(fqcn: string): Channel {
         return this.cache.get(fqcn);
     }
+    public findByPublishers(publishers: string[]): Channel[] {
+        const channels = [];
+        const iterator = this.cache.values();
+        let channel, isAvailable;
+        do {
+            channel = iterator.next();
 
-    public async register(fqcn: string, channelMetadata: ChannelMetadata): Promise<void> {
+            if (!channel.value) isAvailable = false;
+            else if (!channel.value.publishers) isAvailable = true;
+            else
+                isAvailable = channel.value.publishers.some((_pub: string) =>
+                    publishers.some((pub: string) => _pub === pub)
+                );
+
+            if (isAvailable) channels.push(channel.value);
+        } while (!channel.done);
+
+        return channels;
+    }
+    public findBySubscribers(subscribers: string[]): Channel[] {
+        const channels = [];
+        const iterator = this.cache.values();
+        let channel, isAvailable;
+        do {
+            channel = iterator.next();
+
+            if (!channel.value) isAvailable = false;
+            else if (!channel.value.subscribers) isAvailable = true;
+            else
+                isAvailable = channel.value.subscribers.some((_pub: string) =>
+                    subscribers.some((pub: string) => _pub === pub)
+                );
+
+            if (isAvailable) channels.push(channel.value);
+        } while (!channel.done);
+
+        return channels;
+    }
+
+    public async register(channel: Channel): Promise<void> {
         const claim = await this.iam.createPublicClaim({
-            subject: fqcn,
-            data: { ...channelMetadata }
+            subject: channel.fqcn,
+            data: { ...channel }
         });
 
-        await this.transport.publish(this.addressBookChannel, claim);
+        await this.transport.publish(this.addressBookChannel, 'default', claim);
     }
 }

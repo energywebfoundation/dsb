@@ -10,6 +10,13 @@ export class MessageDTO {
 
     @ApiProperty({
         type: String,
+        description: 'Message topic',
+        example: 'default'
+    })
+    topic: string;
+
+    @ApiProperty({
+        type: String,
         description: 'Any stringified payload like JSON, BASE64 etc',
         example: '{"data": "test"}'
     })
