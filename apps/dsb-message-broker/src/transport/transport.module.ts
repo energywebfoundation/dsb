@@ -15,10 +15,6 @@ const transportFactory = {
         const privateKey = configService.get('PRIVATE_KEY');
         const mbDID = configService.get('MB_DID');
 
-        // console.log("mbDID ", mbDID);
-        // const orgs = configService.get('ORGANIZATIONS');
-        // console.log("orgs ", orgs);
-
         const transport = new NATSJetstreamTransport([url], web3Url, privateKey, mbDID);
 
         await transport.connect();

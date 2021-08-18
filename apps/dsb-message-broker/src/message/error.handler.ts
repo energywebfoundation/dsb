@@ -14,8 +14,8 @@ export const messageErrorHandler = (error: any) => {
     }
 
     if (
-        error.message === 'Not authurized to publish' ||
-        error.message === 'Not authurized to subscribe'
+        error.message === 'Not authorized to publish' ||
+        error.message === 'Not authorized to subscribe'
     )
         throw new BadRequestException({ message: error.message });
 
