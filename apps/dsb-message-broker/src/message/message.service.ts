@@ -23,7 +23,7 @@ export class MessageService implements OnModuleInit {
     ): Promise<string> {
         const channelsToPublish = this.transport.channelsToPublish(senderDID, senderVR);
         const canPublish = channelsToPublish.some((channel) => channel.fqcn === fqcn);
-        if (!canPublish) throw new Error('Not authurized to publish');
+        if (!canPublish) throw new Error('Not authorized to publish');
 
         return this.transport.publish(
             fqcn,
@@ -40,7 +40,7 @@ export class MessageService implements OnModuleInit {
     ): Promise<MessageDTO[]> {
         const channelsToSubscribe = this.transport.channelsToSubscribe(receiverDID, receiverVR);
         const canSubscribe = channelsToSubscribe.some((channel) => channel.fqcn === fqcn);
-        if (!canSubscribe) throw new Error('Not authurized to subscribe');
+        if (!canSubscribe) throw new Error('Not authorized to subscribe');
 
         const messages = await this.transport.pull(fqcn, amount, receiverDID);
 
