@@ -3,9 +3,10 @@ import {
     ChannelNotFoundError,
     ITransport,
     Message,
+    Channel,
     TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
-import { NatsJetstreamAddressBook, ChannelMetadata } from '@energyweb/dsb-address-book-nats-js';
+import { NatsJetstreamAddressBook } from '@energyweb/dsb-address-book-nats-js';
 import { Logger } from '@nestjs/common';
 import {
     AckPolicy,
@@ -20,7 +21,7 @@ import {
 } from 'nats';
 import polly from 'polly-js';
 
-import { fqcnToStream } from './fqcn-utils';
+import { fqcnToStream, getStreamName, getStreamSubjects, getSubjectName } from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
@@ -70,10 +71,10 @@ export class NATSJetstreamTransport implements ITransport {
         }
     }
 
-    public async publish(fqcn: string, payload: string): Promise<string> {
+    public async publish(fqcn: string, topic = 'default', payload: string): Promise<string> {
         await this.ensureConnected();
         try {
-            const { subject } = fqcnToStream(fqcn);
+            const subject = getSubjectName(fqcn, topic);
             const publishAck = await this.jetstreamClient.publish(
                 subject,
                 this.stringCodec.encode(payload)
@@ -86,23 +87,25 @@ export class NATSJetstreamTransport implements ITransport {
         }
     }
 
-    public async createChannel(fqcn: string, metadata?: ChannelMetadata): Promise<string> {
+    public async createChannel(channel: Channel, saveToAB = true): Promise<string> {
         await this.ensureConnected();
 
-        const { stream, subject } = fqcnToStream(fqcn);
-
         try {
+            const stream = getStreamName(channel.fqcn);
+            const subjects = getStreamSubjects(stream, channel.topics);
+
             await this.jetstreamManager.streams.add({
                 name: stream,
-                subjects: [subject]
+                subjects
             });
-            if (metadata) await this.addressBook.register(fqcn, metadata);
+
+            if (saveToAB) await this.addressBook.register(channel);
+
+            return stream;
         } catch (error) {
             this.logger.error(error);
-            throw new ChannelAlreadyCreatedError(fqcn);
+            throw new ChannelAlreadyCreatedError(channel.fqcn);
         }
-
-        return stream;
     }
 
     public async removeChannel(fqcn: string): Promise<string> {
@@ -122,16 +125,16 @@ export class NATSJetstreamTransport implements ITransport {
 
     public async hasChannel(fqcn: string): Promise<boolean> {
         await this.ensureConnected();
-        const { stream } = fqcnToStream(fqcn);
+        const stream = getStreamName(fqcn);
         const streams = await this.jetstreamManager.streams.list().next();
         return streams.some((_streamInfo) => _streamInfo.config.name === stream);
     }
 
-    public async getChannelMetadata(fqcn: string): Promise<ChannelMetadata> {
+    public async getChannel(fqcn: string): Promise<Channel> {
         return this.addressBook.findByFqcn(fqcn);
     }
 
-    public async pull(fqcn: string, clientId: string, amount: number): Promise<Message[]> {
+    public async pull(fqcn: string, amount: number, clientId: string): Promise<Message[]> {
         const consumerIsAvailable = await this.hasConsumer(fqcn, clientId);
         if (!consumerIsAvailable) {
             try {
@@ -160,6 +163,7 @@ export class NATSJetstreamTransport implements ITransport {
             res.push(
                 new Message(
                     message.seq.toString(),
+                    message.subject.split('.').pop(),
                     this.stringCodec.decode(message.data),
                     message.info.timestampNanos
                 )
@@ -184,6 +188,7 @@ export class NATSJetstreamTransport implements ITransport {
             cb(
                 new Message(
                     message.seq.toString(),
+                    message.subject.split('.').pop(),
                     this.stringCodec.decode(message.data),
                     message.info.timestampNanos
                 )
@@ -240,5 +245,14 @@ export class NATSJetstreamTransport implements ITransport {
                     break;
             }
         }
+    }
+
+    public channelsToPublish(did: string, roles: string[]): Channel[] {
+        const channels = this.addressBook.findByPublishers([did, ...roles]);
+        return channels;
+    }
+    public channelsToSubscribe(did: string, roles: string[]): Channel[] {
+        const channels = this.addressBook.findBySubscribers([did, ...roles]);
+        return channels;
     }
 }

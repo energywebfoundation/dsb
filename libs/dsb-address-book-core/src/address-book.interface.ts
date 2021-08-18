@@ -1,8 +1,10 @@
-import { ChannelMetadata } from './channel-metadata';
+import { Channel } from '@energyweb/dsb-transport-core';
 
 export const IAddressBook = Symbol('IAddressBook');
 
 export interface IAddressBook {
-    register(fqcn: string, channelMetadata: ChannelMetadata): Promise<void>;
-    findByFqcn(fqcn: string): Promise<ChannelMetadata>;
+    register(channel: Channel): Promise<void>;
+    findByFqcn(fqcn: string): Channel;
+    findByPublishers(publishers: string[]): Channel[];
+    findBySubscribers(subscribers: string[]): Channel[];
 }

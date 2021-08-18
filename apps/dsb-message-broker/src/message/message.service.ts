@@ -17,21 +17,40 @@ export class MessageService implements OnModuleInit {
     }
 
     public async publish(
-        sender: string,
-        { fqcn, payload, signature }: PublishMessageDto
+        { fqcn, topic, payload, signature }: PublishMessageDto,
+        senderDID: string,
+        senderVR: string[]
     ): Promise<string> {
-        return this.transport.publish(fqcn, JSON.stringify({ sender, payload, signature }));
+        const channelsToPublish = this.transport.channelsToPublish(senderDID, senderVR);
+        const canPublish = channelsToPublish.some((channel) => channel.fqcn === fqcn);
+        if (!canPublish) throw new Error('Not authorized to publish');
+
+        return this.transport.publish(
+            fqcn,
+            topic,
+            JSON.stringify({ payload, signature, sender: senderDID })
+        );
     }
 
-    public async pull(fqcn: string, clientId: string, amount: number): Promise<MessageDTO[]> {
-        const messages = await this.transport.pull(fqcn, clientId, amount);
+    public async pull(
+        fqcn: string,
+        amount: number,
+        receiverDID: string,
+        receiverVR: string[]
+    ): Promise<MessageDTO[]> {
+        const channelsToSubscribe = this.transport.channelsToSubscribe(receiverDID, receiverVR);
+        const canSubscribe = channelsToSubscribe.some((channel) => channel.fqcn === fqcn);
+        if (!canSubscribe) throw new Error('Not authorized to subscribe');
+
+        const messages = await this.transport.pull(fqcn, amount, receiverDID);
 
         return messages.map(
             (message) =>
                 ({
                     id: message.id,
-                    timestampNanos: message.timestampNanos,
-                    ...JSON.parse(message.data)
+                    topic: message.subject,
+                    ...JSON.parse(message.data),
+                    timestampNanos: message.timestampNanos
                 } as MessageDTO)
         );
     }

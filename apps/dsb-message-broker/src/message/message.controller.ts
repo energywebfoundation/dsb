@@ -1,16 +1,12 @@
-import { ChannelNotFoundError, TransportUnavailableError } from '@energyweb/dsb-transport-core';
 import {
-    BadRequestException,
     Body,
     ClassSerializerInterceptor,
     Controller,
     Get,
     HttpStatus,
-    InternalServerErrorException,
     Logger,
     Post,
     Query,
-    ServiceUnavailableException,
     UseGuards,
     UseInterceptors,
     UsePipes,
@@ -19,16 +15,17 @@ import {
 import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/jwt.guard';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { Role } from '../auth/role.decorator';
+import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
 import { UserDecorator } from '../auth/user.decorator';
 import { MessageDTO } from './dto/message.dto';
 import { PublishMessageDto } from './dto/publish-message.dto';
 import { MessageService } from './message.service';
+import { messageErrorHandler } from './error.handler';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, DynamicRolesGuard)
 @Controller('message')
 @ApiTags('message')
 @ApiBearerAuth('access-token')
@@ -39,7 +36,7 @@ export class MessageController {
     constructor(private readonly messageService: MessageService) {}
 
     @Post()
-    @Roles('user.roles.dsb.apps.energyweb.iam.ewc')
+    @Role('user')
     @ApiBody({ type: PublishMessageDto })
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
@@ -51,25 +48,20 @@ export class MessageController {
         @Body() message: PublishMessageDto
     ): Promise<string> {
         try {
-            const id = await this.messageService.publish(user.did, message);
+            const id = await this.messageService.publish(
+                message,
+                user.did,
+                user.verifiedRoles.map((role: any) => role.namespace)
+            );
             return `msg-#${id}`;
         } catch (error) {
             this.logger.error(error.message);
-            if (error instanceof ChannelNotFoundError) {
-                throw new BadRequestException({ message: error.message });
-            }
-            if (error instanceof TransportUnavailableError) {
-                throw new ServiceUnavailableException();
-            }
-
-            throw new InternalServerErrorException({
-                message: `Unable to publish a message due an unknown error`
-            });
+            messageErrorHandler(error);
         }
     }
 
     @Get()
-    @Roles('user.roles.dsb.apps.energyweb.iam.ewc')
+    @Role('user')
     @ApiQuery({
         name: 'fqcn',
         required: true,
@@ -95,20 +87,14 @@ export class MessageController {
         try {
             const messages = await this.messageService.pull(
                 fqcn,
+                parseInt(amount) ?? this.DEFAULT_AMOUNT,
                 user.did,
-                parseInt(amount) ?? this.DEFAULT_AMOUNT
+                user.verifiedRoles.map((role: any) => role.namespace)
             );
             return messages;
         } catch (error) {
             this.logger.error(error.message);
-
-            if (error instanceof TransportUnavailableError) {
-                throw new ServiceUnavailableException();
-            }
-
-            if (error instanceof ChannelNotFoundError) {
-                throw new BadRequestException({ message: error.message });
-            }
+            messageErrorHandler(error);
         }
     }
 }

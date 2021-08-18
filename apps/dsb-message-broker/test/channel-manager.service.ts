@@ -16,7 +16,11 @@ export class ChannelManagerService {
     }
 
     public async create(channel: CreateChannelDto) {
-        await this.channelService.create(channel);
+        await this.channelService.create({
+            ...channel,
+            createdBy: '',
+            createdDateTime: new Date().toUTCString()
+        });
 
         this.channels.push(channel.fqcn);
     }

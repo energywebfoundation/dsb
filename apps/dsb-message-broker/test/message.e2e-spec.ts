@@ -52,7 +52,7 @@ describe('MessageController (e2e)', () => {
     });
 
     it('should publish a message to existing channel', async () => {
-        const fqcn = 'test.channel.test.apps.test.iam.ewc';
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
         const message: PublishMessageDto = {
             fqcn,
             payload: 'payload',
@@ -67,7 +67,7 @@ describe('MessageController (e2e)', () => {
     });
 
     it('should not publish a message to missing channel', async () => {
-        const fqcn = 'missing.channel.test.apps.test.iam.ewc';
+        const fqcn = 'missing.channels.dsb.apps.energyweb.iam.ewc';
         const message: PublishMessageDto = {
             fqcn,
             payload: 'payload',
@@ -78,7 +78,7 @@ describe('MessageController (e2e)', () => {
     });
 
     it('should be able to receive no messages if channel is empty', async () => {
-        const fqcn = 'test1.channel.test.apps.test.iam.ewc';
+        const fqcn = 'test200.channels.dsb.apps.energyweb.iam.ewc';
         await channelManagerService.create({ fqcn });
 
         await request(app)
@@ -92,7 +92,7 @@ describe('MessageController (e2e)', () => {
     });
 
     it('should be able to receive a message that was previously published', async () => {
-        const fqcn = 'test2.channel.test.apps.test.iam.ewc';
+        const fqcn = 'test300.channels.dsb.apps.energyweb.iam.ewc';
 
         const message: PublishMessageDto = {
             fqcn,
@@ -118,7 +118,7 @@ describe('MessageController (e2e)', () => {
     });
 
     it('should be able to receive multiple messages that were previously published in FIFO order', async () => {
-        const fqcn = 'test3.channel.test.apps.test.iam.ewc';
+        const fqcn = 'test400.channels.dsb.apps.energyweb.iam.ewc';
 
         const message: PublishMessageDto = {
             fqcn,
@@ -154,7 +154,7 @@ describe('MessageController (e2e)', () => {
     });
 
     it('should be able to receive multiple messages that were previously published in FIFO order using 2 pull requests', async () => {
-        const fqcn = 'test4.channel.test.apps.test.iam.ewc';
+        const fqcn = 'test500.channels.dsb.apps.energyweb.iam.ewc';
 
         const message: PublishMessageDto = {
             fqcn,
