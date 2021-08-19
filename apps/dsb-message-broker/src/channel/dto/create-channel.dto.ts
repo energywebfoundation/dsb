@@ -76,7 +76,7 @@ export class CreateChannelDto {
         type: 'number',
         required: false,
         description: 'Maximum age of any message in the channel, expressed in nanoseconds.',
-        example: 24 * 60 * 60 * 1000 * 1000
+        example: 86400000000
     })
     @IsOptional()
     maxMsgAge?: number;
