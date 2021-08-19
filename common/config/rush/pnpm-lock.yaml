@@ -24,6 +24,7 @@ dependencies:
   '@types/supertest': 2.0.10
   '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
   '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
+  ajv: 8.6.2
   base64url: 3.0.1
   chai: 4.3.4
   class-transformer: 0.4.0
@@ -9340,7 +9341,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-address-book-core'
     resolution:
-      integrity: sha512-Oz8fFpvdysaoUL4ScxjCxeTIg4ij/kdapskZX5Q1VnpLtEMLt2m8imEViBeRoCYLzoEJeT+b1CbsUDeWc8Bttg==
+      integrity: sha512-1XATc66kZr9xyVAzZunt0DdsyOgZK/Y7Zz0Bg5b8nj8LEmpOEOhk7GtT9e0tKRyA7zpt3k4QYsbbDvdgc04SgQ==
       tarball: file:projects/dsb-address-book-core.tgz
     version: 0.0.0
   file:projects/dsb-address-book-nats-js.tgz:
@@ -9348,11 +9349,12 @@ packages:
       '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
       '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
       eslint: 7.27.0
+      iam-client-lib: 3.0.0-alpha.36
       typescript: 4.3.5
     dev: false
     name: '@rush-temp/dsb-address-book-nats-js'
     resolution:
-      integrity: sha512-8SyFsGl7RrcLMqlZ6IHEXhEpNAVkWRr6O5PF1Pwl4GMa7zC9OkKhndHlKsS/wLMlMY5z7CeIQxxXhU4pvfiz8g==
+      integrity: sha512-VxlhP1Kq4EK0+VwM/glfSYrnWBRf5cnlWmzDQPWAsGUrhCvvYn4la7q9sg53Y4FXBEsPRkiDhJOFSiMtAa+r8g==
       tarball: file:projects/dsb-address-book-nats-js.tgz
     version: 0.0.0
   file:projects/dsb-message-broker.tgz:
@@ -9377,6 +9379,7 @@ packages:
       '@types/supertest': 2.0.10
       '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
       '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
+      ajv: 8.6.2
       base64url: 3.0.1
       chai: 4.3.4
       class-transformer: 0.4.0
@@ -9401,7 +9404,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-q7oGfatIsgUVPDRITDNV5tt1yCVQV5kBechxFPueTyzKPuc1ed6JJkLvFBHUTCK1qAoE4yIrNfk6IHaZCwj0uA==
+      integrity: sha512-xtvlyK3cGBBFRHQJmAvpMQCmVW6mBYtY5DFZFx4FAA/YIja1HtWaUXa8RtGWwhqqsgJXBy/IaNTJeIVwoMikKA==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -9434,7 +9437,7 @@ packages:
       reflect-metadata: '*'
       rxjs: '*'
     resolution:
-      integrity: sha512-pM6gwLMwiYqJfj3k+L7qeRgoVLk7a1Kcajv9tpDoFRw5BPFr4i/ELw8ZbtF6hzSILSBPOEtAvMEtbCtYI/4XgA==
+      integrity: sha512-koXu858AyDAsuNI9cZEdB+waRUduqMpOXLPP6SV0iMCrH7Xoij/TqvwY86+ztjCbMJrbXpEyiG3nV3HW4tJPOQ==
       tarball: file:projects/dsb-transport-nats-js.tgz
     version: 0.0.0
   github.com/ethereumjs/ethereumjs-abi/ee3994657fa7a427238e6ba92a84d0b529bbcde0:
@@ -9473,6 +9476,7 @@ specifiers:
   '@types/supertest': 2.0.10
   '@typescript-eslint/eslint-plugin': 4.19.0
   '@typescript-eslint/parser': 4.19.0
+  ajv: ~8.6.2
   base64url: 3.0.1
   chai: 4.3.4
   class-transformer: 0.4.0

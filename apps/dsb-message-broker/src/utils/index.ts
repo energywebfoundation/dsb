@@ -1,5 +1,14 @@
 export const extractFqcn = (fqcn: string) => {
-    const parts = fqcn.split('.');
+    let parts = fqcn.split('.');
+    if (
+        parts.length !== 7 ||
+        parts[1] !== 'channels' ||
+        parts[3] !== 'apps' ||
+        parts[5] !== 'iam' ||
+        parts[6] !== 'ewc'
+    )
+        parts = new Array(7).fill(undefined);
+
     return {
         channel: parts[0],
         app: parts[2],

@@ -11,7 +11,7 @@ import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
 import { MessageModule } from './message/message.module';
 
 import { organizations } from './configs';
-
+import { UtilsModule } from './utils/utils.module';
 @Module({
     imports: [
         MessageModule,
@@ -32,7 +32,8 @@ import { organizations } from './configs';
             }),
             load: [organizations]
         }),
-        AuthModule
+        AuthModule,
+        UtilsModule
     ],
     providers: [{ provide: APP_INTERCEPTOR, useClass: HTTPLoggingInterceptor }]
 })

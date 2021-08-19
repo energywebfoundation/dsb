@@ -14,8 +14,9 @@ export const messageErrorHandler = (error: any) => {
     }
 
     if (
-        error.message === 'Not authorized to publish' ||
-        error.message === 'Not authorized to subscribe'
+        error.message === 'Unauthorized to publish this message.' ||
+        error.message === 'Unauthorized to subscribe.' ||
+        error.message === 'Payload does not match the schema for the topic.'
     )
         throw new BadRequestException({ message: error.message });
 

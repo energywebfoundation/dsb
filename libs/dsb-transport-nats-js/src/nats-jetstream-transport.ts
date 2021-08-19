@@ -17,7 +17,8 @@ import {
     JetStreamManager,
     JetStreamClient,
     consumerOpts,
-    createInbox
+    createInbox,
+    StreamConfig
 } from 'nats';
 import polly from 'polly-js';
 
@@ -94,9 +95,14 @@ export class NATSJetstreamTransport implements ITransport {
             const stream = getStreamName(channel.fqcn);
             const subjects = getStreamSubjects(stream, channel.topics);
 
+            const otherOptions: Partial<StreamConfig> = {};
+            if (channel.maxMsgAge) otherOptions['max_age'] = channel.maxMsgAge;
+            if (channel.maxMsgSize) otherOptions['max_msg_size'] = channel.maxMsgSize;
+
             await this.jetstreamManager.streams.add({
                 name: stream,
-                subjects
+                subjects,
+                ...otherOptions
             });
 
             if (saveToAB) await this.addressBook.register(channel);
@@ -106,6 +112,26 @@ export class NATSJetstreamTransport implements ITransport {
             this.logger.error(error);
             throw new ChannelAlreadyCreatedError(channel.fqcn);
         }
+    }
+
+    public async updateChannel(channel: Channel): Promise<string> {
+        const stream = getStreamName(channel.fqcn);
+        const subjects = getStreamSubjects(stream, channel.topics);
+
+        const updateObject: Partial<StreamConfig> = {};
+        updateObject.subjects = subjects;
+        if (channel.maxMsgAge) updateObject['max_age'] = channel.maxMsgAge;
+        if (channel.maxMsgSize) updateObject['max_msg_size'] = channel.maxMsgSize;
+
+        const _channel = (await this.jetstreamManager.streams.info(stream)).config;
+
+        await this.jetstreamManager.streams.update({
+            ...{ ..._channel, ...updateObject }
+        });
+
+        await this.addressBook.register(channel);
+
+        return 'ok';
     }
 
     public async removeChannel(fqcn: string): Promise<string> {
@@ -130,7 +156,7 @@ export class NATSJetstreamTransport implements ITransport {
         return streams.some((_streamInfo) => _streamInfo.config.name === stream);
     }
 
-    public async getChannel(fqcn: string): Promise<Channel> {
+    public getChannel(fqcn: string): Channel {
         return this.addressBook.findByFqcn(fqcn);
     }
 
