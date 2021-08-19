@@ -12,7 +12,14 @@ import {
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiQuery,
+    ApiResponse,
+    ApiTags,
+    ApiOperation
+} from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Role } from '../auth/role.decorator';
@@ -23,10 +30,10 @@ import { PublishMessageDto } from './dto/publish-message.dto';
 import { MessageService } from './message.service';
 import { messageErrorHandler } from './error.handler';
 
+@Controller('message')
+@UseGuards(JwtAuthGuard, DynamicRolesGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
-@UseGuards(JwtAuthGuard, DynamicRolesGuard)
-@Controller('message')
 @ApiTags('message')
 @ApiBearerAuth('access-token')
 export class MessageController {
@@ -38,6 +45,9 @@ export class MessageController {
     @Post()
     @Role('user')
     @ApiBody({ type: PublishMessageDto })
+    @ApiOperation({
+        description: 'Pushes a message to a topic in a channel.'
+    })
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
         type: String,
@@ -73,6 +83,9 @@ export class MessageController {
         required: false,
         description: 'Amount of messages to be returned in the request, default value is 100',
         example: '100'
+    })
+    @ApiOperation({
+        description: 'Pulls new message from a topic in a channel.'
     })
     @ApiResponse({
         status: HttpStatus.OK,

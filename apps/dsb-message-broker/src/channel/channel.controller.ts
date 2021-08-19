@@ -6,6 +6,7 @@ import {
     Logger,
     Post,
     Get,
+    Patch,
     Param,
     UseGuards,
     UseInterceptors,
@@ -19,13 +20,15 @@ import { Role } from '../auth/role.decorator';
 import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
 import { ChannelService } from './channel.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { UpdateChannelDto } from './dto/update-channel.dto';
 import { UserDecorator } from '../auth/user.decorator';
 import { channelErrorHandler } from './error.handler';
+import { ChannelDataPipe } from './channel.data.pipe';
 
+@Controller('channel')
+@UseGuards(JwtAuthGuard, DynamicRolesGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
-@UseGuards(JwtAuthGuard, DynamicRolesGuard)
-@Controller('channel')
 @ApiTags('channel')
 @ApiBearerAuth('access-token')
 export class ChannelController {
@@ -34,7 +37,7 @@ export class ChannelController {
     constructor(private readonly channelService: ChannelService) {}
 
     @Post()
-    @Role('channelCreator') // refers to role type for each org in organizations.ts
+    @Role('channelCreator') // refers to role type for each org in configs/organizations.ts
     @ApiBody({ type: CreateChannelDto })
     @ApiOperation({
         description: 'Creates a channel'
@@ -44,12 +47,12 @@ export class ChannelController {
         type: String,
         description: "Created channel's name"
     })
-    public async create(
+    public async createChannel(
         @UserDecorator() user: any,
-        @Body() createDto: CreateChannelDto
+        @Body(ChannelDataPipe) createDto: CreateChannelDto
     ): Promise<string> {
         try {
-            const channelName = await this.channelService.create({
+            const channelName = await this.channelService.createChannel({
                 ...createDto,
                 createdBy: user.did,
                 createdDateTime: new Date().toISOString()
@@ -61,19 +64,48 @@ export class ChannelController {
         }
     }
 
+    @Patch()
+    @Role('user')
+    @ApiBody({ type: UpdateChannelDto })
+    @ApiOperation({
+        description: 'Updates a channel'
+    })
+    @ApiResponse({
+        status: HttpStatus.ACCEPTED,
+        type: String,
+        description: 'Update result'
+    })
+    public async updateChannel(
+        @UserDecorator() user: any,
+        @Body(ChannelDataPipe) updateDto: UpdateChannelDto
+    ): Promise<string> {
+        try {
+            const result = await this.channelService.updateChannel({
+                ...updateDto,
+                modifiedBy: user.did,
+                modifiedDateTime: new Date().toISOString()
+            });
+            return result;
+        } catch (error) {
+            this.logger.error(error.message);
+            channelErrorHandler(error);
+        }
+    }
+
     @Get('/pubsub')
+    @Role('user')
     @ApiOperation({
         description:
-            'Return a list of available channels for the requestor user to publish or subscribe'
+            'Returns the list of accessible channels to publish or subscribe based on DID and verified-roles of the user'
     })
     @ApiResponse({
         status: HttpStatus.OK,
         type: Array,
         description: 'Array of channels with their options'
     })
-    public async getAvailableChannels(@UserDecorator() user: any): Promise<Channel[]> {
+    public async getAccessibleChannels(@UserDecorator() user: any): Promise<Channel[]> {
         try {
-            const channels = await this.channelService.getAvailableChannels(
+            const channels = await this.channelService.getAccessibleChannels(
                 user.did,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );
@@ -85,6 +117,7 @@ export class ChannelController {
     }
 
     @Get('/:fqcn')
+    @Role('user')
     @ApiOperation({
         description: "Returns the requested channel's options"
     })

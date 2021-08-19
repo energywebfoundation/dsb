@@ -3,9 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PublishMessageDto {
     @ApiProperty({
-        type: String,
-        description: 'Fully qualified channel name (fcqn)',
-        example: 'test.channels.testapp.apps.testorganization.iam.ewc'
+        type: 'string',
+        required: true,
+        format: '{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc',
+        description: 'Fully Qualified Channel Name (fcqn)'
     })
     @IsString()
     @IsNotEmpty()
@@ -13,6 +14,7 @@ export class PublishMessageDto {
 
     @ApiProperty({
         type: String,
+        required: false,
         description: 'Topic name for the message (default value is "default")'
     })
     @IsString()
