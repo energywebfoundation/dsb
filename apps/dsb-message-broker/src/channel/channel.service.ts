@@ -3,6 +3,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { UpdateChannelDto } from './dto/update-channel.dto';
 import { RemoveChannelDto } from './dto/remove-channel.dto';
 import { TopicSchemaService } from '../utils/topic.schema.service';
 
@@ -30,7 +31,7 @@ export class ChannelService implements OnModuleInit {
     }
 
     public async updateChannel(
-        channelData: CreateChannelDto & { modifiedBy: string; modifiedDateTime: string }
+        channelData: UpdateChannelDto & { modifiedBy: string; modifiedDateTime: string }
     ): Promise<string> {
         const _channel = this.transport.getChannel(channelData.fqcn);
         if (!_channel) throw new ChannelNotFoundError(channelData.fqcn);
