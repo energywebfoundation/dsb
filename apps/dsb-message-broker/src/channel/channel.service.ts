@@ -37,7 +37,7 @@ export class ChannelService implements OnModuleInit {
         const canModify = _channel.admins.some((_admin) => _admin === channelData.modifiedBy);
         if (!canModify) throw new Error('Unauthorized to modify.');
 
-        _channel.topics.forEach((_topic) =>
+        _channel.topics.forEach((_topic: any) =>
             this.topicSchemaService.removeValidator(_channel.fqcn, _topic.namespace)
         );
 
@@ -50,7 +50,7 @@ export class ChannelService implements OnModuleInit {
 
         const uniqueChannels = [...channelsToPublish, ...channelsToSubscribe].filter(
             (channel, index, self) => {
-                return self.findIndex((_channel) => _channel.fqcn === channel.fqcn) === index;
+                return self.findIndex((_channel: any) => _channel.fqcn === channel.fqcn) === index;
             }
         );
 

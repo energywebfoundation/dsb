@@ -13,8 +13,8 @@ components:
       properties:
         fqcn:
           type: "string"
-          description: "Fully qualified channel name (fcqn)"
-          example: "test.channels.testapp.apps.testorganization.iam.ewc"
+          format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
         topic:
           type: "string"
           description: "Topic name for the message (default value is \"default\")"
@@ -27,7 +27,6 @@ components:
           description: "Compacted EcdsaSecp256k1Signature2019"
       required:
         - "fqcn"
-        - "topic"
         - "payload"
         - "signature"
     MessageDTO:
@@ -67,21 +66,31 @@ components:
       properties:
         fqcn:
           type: "string"
-          description: "Fully qualified channel name (fcqn)"
-          example: "test.channels.testapp.apps.testorganization.iam.ewc"
+          format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
         topics:
           type: "object"
-          description: "Array of topics that is available in the channel"
+          properties:
+            namespace:
+              type: "string"
+            schema:
+              type: "string | JSONSchemaType"
+          description: "Array of topic objects that determines topics for messages."
+        admins:
+          description: "Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin."
+          type: "array"
+          items:
+            type: "array"
         publishers:
-          description: "Array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          description: "A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
           type: "array"
           items:
-            type: "string"
+            type: "array"
         subscribers:
-          description: "Array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          description: "A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
           type: "array"
           items:
-            type: "string"
+            type: "array"
         maxMsgAge:
           type: "number"
           description: "Maximum age of any message in the channel, expressed in nanoseconds."
@@ -90,11 +99,44 @@ components:
           description: "Maximum size of any message in the channel, expressed in bytes."
       required:
         - "fqcn"
-        - "topics"
-        - "publishers"
-        - "subscribers"
-        - "maxMsgAge"
-        - "maxMsgSize"
+    UpdateChannelDto:
+      type: "object"
+      properties:
+        fqcn:
+          type: "string"
+          format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
+        topics:
+          type: "object"
+          properties:
+            namespace:
+              type: "string"
+            schema:
+              type: "string | JSONSchemaType"
+          description: "Array of topic objects that determines topics for messages."
+        admins:
+          description: "Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin."
+          type: "array"
+          items:
+            type: "array"
+        publishers:
+          description: "A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          type: "array"
+          items:
+            type: "array"
+        subscribers:
+          description: "A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          type: "array"
+          items:
+            type: "array"
+        maxMsgAge:
+          type: "number"
+          description: "Maximum age of any message in the channel, expressed in nanoseconds."
+        maxMsgSize:
+          type: "number"
+          description: "Maximum size of any message in the channel, expressed in bytes."
+      required:
+        - "fqcn"
     LoginDataDTO:
       type: "object"
       properties:
@@ -123,6 +165,8 @@ paths:
   /message:
     post:
       operationId: "MessageController_publish"
+      summary: ""
+      description: "Pushes a message to a topic in a channel."
       parameters: []
       requestBody:
         required: true
@@ -143,6 +187,8 @@ paths:
         - access-token: []
     get:
       operationId: "MessageController_getNewFromChannel"
+      summary: ""
+      description: "Pulls new message from a topic in a channel."
       parameters:
         - name: "fqcn"
           required: true
@@ -173,7 +219,7 @@ paths:
         - access-token: []
   /channel:
     post:
-      operationId: "ChannelController_create"
+      operationId: "ChannelController_createChannel"
       summary: ""
       description: "Creates a channel"
       parameters: []
@@ -194,11 +240,33 @@ paths:
         - "channel"
       security:
         - access-token: []
+    patch:
+      operationId: "ChannelController_updateChannel"
+      summary: ""
+      description: "Updates a channel"
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateChannelDto"
+      responses:
+        202:
+          description: "Update result"
+          content:
+            application/json:
+              schema:
+                type: "string"
+      tags:
+        - "channel"
+      security:
+        - access-token: []
   /channel/pubsub:
     get:
-      operationId: "ChannelController_getAvailableChannels"
+      operationId: "ChannelController_getAccessibleChannels"
       summary: ""
-      description: "Return a list of available channels for the requestor user to publish or subscribe"
+      description: "Returns the list of accessible channels to publish or subscribe based on DID and verified-roles of the user"
       parameters: []
       responses:
         200:
