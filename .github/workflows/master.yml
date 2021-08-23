@@ -87,6 +87,8 @@ jobs:
     - run: |
         docker tag ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}}
+        docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:canary
+        doker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:canary
 
     - name: ArgoCD login
       uses: clowdhaus/argo-cd-action/@main
