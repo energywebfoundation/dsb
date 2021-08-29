@@ -2,6 +2,8 @@ import { Message } from './message';
 
 export const ITransport = Symbol('ITransport');
 
+export { Message };
+
 export type Channel = {
     fqcn: string;
     topics?: {
@@ -24,13 +26,20 @@ export interface ITransport {
     createChannel(channel: Channel, saveToAB?: boolean): Promise<string>;
     updateChannel(channel: Channel): Promise<string>;
     removeChannel(fqcn: string): Promise<string>;
-    isConnected(): Promise<boolean>;
+    getChannel(fqcn: string): Channel;
     hasChannel(name: string): Promise<boolean>;
+    isConnected(): Promise<boolean>;
     createConsumer(name: string, clientId: string): Promise<any>;
     removeConsumer(name: string, clientId: string): Promise<boolean>;
     hasConsumer(streamChannelName: string, consumer: string): Promise<boolean>;
-    getChannel(fqcn: string): Channel;
-    subscribe(fqcn: string, clientId: string, cb: any): Promise<void>;
+    subscribe(
+        fqcn: string,
+        subject: string,
+        clientId: string,
+        cb: any,
+        socketId?: string
+    ): Promise<any>;
+    unsubscribe(subcriptionsId: number): void;
     channelsToPublish(did: string, roles: string[]): Channel[];
     channelsToSubscribe(did: string, roles: string[]): Channel[];
 }

@@ -1,11 +1,16 @@
-import { ITransport, Channel, ChannelNotFoundError } from '@energyweb/dsb-transport-core';
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
-import { RemoveChannelDto } from './dto/remove-channel.dto';
+import { ITransport, Channel } from '@energyweb/dsb-transport-core';
+
 import { TopicSchemaService } from '../utils/topic.schema.service';
+
+import { CreateChannelDto, UpdateChannelDto, RemoveChannelDto, ReadChannelDto } from './dto';
+import {
+    UnauthorizedToModifyError,
+    UnauthorizedToRemoveError,
+    UnauthorizedToGetError
+} from './error';
 
 @Injectable()
 export class ChannelService implements OnModuleInit {
@@ -23,31 +28,28 @@ export class ChannelService implements OnModuleInit {
     }
 
     public async createChannel(
-        channelData: CreateChannelDto & { createdBy: string; createdDateTime: string }
+        createDto: CreateChannelDto & { createdBy: string; createdDateTime: string }
     ): Promise<string> {
-        if (!channelData.admins) channelData.admins = [channelData.createdBy];
+        if (!createDto.admins) createDto.admins = [createDto.createdBy];
 
-        return this.transport.createChannel(channelData);
+        return this.transport.createChannel(createDto);
     }
 
     public async updateChannel(
-        channelData: UpdateChannelDto & { modifiedBy: string; modifiedDateTime: string }
+        updateDto: UpdateChannelDto & { modifiedBy: string; modifiedDateTime: string }
     ): Promise<string> {
-        const _channel = this.transport.getChannel(channelData.fqcn);
-        if (!_channel) throw new ChannelNotFoundError(channelData.fqcn);
-        const canModify = _channel.admins.some((_admin) => _admin === channelData.modifiedBy);
-        if (!canModify) throw new Error('Unauthorized to modify.');
+        this.ensureCanModifyOrRemove(updateDto.fqcn, updateDto.modifiedBy, 'modify');
 
-        _channel.topics.forEach((_topic: any) =>
-            this.topicSchemaService.removeValidator(_channel.fqcn, _topic.namespace)
-        );
+        this.topicSchemaService.removeValidators(updateDto.fqcn);
 
-        return this.transport.updateChannel({ ..._channel, ...channelData });
+        const _channel = this.transport.getChannel(updateDto.fqcn);
+
+        return this.transport.updateChannel({ ..._channel, ...updateDto });
     }
 
-    public async getAccessibleChannels(userDID: string, userVR: string[]): Promise<Channel[]> {
-        const channelsToPublish = this.transport.channelsToPublish(userDID, userVR);
-        const channelsToSubscribe = this.transport.channelsToSubscribe(userDID, userVR);
+    public async getAccessibleChannels(userDID: string, userVRs: string[]): Promise<Channel[]> {
+        const channelsToPublish = this.transport.channelsToPublish(userDID, userVRs);
+        const channelsToSubscribe = this.transport.channelsToSubscribe(userDID, userVRs);
 
         const uniqueChannels = [...channelsToPublish, ...channelsToSubscribe].filter(
             (channel, index, self) => {
@@ -58,11 +60,50 @@ export class ChannelService implements OnModuleInit {
         return uniqueChannels;
     }
 
-    public async getChannel(fqcn: string): Promise<Channel> {
+    public async getChannel({
+        fqcn,
+        usrDID,
+        usrVRs
+    }: ReadChannelDto & { usrDID: string; usrVRs: string[] }): Promise<Channel> {
+        this.ensureCanPublishOrSubscribe(fqcn, usrDID, usrVRs);
+
         return this.transport.getChannel(fqcn);
     }
 
-    public async remove({ fqcn }: RemoveChannelDto): Promise<string> {
-        return this.transport.removeChannel(fqcn);
+    public async remove({ fqcn, usrDID }: RemoveChannelDto & { usrDID: string }): Promise<string> {
+        this.ensureCanModifyOrRemove(fqcn, usrDID, 'remove');
+
+        const result = this.transport.removeChannel(fqcn);
+
+        this.topicSchemaService.removeValidators(fqcn);
+
+        return result;
+    }
+
+    private ensureCanPublishOrSubscribe(fqcn: string, usrDID: string, usrVRs: string[]) {
+        const channel = this.transport.getChannel(fqcn);
+
+        let canPublish = channel?.publishers?.some((pub: string) =>
+            [usrDID, ...usrVRs].some((usr: string) => usr === pub)
+        );
+        if (!channel || !channel.publishers || !channel.publishers.length) canPublish = true;
+
+        let canSubscribe = channel?.subscribers?.some((sub: string) =>
+            [usrDID, ...usrVRs].some((usr: string) => usr === sub)
+        );
+        if (!channel || !channel.subscribers || !channel.subscribers.length) canSubscribe = true;
+
+        if (!canPublish && !canSubscribe) throw new UnauthorizedToGetError(fqcn);
+
+        return;
+    }
+
+    private ensureCanModifyOrRemove(fqcn: string, modDID: string, mode: 'modify' | 'remove'): void {
+        const channel = this.transport.getChannel(fqcn);
+        let canModify = channel?.admins?.some((admin: string) => admin === modDID);
+        if (!channel || !channel.admins || !channel.admins.length) canModify = true;
+        if (!canModify && mode === 'modify') throw new UnauthorizedToModifyError(fqcn);
+        if (!canModify && mode === 'remove') throw new UnauthorizedToRemoveError(fqcn);
+        return;
     }
 }

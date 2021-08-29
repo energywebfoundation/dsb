@@ -15,15 +15,18 @@ export class DynamicRolesGuard implements CanActivate {
         if (!requiredRoleCategory) return true;
 
         const user = context.switchToHttp().getRequest().user;
+
         const verifiedRoles = user.verifiedRoles?.map((role: any) => role.namespace) || [];
+
         if (!verifiedRoles.length) return false;
 
         const organizations = this.configService.get('ORGANIZATIONS');
 
         const fqcn =
-            context.switchToHttp().getRequest().body?.fqcn ??
-            context.switchToHttp().getRequest().params?.fqcn ??
-            context.switchToHttp().getRequest().query?.fqcn;
+            context.switchToHttp().getRequest()?.body?.fqcn ??
+            context.switchToHttp().getRequest()?.params?.fqcn ??
+            context.switchToHttp().getRequest()?.query?.fqcn ??
+            context.switchToWs().getData()?.fqcn;
 
         let requiredRoles: string[] = [];
         if (!fqcn) {
@@ -42,7 +45,7 @@ export class DynamicRolesGuard implements CanActivate {
               requiredRoles contains requiredRoleCategory roles from a specific app in a specific org determined by fqcn
             */
             const { org, app } = extractFqcn(fqcn);
-            if (!org || !app) return true; // it will be handled in CreateChannelPipe. Otherwise this method will returns false which results in an irrelevant 403 error.
+            if (!org || !app) return true; // it will be handled in FqcnValidationPipe. Otherwise this method will returns false which results in an irrelevant 403 error.
 
             requiredRoles = (
                 organizations

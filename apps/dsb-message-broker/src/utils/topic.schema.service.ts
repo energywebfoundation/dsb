@@ -1,13 +1,13 @@
 import { ITransport } from '@energyweb/dsb-transport-core';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import Ajv, { JSONSchemaType, AnySchema } from 'ajv';
+import Ajv, { JSONSchemaType, AnySchema, ValidateFunction } from 'ajv';
 
 @Injectable()
 export class TopicSchemaService implements OnModuleInit {
     private transport: ITransport;
     private readonly ajv = new Ajv();
-    private readonly _validates = new Map<string, any>();
+    private readonly _validators = new Map<string, Record<string, ValidateFunction<unknown>>>();
 
     constructor(private readonly moduleRef: ModuleRef) {}
 
@@ -18,31 +18,46 @@ export class TopicSchemaService implements OnModuleInit {
     }
 
     public validate(fqcn: string, topic: string, payload: string): boolean {
-        let _validate = this._validates.get(fqcn + '/' + topic);
-        if (!_validate) {
+        let validators = this._validators.get(fqcn);
+        if (!validators) validators = {};
+
+        if (!validators[topic]) {
             const channel = this.transport.getChannel(fqcn);
-            const schema = channel.topics?.find(
+
+            const schema = channel?.topics?.find(
                 (_topic: any) => _topic.namespace === topic
             )?.schema;
+
             if (schema) {
                 const JSONSchema: JSONSchemaType<any> = JSON.parse(schema);
-                _validate = this.ajv.compile(JSONSchema);
-                this._validates.set(fqcn + '/' + topic, _validate);
+                validators[topic] = this.ajv.compile(JSONSchema);
+                this._validators.set(fqcn, validators);
             }
         }
-        if (_validate) {
-            const valid = _validate(JSON.parse(payload));
-            return valid;
+
+        if (validators[topic]) {
+            const _validate = validators[topic];
+            const isValid = _validate(JSON.parse(payload));
+            return isValid;
         }
+
         return true;
     }
 
     public removeValidator(fqcn: string, topic: string): void {
-        this._validates.delete(fqcn + '/' + topic);
+        const validators = this._validators.get(fqcn);
+        if (!validators) return;
+        if (validators[topic]) {
+            delete validators[topic];
+            this._validators.set(fqcn, validators);
+        }
+    }
+    public removeValidators(fqcn: string): void {
+        this._validators.delete(fqcn);
     }
 
     public validateSchema(schema: AnySchema): boolean {
-        // needs a solid schema to validate
+        // needs a better schema validation logic
         return this.ajv.validateSchema(schema) as boolean;
     }
 }

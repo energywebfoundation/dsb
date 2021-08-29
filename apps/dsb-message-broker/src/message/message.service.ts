@@ -1,13 +1,22 @@
-import { ITransport } from '@energyweb/dsb-transport-core';
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { MessageDTO } from './dto/message.dto';
-import { PublishMessageDto } from './dto/publish-message.dto';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Server as WsServer } from 'socket.io';
+
+import { ITransport, Message } from '@energyweb/dsb-transport-core';
 import { TopicSchemaService } from '../utils/topic.schema.service';
+
+import { MessageDto, PublishMessageDto } from './dto';
+import {
+    UnauthorizedToPublishError,
+    UnauthorizedToSubscribeError,
+    PayloadNotValidError
+} from './error';
 
 @Injectable()
 export class MessageService implements OnModuleInit {
     private transport: ITransport;
+    public wsServer: WsServer;
+    public subscriptions = new Map<string, Array<number>>();
 
     constructor(
         private readonly moduleRef: ModuleRef,
@@ -20,36 +29,45 @@ export class MessageService implements OnModuleInit {
         });
     }
 
+    public setWsServer(server: WsServer) {
+        this.wsServer = server;
+    }
+    public onConnection(socketId: string) {
+        this.subscriptions.set(socketId, []);
+    }
+    public onDisconnect(socketId: string) {
+        const subscriptions = this.subscriptions.get(socketId);
+        if (!subscriptions) return;
+        subscriptions.forEach((subId: number) => this.transport.unsubscribe(subId));
+        this.subscriptions.delete(socketId);
+    }
+
     public async publish(
         { fqcn, topic, payload, signature }: PublishMessageDto,
-        senderDID: string,
-        senderVR: string[]
+        pubDID: string,
+        pubVRs: string[]
     ): Promise<string> {
-        const channelsToPublish = this.transport.channelsToPublish(senderDID, senderVR);
-        const canPublish = channelsToPublish.some((channel) => channel.fqcn === fqcn);
-        if (!canPublish) throw new Error('Unauthorized to publish this message.');
+        this.ensureCanPublish(fqcn, pubDID, pubVRs);
 
         const schemaMatched = this.topicSchemaService.validate(fqcn, topic, payload);
-        if (!schemaMatched) throw new Error('Payload does not match the schema for the topic.');
+        if (!schemaMatched) throw new PayloadNotValidError(topic);
 
         return this.transport.publish(
             fqcn,
             topic,
-            JSON.stringify({ payload, signature, sender: senderDID })
+            JSON.stringify({ payload, signature, sender: pubDID })
         );
     }
 
     public async pull(
         fqcn: string,
         amount: number,
-        receiverDID: string,
-        receiverVR: string[]
-    ): Promise<MessageDTO[]> {
-        const channelsToSubscribe = this.transport.channelsToSubscribe(receiverDID, receiverVR);
-        const canSubscribe = channelsToSubscribe.some((channel) => channel.fqcn === fqcn);
-        if (!canSubscribe) throw new Error('Unauthorized to subscribe.');
+        subDID: string,
+        subVRs: string[]
+    ): Promise<MessageDto[]> {
+        this.ensureCanSubscribe(fqcn, subDID, subVRs);
 
-        const messages = await this.transport.pull(fqcn, amount, receiverDID);
+        const messages = await this.transport.pull(fqcn, amount, subDID);
 
         return messages.map(
             (message) =>
@@ -58,7 +76,71 @@ export class MessageService implements OnModuleInit {
                     topic: message.subject,
                     ...JSON.parse(message.data),
                     timestampNanos: message.timestampNanos
-                } as MessageDTO)
+                } as MessageDto)
         );
+    }
+
+    public async subscribe(
+        fqcn: string,
+        topic: string,
+        subDID: string,
+        subVRs: string[],
+        socketId: string
+    ): Promise<string> {
+        this.ensureCanSubscribe(fqcn, subDID, subVRs);
+
+        const subscriptionId = await this.transport.subscribe(
+            fqcn,
+            topic,
+            subDID,
+            this.pushMessageToSubscriber.bind(this),
+            socketId
+        );
+
+        this.addToSubscriptions(socketId, subscriptionId);
+
+        return subscriptionId;
+    }
+    public async pushMessageToSubscriber(err: any, to: string, msg: Message) {
+        if (err) throw new Error(err.message);
+        this.wsServer.to(to).emit('IncomingMessage', msg);
+    }
+
+    public unsubscribe(subscriptionId: number, socketId: string): void {
+        this.transport.unsubscribe(subscriptionId);
+        this.removeFromSubscriptions(socketId, subscriptionId);
+    }
+
+    private ensureCanPublish(fqcn: string, pubDID: string, pubVRs: string[]) {
+        const channel = this.transport.getChannel(fqcn);
+        let canPublish = channel?.publishers?.some((pub: string) =>
+            [pubDID, ...pubVRs].some((per: string) => per === pub)
+        );
+        if (!channel || !channel.publishers || !channel.publishers.length) canPublish = true;
+        if (!canPublish) throw new UnauthorizedToPublishError(fqcn);
+        return;
+    }
+    private ensureCanSubscribe(fqcn: string, subDID: string, subVRs: string[]) {
+        const channel = this.transport.getChannel(fqcn);
+        let canSubscribe = channel?.subscribers?.some((sub: string) =>
+            [subDID, ...subVRs].some((per: string) => per === sub)
+        );
+        if (!channel || !channel.subscribers || !channel.subscribers.length) canSubscribe = true;
+        if (!canSubscribe) throw new UnauthorizedToSubscribeError(fqcn);
+        return;
+    }
+
+    private addToSubscriptions(socketId: string, subscriptionId: number) {
+        let subscriptions = this.subscriptions.get(socketId);
+        if (!subscriptions) subscriptions = [];
+        subscriptions.push(subscriptionId);
+        this.subscriptions.set(socketId, subscriptions);
+    }
+    private removeFromSubscriptions(socketId: string, subscriptionId: number) {
+        const subscriptions = this.subscriptions.get(socketId);
+        if (!subscriptions) throw new Error();
+        const subIndex = subscriptions.findIndex((subId) => subId === subscriptionId);
+        subscriptions.splice(subIndex, 1);
+        this.subscriptions.set(socketId, subscriptions);
     }
 }

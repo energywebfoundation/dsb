@@ -7,22 +7,33 @@ import {
     Post,
     Get,
     Patch,
+    Delete,
     Param,
     UseGuards,
     UseInterceptors,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiBody,
+    ApiResponse,
+    ApiTags,
+    ApiOperation,
+    ApiBearerAuth,
+    ApiParam
+} from '@nestjs/swagger';
+
 import { Channel } from '@energyweb/dsb-transport-core';
+
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Role } from '../auth/role.decorator';
 import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
-import { ChannelService } from './channel.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
 import { UserDecorator } from '../auth/user.decorator';
-import { channelErrorHandler } from './error.handler';
+import { FqcnValidationPipe } from '../utils/fqcn.validation.pipe';
+
+import { ChannelService } from './channel.service';
+import { CreateChannelDto, RemoveChannelDto, UpdateChannelDto, ReadChannelDto } from './dto';
+import { ChannelErrorHandler } from './error.handler';
 import { ChannelDataPipe } from './channel.data.pipe';
 
 @Controller('channel')
@@ -49,7 +60,7 @@ export class ChannelController {
     })
     public async createChannel(
         @UserDecorator() user: any,
-        @Body(ChannelDataPipe) createDto: CreateChannelDto
+        @Body(FqcnValidationPipe, ChannelDataPipe) createDto: CreateChannelDto
     ): Promise<string> {
         try {
             const channelName = await this.channelService.createChannel({
@@ -60,7 +71,7 @@ export class ChannelController {
             return channelName;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 
@@ -88,7 +99,7 @@ export class ChannelController {
             return result;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 
@@ -112,12 +123,13 @@ export class ChannelController {
             return channels;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 
     @Get('/:fqcn')
     @Role('user')
+    @ApiParam({ name: 'fqcn', type: String })
     @ApiOperation({
         description: "Returns the requested channel's options"
     })
@@ -126,13 +138,44 @@ export class ChannelController {
         type: Object,
         description: 'Channel options'
     })
-    public async getChannel(@Param('fqcn') fqcn: string): Promise<Channel> {
+    public async getChannel(
+        @UserDecorator() user: any,
+        @Param(FqcnValidationPipe) { fqcn }: ReadChannelDto
+    ): Promise<Channel> {
         try {
-            const metadata = await this.channelService.getChannel(fqcn);
+            const metadata = await this.channelService.getChannel({
+                fqcn,
+                usrDID: user.did,
+                usrVRs: user.verifiedRoles.map((role: any) => role.namespace)
+            });
             return metadata;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
+        }
+    }
+
+    @Delete('/:fqcn')
+    @Role('user')
+    @ApiParam({ name: 'fqcn', type: String })
+    @ApiOperation({
+        description: 'Removes the channel'
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        type: String,
+        description: 'Channel deletion result'
+    })
+    public async removeChannel(
+        @UserDecorator() user: any,
+        @Param(FqcnValidationPipe) { fqcn }: RemoveChannelDto
+    ): Promise<string> {
+        try {
+            const result = await this.channelService.remove({ fqcn, usrDID: user.did });
+            return result;
+        } catch (error) {
+            this.logger.error(error.message);
+            ChannelErrorHandler(error);
         }
     }
 }

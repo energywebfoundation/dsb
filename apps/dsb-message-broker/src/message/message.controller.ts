@@ -25,10 +25,12 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Role } from '../auth/role.decorator';
 import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
 import { UserDecorator } from '../auth/user.decorator';
-import { MessageDTO } from './dto/message.dto';
-import { PublishMessageDto } from './dto/publish-message.dto';
+
+import { PublishMessageDto, MessageDto } from './dto';
 import { MessageService } from './message.service';
-import { messageErrorHandler } from './error.handler';
+import { MessageQueryPipe } from './message.query.pipe';
+import { HttpMessageErrorHandler } from './error.handler';
+import { FqcnValidationPipe } from '../utils/fqcn.validation.pipe';
 
 @Controller('message')
 @UseGuards(JwtAuthGuard, DynamicRolesGuard)
@@ -51,11 +53,11 @@ export class MessageController {
     @ApiResponse({
         status: HttpStatus.ACCEPTED,
         type: String,
-        description: 'Message id that is local to fqcn'
+        description: 'Published message ID in the specified channel'
     })
     public async publish(
         @UserDecorator() user: any,
-        @Body() message: PublishMessageDto
+        @Body(FqcnValidationPipe) message: PublishMessageDto
     ): Promise<string> {
         try {
             const id = await this.messageService.publish(
@@ -66,7 +68,7 @@ export class MessageController {
             return `msg-#${id}`;
         } catch (error) {
             this.logger.error(error.message);
-            messageErrorHandler(error);
+            HttpMessageErrorHandler(error);
         }
     }
 
@@ -75,8 +77,8 @@ export class MessageController {
     @ApiQuery({
         name: 'fqcn',
         required: true,
-        description: 'Fully qualified channel name (fqcn)',
-        example: 'test.channels.testapp.apps.testorganization.iam.ewc'
+        description: 'Fully Qualified Channel Name (fqcn)',
+        example: 'testChannel.channels.dsb.apps.energyweb.iam.ewc'
     })
     @ApiQuery({
         name: 'amount',
@@ -85,29 +87,28 @@ export class MessageController {
         example: '100'
     })
     @ApiOperation({
-        description: 'Pulls new message from a topic in a channel.'
+        description: 'Pulls new messages from the channel.'
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        type: [MessageDTO],
-        description: 'Pull and returns messages from given channel'
+        type: [MessageDto],
+        description: 'Array of pulled messages from a given channel'
     })
     public async getNewFromChannel(
         @UserDecorator() user: any,
-        @Query('fqcn') fqcn: string,
-        @Query('amount') amount: string
-    ): Promise<MessageDTO[]> {
+        @Query(FqcnValidationPipe, MessageQueryPipe) query: { fqcn: string; amount: string }
+    ): Promise<MessageDto[]> {
         try {
             const messages = await this.messageService.pull(
-                fqcn,
-                parseInt(amount) ?? this.DEFAULT_AMOUNT,
+                query.fqcn,
+                parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
                 user.did,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );
             return messages;
         } catch (error) {
             this.logger.error(error.message);
-            messageErrorHandler(error);
+            HttpMessageErrorHandler(error);
         }
     }
 }

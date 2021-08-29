@@ -14,14 +14,16 @@ components:
         fqcn:
           type: "string"
           format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
           description: "Fully Qualified Channel Name (fcqn)"
         topic:
           type: "string"
-          description: "Topic name for the message (default value is \"default\")"
+          example: "testTopic"
+          description: "Topic name of the channel (default value is \"default\")"
         payload:
           type: "string"
           description: "Any stringified payload like JSON, BASE64 etc"
-          example: "{\"data\": \"test\"}"
+          example: "{\"data\": \"testData\"}"
         signature:
           type: "string"
           description: "Compacted EcdsaSecp256k1Signature2019"
@@ -29,7 +31,7 @@ components:
         - "fqcn"
         - "payload"
         - "signature"
-    MessageDTO:
+    MessageDto:
       type: "object"
       properties:
         id:
@@ -43,14 +45,14 @@ components:
         payload:
           type: "string"
           description: "Any stringified payload like JSON, BASE64 etc"
-          example: "{\"data\": \"test\"}"
+          example: "{\"data\": \"testData\"}"
+        signature:
+          type: "string"
+          description: "Compacted EcdsaSecp256k1Signature2019"
         sender:
           type: "string"
           description: "Sender of the message"
           example: "did:ethr:0x57618002cF07E53De4a5abf1e8735882169f2efB"
-        signature:
-          type: "string"
-          description: "Compacted EcdsaSecp256k1Signature2019"
         timestampNanos:
           type: "string"
           description: "Message published timestamp in nanoseconds"
@@ -58,8 +60,8 @@ components:
         - "id"
         - "topic"
         - "payload"
-        - "sender"
         - "signature"
+        - "sender"
         - "timestampNanos"
     CreateChannelDto:
       type: "object"
@@ -67,36 +69,52 @@ components:
         fqcn:
           type: "string"
           format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
           description: "Fully Qualified Channel Name (fcqn)"
         topics:
-          type: "object"
           properties:
             namespace:
               type: "string"
             schema:
               type: "string | JSONSchemaType"
           description: "Array of topic objects that determines topics for messages."
+          example:
+            - namespace: "testTopic"
+              schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
+          type: "array"
+          items:
+            type: "string"
         admins:
           description: "Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin."
+          example:
+            - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
           type: "array"
           items:
-            type: "array"
+            type: "string"
         publishers:
           description: "A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          example:
+            - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
+            - "user.roles.dsb.apps.energyweb.iam.ewc"
           type: "array"
           items:
-            type: "array"
+            type: "string"
         subscribers:
           description: "A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          example:
+            - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
+            - "user.roles.dsb.apps.energyweb.iam.ewc"
           type: "array"
           items:
-            type: "array"
+            type: "string"
         maxMsgAge:
           type: "number"
           description: "Maximum age of any message in the channel, expressed in nanoseconds."
+          example: 86400000000
         maxMsgSize:
           type: "number"
           description: "Maximum size of any message in the channel, expressed in bytes."
+          example: 1000000
       required:
         - "fqcn"
     UpdateChannelDto:
@@ -105,36 +123,52 @@ components:
         fqcn:
           type: "string"
           format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
           description: "Fully Qualified Channel Name (fcqn)"
         topics:
-          type: "object"
           properties:
             namespace:
               type: "string"
             schema:
               type: "string | JSONSchemaType"
           description: "Array of topic objects that determines topics for messages."
+          example:
+            - namespace: "testTopic"
+              schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
+          type: "array"
+          items:
+            type: "string"
         admins:
           description: "Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin."
+          example:
+            - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
           type: "array"
           items:
-            type: "array"
+            type: "string"
         publishers:
           description: "A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          example:
+            - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
+            - "user.roles.dsb.apps.energyweb.iam.ewc"
           type: "array"
           items:
-            type: "array"
+            type: "string"
         subscribers:
           description: "A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          example:
+            - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
+            - "user.roles.dsb.apps.energyweb.iam.ewc"
           type: "array"
           items:
-            type: "array"
+            type: "string"
         maxMsgAge:
           type: "number"
           description: "Maximum age of any message in the channel, expressed in nanoseconds."
+          example: 86400000000
         maxMsgSize:
           type: "number"
           description: "Maximum size of any message in the channel, expressed in bytes."
+          example: 1000000
       required:
         - "fqcn"
     LoginDataDTO:
@@ -176,7 +210,7 @@ paths:
               $ref: "#/components/schemas/PublishMessageDto"
       responses:
         202:
-          description: "Message id that is local to fqcn"
+          description: "Published message ID in the specified channel"
           content:
             application/json:
               schema:
@@ -188,31 +222,29 @@ paths:
     get:
       operationId: "MessageController_getNewFromChannel"
       summary: ""
-      description: "Pulls new message from a topic in a channel."
+      description: "Pulls new messages from the channel."
       parameters:
-        - name: "fqcn"
-          required: true
-          in: "query"
-          description: "Fully qualified channel name (fqcn)"
-          example: "test.channels.testapp.apps.testorganization.iam.ewc"
-          schema:
-            type: "string"
         - name: "amount"
           required: false
           in: "query"
           description: "Amount of messages to be returned in the request, default value is 100"
           example: "100"
-          schema:
-            type: "string"
+          schema: {}
+        - name: "fqcn"
+          required: true
+          in: "query"
+          description: "Fully Qualified Channel Name (fqcn)"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
+          schema: {}
       responses:
         200:
-          description: "Pull and returns messages from given channel"
+          description: "Array of pulled messages from a given channel"
           content:
             application/json:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/MessageDTO"
+                  $ref: "#/components/schemas/MessageDto"
       tags:
         - "message"
       security:
@@ -288,7 +320,10 @@ paths:
         - name: "fqcn"
           required: true
           in: "path"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
           schema:
+            format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
             type: "string"
       responses:
         200:
@@ -297,6 +332,30 @@ paths:
             application/json:
               schema:
                 type: "object"
+      tags:
+        - "channel"
+      security:
+        - access-token: []
+    delete:
+      operationId: "ChannelController_removeChannel"
+      summary: ""
+      description: "Removes the channel"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "path"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
+          schema:
+            format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+            type: "string"
+      responses:
+        200:
+          description: "Channel deletion result"
+          content:
+            application/json:
+              schema:
+                type: "string"
       tags:
         - "channel"
       security:

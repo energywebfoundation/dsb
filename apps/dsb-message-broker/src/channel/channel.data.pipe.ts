@@ -1,8 +1,10 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+import { Channel } from '@energyweb/dsb-transport-core';
+
 import { extractFqcn } from '../utils';
 import { TopicSchemaService } from '../utils/topic.schema.service';
-import { Channel } from '@energyweb/dsb-transport-core';
 
 @Injectable()
 export class ChannelDataPipe implements PipeTransform<any> {
@@ -13,8 +15,6 @@ export class ChannelDataPipe implements PipeTransform<any> {
 
     async transform(channelData: Channel) {
         const { org, app, channel } = extractFqcn(channelData.fqcn);
-        if (!org || !app || !channel)
-            throw new BadRequestException('fqcn is not a fully qualified channel name.');
 
         const organizations = this.configService.get('ORGANIZATIONS');
 
@@ -26,17 +26,28 @@ export class ChannelDataPipe implements PipeTransform<any> {
                 return new RegExp(_app.channels).test(channel);
             });
         });
-        if (!fqcnIsValid) throw new BadRequestException('fqcn does not match the defined pattern.');
+        if (!fqcnIsValid) {
+            throw new BadRequestException({
+                statusCode: 400,
+                message: 'fqcn does not match the defined pattern.',
+                error: 'Bad Request'
+            });
+        }
 
-        channelData.topics?.forEach((topic: any) => {
+        channelData.topics?.forEach((topic: any, index: number) => {
             let _schema: any = topic.schema;
 
             if (typeof _schema === 'string') _schema = JSON.parse(_schema);
 
             const isValid = this.topicSchemaService.validateSchema(_schema);
 
-            if (!isValid)
-                throw new BadRequestException(`Topic schema in ${topic.namespace} is not valid.`);
+            if (!isValid) {
+                throw new BadRequestException({
+                    statusCode: 400,
+                    message: `topics.${index}.schema is not valid`,
+                    error: 'Bad Request'
+                });
+            }
 
             if (typeof topic.schema !== 'string') topic.schema = JSON.stringify(_schema);
         });
