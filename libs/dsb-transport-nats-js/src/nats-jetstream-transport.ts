@@ -28,13 +28,7 @@ import {
 } from 'nats';
 import polly from 'polly-js';
 
-import {
-    fqcnToStream,
-    getStreamName,
-    getStreamSubjects,
-    getSubjectName,
-    streamToFqcn
-} from './fqcn-utils';
+import { fqcnToStream, getStreamName, getStreamSubjects, getSubjectName } from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
@@ -139,6 +133,8 @@ export class NATSJetstreamTransport implements ITransport {
 
         try {
             await this.jetstreamManager.streams.delete(stream);
+
+            await this.addressBook.remove(fqcn);
         } catch (error) {
             this.logger.error(error);
             throw new ChannelNotFoundError(fqcn);
@@ -161,7 +157,6 @@ export class NATSJetstreamTransport implements ITransport {
     public async publish(fqcn: string, topic = 'default', payload: string): Promise<string> {
         await this.ensureConnected();
         try {
-            // console.log("topic ", topic);
             const subject = getSubjectName(fqcn, topic);
             const publishAck = await this.jetstreamClient.publish(
                 subject,
@@ -284,11 +279,8 @@ export class NATSJetstreamTransport implements ITransport {
         const { stream } = fqcnToStream(fqcn);
 
         const consumers = await this.jetstreamManager.consumers.list(stream).next();
-        // console.log("consumers", consumers);
 
         return consumers.some((consumerInfo) => {
-            // console.log("consumerInfo ", consumerInfo);
-
             return consumerInfo.name === consumer;
         });
     }

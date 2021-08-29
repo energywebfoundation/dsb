@@ -30,6 +30,7 @@ import { PublishMessageDto, MessageDto } from './dto';
 import { MessageService } from './message.service';
 import { MessageQueryPipe } from './message.query.pipe';
 import { HttpMessageErrorHandler } from './error.handler';
+import { FqcnValidationPipe } from '../utils/fqcn.validation.pipe';
 
 @Controller('message')
 @UseGuards(JwtAuthGuard, DynamicRolesGuard)
@@ -56,7 +57,7 @@ export class MessageController {
     })
     public async publish(
         @UserDecorator() user: any,
-        @Body() message: PublishMessageDto
+        @Body(FqcnValidationPipe) message: PublishMessageDto
     ): Promise<string> {
         try {
             const id = await this.messageService.publish(
@@ -95,13 +96,12 @@ export class MessageController {
     })
     public async getNewFromChannel(
         @UserDecorator() user: any,
-        @Query('fqcn', MessageQueryPipe) fqcn: string,
-        @Query('amount') amount: string
+        @Query(FqcnValidationPipe, MessageQueryPipe) query: { fqcn: string; amount: string }
     ): Promise<MessageDto[]> {
         try {
             const messages = await this.messageService.pull(
-                fqcn,
-                parseInt(amount) ?? this.DEFAULT_AMOUNT,
+                query.fqcn,
+                parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
                 user.did,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );

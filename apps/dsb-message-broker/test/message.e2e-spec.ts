@@ -74,7 +74,7 @@ describe('MessageController (e2e)', () => {
             signature: 'sig'
         };
 
-        await request(app).post('/message').send(message).expect(HttpStatus.BAD_REQUEST);
+        await request(app).post('/message').send(message).expect(HttpStatus.NOT_FOUND);
     });
 
     it('should be able to receive no messages if channel is empty', async () => {

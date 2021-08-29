@@ -58,4 +58,22 @@ describe('ChannelController (e2e)', () => {
     it('should create a channel', async () => {
         await request(app).post('/channel').send({ fqcn }).expect(HttpStatus.CREATED);
     });
+
+    // TODO
+
+    // it('should not create a channel without having channelcreation role in the org for the app', async () => {});
+
+    // it('should not create a channel with missing fqcn', async () => {});
+
+    // it('should not create a channel with invalid fqcn', async () => {});
+
+    // it('should not create a channel with invalid metadata', async () => {});
+
+    // it('should modify a channel', async () => {});
+
+    // it('should not be able to modify a channel without having admin permission', async () => {});
+
+    // it('should remove a channel', async () => {});
+
+    // it('should not be able to remove a channel without having admin permission', async () => {});
 });

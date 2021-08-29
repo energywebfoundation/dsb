@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    UnauthorizedException,
     InternalServerErrorException,
     ServiceUnavailableException,
     NotFoundException
@@ -11,7 +12,16 @@ import {
     TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
 
-import { FqcnNotQualifiedError, FqcnNotMatchedError, TopicSchemaNotValid } from './error';
+import {
+    FqcnNotQualifiedError,
+    FqcnNotMatchedError,
+    TopicSchemaNotValid,
+    UnauthorizedToGetError,
+    UnauthorizedToModifyError,
+    UnauthorizedToRemoveError
+} from './error';
+
+// TODO: changing errors to exceptions and error handlers to exception filters
 
 export const ChannelErrorHandler = (error: any) => {
     if (
@@ -24,6 +34,18 @@ export const ChannelErrorHandler = (error: any) => {
             statusCode: 400,
             message: error.message,
             error: 'Bad Request'
+        });
+    }
+
+    if (
+        error instanceof UnauthorizedToGetError ||
+        error instanceof UnauthorizedToModifyError ||
+        error instanceof UnauthorizedToRemoveError
+    ) {
+        throw new UnauthorizedException({
+            statusCode: 401,
+            message: error.message,
+            error: 'Unauthorized'
         });
     }
 

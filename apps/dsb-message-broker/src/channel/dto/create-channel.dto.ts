@@ -45,7 +45,7 @@ export class CreateChannelDto {
         example: [
             {
                 namespace: 'testTopic',
-                schema: '{"type":"object","properties":{"foo":{"type":"integer"},"bar":{"type":"string"}},"required":["foo"],"additionalProperties":false}'
+                schema: '{"type": "object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
             }
         ]
     })

@@ -1,6 +1,6 @@
 export class ChannelNotFoundError extends Error {
     constructor(fqcn: string) {
-        super(`Channel ${fqcn} does not exist.`);
+        super(`Channel (${fqcn}) does not exist.`);
     }
 }
 export class ChannelOrTopicNotFoundError extends Error {

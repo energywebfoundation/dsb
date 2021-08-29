@@ -97,4 +97,8 @@ export class NatsJetstreamAddressBook implements IAddressBook {
 
         await this.transport.publish(this.addressBookChannel, 'default', claim);
     }
+
+    public remove(fqcn: string): void {
+        this.cache.delete(fqcn);
+    }
 }

@@ -11,14 +11,17 @@ export class ChannelManagerService {
 
     public async cleanUp(): Promise<void> {
         for (const channel of this.channels) {
-            await this.channelService.remove({ fqcn: channel });
+            await this.channelService.remove({
+                fqcn: channel,
+                usrDID: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596'
+            });
         }
     }
 
     public async create(channel: CreateChannelDto) {
         await this.channelService.createChannel({
             ...channel,
-            createdBy: '',
+            createdBy: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
             createdDateTime: new Date().toUTCString()
         });
 
@@ -26,6 +29,9 @@ export class ChannelManagerService {
     }
 
     public async remove(channel: string) {
-        await this.channelService.remove({ fqcn: channel });
+        await this.channelService.remove({
+            fqcn: channel,
+            usrDID: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596'
+        });
     }
 }

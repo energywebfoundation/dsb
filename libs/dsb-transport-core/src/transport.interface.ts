@@ -26,12 +26,12 @@ export interface ITransport {
     createChannel(channel: Channel, saveToAB?: boolean): Promise<string>;
     updateChannel(channel: Channel): Promise<string>;
     removeChannel(fqcn: string): Promise<string>;
-    isConnected(): Promise<boolean>;
+    getChannel(fqcn: string): Channel;
     hasChannel(name: string): Promise<boolean>;
+    isConnected(): Promise<boolean>;
     createConsumer(name: string, clientId: string): Promise<any>;
     removeConsumer(name: string, clientId: string): Promise<boolean>;
     hasConsumer(streamChannelName: string, consumer: string): Promise<boolean>;
-    getChannel(fqcn: string): Channel;
     subscribe(
         fqcn: string,
         subject: string,

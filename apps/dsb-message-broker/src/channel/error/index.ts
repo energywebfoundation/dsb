@@ -16,8 +16,20 @@ export class TopicSchemaNotValid extends Error {
     }
 }
 
+export class UnauthorizedToGetError extends Error {
+    constructor(fqcn: string) {
+        super(`Unauthorized to get the channel (${fqcn}).`);
+    }
+}
+
 export class UnauthorizedToModifyError extends Error {
     constructor(fqcn: string) {
         super(`Unauthorized to modify the channel (${fqcn}).`);
+    }
+}
+
+export class UnauthorizedToRemoveError extends Error {
+    constructor(fqcn: string) {
+        super(`Unauthorized to remove the channel (${fqcn}).`);
     }
 }

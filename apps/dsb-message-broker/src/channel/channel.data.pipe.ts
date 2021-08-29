@@ -15,13 +15,6 @@ export class ChannelDataPipe implements PipeTransform<any> {
 
     async transform(channelData: Channel) {
         const { org, app, channel } = extractFqcn(channelData.fqcn);
-        if (!org || !app || !channel) {
-            throw new BadRequestException({
-                statusCode: 400,
-                message: 'fqcn is not a fully qualified channel name.',
-                error: 'Bad Request'
-            });
-        }
 
         const organizations = this.configService.get('ORGANIZATIONS');
 

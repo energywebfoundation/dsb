@@ -80,7 +80,7 @@ components:
           description: "Array of topic objects that determines topics for messages."
           example:
             - namespace: "testTopic"
-              schema: "{\"type\":\"object\",\"properties\":{\"foo\":{\"type\":\"integer\"},\"bar\":{\"type\":\"string\"}},\"required\":[\"foo\"],\"additionalProperties\":false}"
+              schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
           type: "array"
           items:
             type: "string"
@@ -134,7 +134,7 @@ components:
           description: "Array of topic objects that determines topics for messages."
           example:
             - namespace: "testTopic"
-              schema: "{\"type\":\"object\",\"properties\":{\"foo\":{\"type\":\"integer\"},\"bar\":{\"type\":\"string\"}},\"required\":[\"foo\"],\"additionalProperties\":false}"
+              schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
           type: "array"
           items:
             type: "string"
@@ -224,20 +224,18 @@ paths:
       summary: ""
       description: "Pulls new messages from the channel."
       parameters:
-        - name: "fqcn"
-          required: true
-          in: "query"
-          description: "Fully Qualified Channel Name (fqcn)"
-          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
-          schema:
-            type: "string"
         - name: "amount"
           required: false
           in: "query"
           description: "Amount of messages to be returned in the request, default value is 100"
           example: "100"
-          schema:
-            type: "string"
+          schema: {}
+        - name: "fqcn"
+          required: true
+          in: "query"
+          description: "Fully Qualified Channel Name (fqcn)"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
+          schema: {}
       responses:
         200:
           description: "Array of pulled messages from a given channel"
@@ -322,7 +320,10 @@ paths:
         - name: "fqcn"
           required: true
           in: "path"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
           schema:
+            format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
             type: "string"
       responses:
         200:
@@ -331,6 +332,30 @@ paths:
             application/json:
               schema:
                 type: "object"
+      tags:
+        - "channel"
+      security:
+        - access-token: []
+    delete:
+      operationId: "ChannelController_removeChannel"
+      summary: ""
+      description: "Removes the channel"
+      parameters:
+        - name: "fqcn"
+          required: true
+          in: "path"
+          example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
+          description: "Fully Qualified Channel Name (fcqn)"
+          schema:
+            format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+            type: "string"
+      responses:
+        200:
+          description: "Channel deletion result"
+          content:
+            application/json:
+              schema:
+                type: "string"
       tags:
         - "channel"
       security:

@@ -2,8 +2,9 @@ import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class MessageQueryPipe implements PipeTransform<any> {
-    async transform(value: string) {
-        if (!value) throw new BadRequestException('fqcn is missing in the query!');
-        return value;
+    async transform(data: any) {
+        if (!data.fqcn) throw new BadRequestException('fqcn is missing in the query!');
+        if (typeof data.fqcn !== 'string') throw new BadRequestException('fqcn must be a string!');
+        return data;
     }
 }
