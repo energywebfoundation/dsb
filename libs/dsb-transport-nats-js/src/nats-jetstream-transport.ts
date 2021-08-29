@@ -1,13 +1,16 @@
+import { Logger } from '@nestjs/common';
+
 import {
     ChannelAlreadyCreatedError,
     ChannelNotFoundError,
+    ChannelOrTopicNotFoundError,
     ITransport,
     Message,
     Channel,
     TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
 import { NatsJetstreamAddressBook } from '@energyweb/dsb-address-book-nats-js';
-import { Logger } from '@nestjs/common';
+
 import {
     AckPolicy,
     connect,
@@ -15,14 +18,23 @@ import {
     StringCodec,
     ConsumerInfo,
     JetStreamManager,
+    JetStreamSubscription,
     JetStreamClient,
     consumerOpts,
     createInbox,
-    StreamConfig
+    StreamConfig,
+    NatsError,
+    JsMsg
 } from 'nats';
 import polly from 'polly-js';
 
-import { fqcnToStream, getStreamName, getStreamSubjects, getSubjectName } from './fqcn-utils';
+import {
+    fqcnToStream,
+    getStreamName,
+    getStreamSubjects,
+    getSubjectName,
+    streamToFqcn
+} from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
@@ -34,6 +46,8 @@ export class NATSJetstreamTransport implements ITransport {
     private isTransportConnected = false;
 
     private addressBook: NatsJetstreamAddressBook;
+
+    private subcriptions = new Map<number, JetStreamSubscription>();
 
     constructor(
         private readonly servers: string[],
@@ -69,22 +83,6 @@ export class NATSJetstreamTransport implements ITransport {
             this.logger.error(`Unable to connect to ${this.servers}. Error: ${error}`);
 
             throw new Error('Unable to connect to the transport layer');
-        }
-    }
-
-    public async publish(fqcn: string, topic = 'default', payload: string): Promise<string> {
-        await this.ensureConnected();
-        try {
-            const subject = getSubjectName(fqcn, topic);
-            const publishAck = await this.jetstreamClient.publish(
-                subject,
-                this.stringCodec.encode(payload)
-            );
-
-            return publishAck.seq.toString();
-        } catch (error) {
-            this.logger.error(error);
-            throw new ChannelNotFoundError(fqcn);
         }
     }
 
@@ -160,6 +158,23 @@ export class NATSJetstreamTransport implements ITransport {
         return this.addressBook.findByFqcn(fqcn);
     }
 
+    public async publish(fqcn: string, topic = 'default', payload: string): Promise<string> {
+        await this.ensureConnected();
+        try {
+            // console.log("topic ", topic);
+            const subject = getSubjectName(fqcn, topic);
+            const publishAck = await this.jetstreamClient.publish(
+                subject,
+                this.stringCodec.encode(payload)
+            );
+
+            return publishAck.seq.toString();
+        } catch (error) {
+            this.logger.error(error);
+            throw new ChannelOrTopicNotFoundError(fqcn, topic);
+        }
+    }
+
     public async pull(fqcn: string, amount: number, clientId: string): Promise<Message[]> {
         const consumerIsAvailable = await this.hasConsumer(fqcn, clientId);
         if (!consumerIsAvailable) {
@@ -199,27 +214,51 @@ export class NATSJetstreamTransport implements ITransport {
         return res;
     }
 
-    public async subscribe(fqcn: string, clientId: string, cb: any): Promise<void> {
-        const { subject } = fqcnToStream(fqcn);
+    public async subscribe(
+        fqcn: string,
+        topic: string,
+        clientId: string,
+        cb: any,
+        socketId?: string
+    ): Promise<number> {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const _this = this;
+        const _subject = getSubjectName(fqcn, topic);
 
         const opts = consumerOpts();
         opts.durable(clientId);
         opts.manualAck();
         opts.ackExplicit();
         opts.deliverTo(createInbox());
-
-        const messageIterator = await this.jetstreamClient.subscribe(subject, opts);
-        for await (const message of messageIterator) {
-            message.ack();
-            cb(
+        opts.callback(function (err: NatsError | null, msg: JsMsg | null) {
+            if (err) return cb(err);
+            msg.ack();
+            const cbBody = [];
+            if (socketId) cbBody.push(socketId);
+            cbBody.push(
                 new Message(
-                    message.seq.toString(),
-                    message.subject.split('.').pop(),
-                    this.stringCodec.decode(message.data),
-                    message.info.timestampNanos
+                    msg.seq.toString(),
+                    msg.subject.split('.').pop(),
+                    _this.stringCodec.decode(msg.data),
+                    msg.info.timestampNanos
                 )
             );
+            cb(null, ...cbBody);
+        });
+
+        const subscription = await this.jetstreamClient.subscribe(_subject, opts);
+        const subcriptionsId = subscription.getID();
+        this.subcriptions.set(subcriptionsId, subscription);
+        return subcriptionsId;
+    }
+
+    public unsubscribe(subcriptionsId: number): void {
+        const subscription = this.subcriptions.get(subcriptionsId);
+        if (subscription) {
+            subscription.unsubscribe();
+            this.subcriptions.delete(subcriptionsId);
         }
+        return;
     }
 
     public async createConsumer(fqcn: string, clientId: string): Promise<ConsumerInfo> {
@@ -245,7 +284,13 @@ export class NATSJetstreamTransport implements ITransport {
         const { stream } = fqcnToStream(fqcn);
 
         const consumers = await this.jetstreamManager.consumers.list(stream).next();
-        return consumers.some((consumerInfo) => consumerInfo.name === consumer);
+        // console.log("consumers", consumers);
+
+        return consumers.some((consumerInfo) => {
+            // console.log("consumerInfo ", consumerInfo);
+
+            return consumerInfo.name === consumer;
+        });
     }
 
     private async ensureConnected() {

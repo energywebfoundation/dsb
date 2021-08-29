@@ -1,11 +1,12 @@
-import { ITransport, Channel, ChannelNotFoundError } from '@energyweb/dsb-transport-core';
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
-import { RemoveChannelDto } from './dto/remove-channel.dto';
+import { ITransport, Channel, ChannelNotFoundError } from '@energyweb/dsb-transport-core';
+
 import { TopicSchemaService } from '../utils/topic.schema.service';
+
+import { CreateChannelDto, UpdateChannelDto, RemoveChannelDto } from './dto';
+import { UnauthorizedToModifyError } from './error';
 
 @Injectable()
 export class ChannelService implements OnModuleInit {
@@ -33,10 +34,9 @@ export class ChannelService implements OnModuleInit {
     public async updateChannel(
         channelData: UpdateChannelDto & { modifiedBy: string; modifiedDateTime: string }
     ): Promise<string> {
+        this.ensureCanModify(channelData.fqcn, channelData.modifiedBy);
+
         const _channel = this.transport.getChannel(channelData.fqcn);
-        if (!_channel) throw new ChannelNotFoundError(channelData.fqcn);
-        const canModify = _channel.admins.some((_admin) => _admin === channelData.modifiedBy);
-        if (!canModify) throw new Error('Unauthorized to modify.');
 
         _channel.topics.forEach((_topic: any) =>
             this.topicSchemaService.removeValidator(_channel.fqcn, _topic.namespace)
@@ -64,5 +64,13 @@ export class ChannelService implements OnModuleInit {
 
     public async remove({ fqcn }: RemoveChannelDto): Promise<string> {
         return this.transport.removeChannel(fqcn);
+    }
+
+    private ensureCanModify(fqcn: string, modDID: string) {
+        const channel = this.transport.getChannel(fqcn);
+        let canModify = channel?.admins?.some((admin: string) => admin === modDID);
+        if (!channel || !channel.admins || !channel.admins.length) canModify = true;
+        if (!canModify) throw new UnauthorizedToModifyError(fqcn);
+        return;
     }
 }

@@ -21,9 +21,11 @@ export class TopicSchemaService implements OnModuleInit {
         let _validate = this._validates.get(fqcn + '/' + topic);
         if (!_validate) {
             const channel = this.transport.getChannel(fqcn);
-            const schema = channel.topics?.find(
+
+            const schema = channel?.topics?.find(
                 (_topic: any) => _topic.namespace === topic
             )?.schema;
+
             if (schema) {
                 const JSONSchema: JSONSchemaType<any> = JSON.parse(schema);
                 _validate = this.ajv.compile(JSONSchema);

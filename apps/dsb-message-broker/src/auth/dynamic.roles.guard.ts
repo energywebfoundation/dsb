@@ -13,9 +13,14 @@ export class DynamicRolesGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const requiredRoleCategory = this.reflector.get<string>('role', context.getHandler());
         if (!requiredRoleCategory) return true;
+        // console.log('requiredRoleCategory ', requiredRoleCategory);
 
         const user = context.switchToHttp().getRequest().user;
+        // console.log('user ', user);
+
         const verifiedRoles = user.verifiedRoles?.map((role: any) => role.namespace) || [];
+        // console.log('verifiedRoles ', verifiedRoles);
+
         if (!verifiedRoles.length) return false;
 
         const organizations = this.configService.get('ORGANIZATIONS');
@@ -24,6 +29,7 @@ export class DynamicRolesGuard implements CanActivate {
             context.switchToHttp().getRequest().body?.fqcn ??
             context.switchToHttp().getRequest().params?.fqcn ??
             context.switchToHttp().getRequest().query?.fqcn;
+        // console.log('fqcn ', fqcn);
 
         let requiredRoles: string[] = [];
         if (!fqcn) {
@@ -50,6 +56,7 @@ export class DynamicRolesGuard implements CanActivate {
                     ?.apps.find((_app: any) => _app.name === app)?.roles[requiredRoleCategory] || []
             ).map((role: string) => `${role}.roles.${app}.apps.${org}.iam.ewc`);
         }
+        // console.log('requiredRoles ', requiredRoles);
 
         return verifiedRoles.some((verified: string) =>
             requiredRoles.some((required: string) => required === verified)

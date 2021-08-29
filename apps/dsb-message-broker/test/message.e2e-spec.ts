@@ -6,7 +6,7 @@ import { AppModule } from '../src/app.module';
 import { request } from './request';
 import { ChannelManagerService } from './channel-manager.service';
 import { ChannelService } from '../src/channel/channel.service';
-import { MessageDTO } from '../src/message/dto/message.dto';
+import { MessageDto } from '../src/message/dto/message.dto';
 import { expect } from 'chai';
 import { JwtAuthGuard } from '../src/auth/jwt.guard';
 
@@ -85,7 +85,7 @@ describe('MessageController (e2e)', () => {
             .get(`/message?fqcn=${fqcn}&amount=10`)
             .expect(HttpStatus.OK)
             .expect((res) => {
-                const messages = res.body as MessageDTO[];
+                const messages = res.body as MessageDto[];
 
                 expect(messages).to.have.lengthOf(0);
             });
@@ -107,7 +107,7 @@ describe('MessageController (e2e)', () => {
             .get(`/message?fqcn=${fqcn}&amount=10`)
             .expect(HttpStatus.OK)
             .expect((res) => {
-                const messages = res.body as MessageDTO[];
+                const messages = res.body as MessageDto[];
 
                 expect(messages).to.have.lengthOf(1);
 
@@ -145,7 +145,7 @@ describe('MessageController (e2e)', () => {
             .get(`/message?fqcn=${fqcn}&amount=3`)
             .expect(HttpStatus.OK)
             .expect((res) => {
-                const messages = res.body as MessageDTO[];
+                const messages = res.body as MessageDto[];
 
                 expect(messages).to.have.lengthOf(3);
                 expect(messages[0].payload).to.be.equal('1');
@@ -181,7 +181,7 @@ describe('MessageController (e2e)', () => {
             .get(`/message?fqcn=${fqcn}&amount=1`)
             .expect(HttpStatus.OK)
             .expect((res) => {
-                const messages = res.body as MessageDTO[];
+                const messages = res.body as MessageDto[];
 
                 expect(messages).to.have.lengthOf(1);
                 expect(messages[0].payload).to.be.equal('1');
@@ -191,7 +191,7 @@ describe('MessageController (e2e)', () => {
             .get(`/message?fqcn=${fqcn}&amount=2`)
             .expect(HttpStatus.OK)
             .expect((res) => {
-                const messages = res.body as MessageDTO[];
+                const messages = res.body as MessageDto[];
 
                 expect(messages).to.have.lengthOf(2);
                 expect(messages[0].payload).to.be.equal('2');

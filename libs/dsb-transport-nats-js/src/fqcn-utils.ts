@@ -31,3 +31,10 @@ export const getSubjectName = (fqcn: string, topic: string) => {
 
     return subject;
 };
+
+export const streamToFqcn = (stream: string): string => {
+    const split = stream.split('_');
+    const reversed = split.reverse();
+    const fqcn = reversed.join('.');
+    return fqcn;
+};

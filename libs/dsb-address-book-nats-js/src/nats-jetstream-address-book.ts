@@ -36,10 +36,15 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         if (adConsumerIsAvaiable)
             await this.transport.removeConsumer(this.addressBookChannel, this.mbDID);
 
-        this.transport.subscribe(this.addressBookChannel, this.mbDID, async (msg: any) => {
-            const claim: any = await this.iam.decodeJWTToken({ token: msg.data });
-            this.cache.set(claim.sub, claim.claimData);
-        });
+        this.transport.subscribe(
+            this.addressBookChannel,
+            'default',
+            this.mbDID,
+            async (err: Error, msg: any) => {
+                const claim: any = await this.iam.decodeJWTToken({ token: msg.data });
+                this.cache.set(claim.sub, claim.claimData);
+            }
+        );
     }
 
     public findByFqcn(fqcn: string): Channel {

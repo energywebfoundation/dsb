@@ -1,21 +1,21 @@
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PublishMessageDto {
     @ApiProperty({
-        type: 'string',
-        required: true,
+        type: String,
         format: '{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc',
+        example: 'testChannel.channels.dsb.apps.energyweb.iam.ewc',
         description: 'Fully Qualified Channel Name (fcqn)'
     })
     @IsString()
     @IsNotEmpty()
     fqcn: string;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         type: String,
-        required: false,
-        description: 'Topic name for the message (default value is "default")'
+        example: 'testTopic',
+        description: 'Topic name of the channel (default value is "default")'
     })
     @IsString()
     @IsOptional()
@@ -24,7 +24,7 @@ export class PublishMessageDto {
     @ApiProperty({
         type: String,
         description: 'Any stringified payload like JSON, BASE64 etc',
-        example: '{"data": "test"}'
+        example: '{"data": "testData"}'
     })
     @IsString()
     @IsNotEmpty()

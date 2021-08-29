@@ -14,15 +14,17 @@ import {
     ValidationPipe
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+
 import { Channel } from '@energyweb/dsb-transport-core';
+
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Role } from '../auth/role.decorator';
 import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
-import { ChannelService } from './channel.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
 import { UserDecorator } from '../auth/user.decorator';
-import { channelErrorHandler } from './error.handler';
+
+import { ChannelService } from './channel.service';
+import { CreateChannelDto, UpdateChannelDto } from './dto';
+import { ChannelErrorHandler } from './error.handler';
 import { ChannelDataPipe } from './channel.data.pipe';
 
 @Controller('channel')
@@ -60,7 +62,7 @@ export class ChannelController {
             return channelName;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 
@@ -88,7 +90,7 @@ export class ChannelController {
             return result;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 
@@ -112,7 +114,7 @@ export class ChannelController {
             return channels;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 
@@ -132,7 +134,7 @@ export class ChannelController {
             return metadata;
         } catch (error) {
             this.logger.error(error.message);
-            channelErrorHandler(error);
+            ChannelErrorHandler(error);
         }
     }
 }
