@@ -7,6 +7,11 @@ info:
 tags: []
 servers: []
 components:
+  securitySchemes:
+    access-token:
+      scheme: "bearer"
+      bearerFormat: "JWT"
+      type: "http"
   schemas:
     PublishMessageDto:
       type: "object"
@@ -493,5 +498,3 @@ paths:
                 $ref: "#/components/schemas/LoginReturnDataDTO"
       tags:
         - "auth"
-      security:
-        - access-token: []
