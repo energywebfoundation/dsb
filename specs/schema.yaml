@@ -85,14 +85,14 @@ components:
           items:
             type: "string"
         admins:
-          description: "Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin."
+          description: "Array of DIDs that have permission to edit the channel. If it is omitted, creator of the channel will be the default admin."
           example:
             - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
           type: "array"
           items:
             type: "string"
         publishers:
-          description: "A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          description: "A mixed array of DIDs and roles that have permission to publish messages to the channel. If it is omitted, any user with \"user\" role can publish messages to the channel."
           example:
             - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
             - "user.roles.dsb.apps.energyweb.iam.ewc"
@@ -100,7 +100,7 @@ components:
           items:
             type: "string"
         subscribers:
-          description: "A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          description: "A mixed array of DIDs and roles that have permission to subscribe to the channel. If it is omitted, any user with \"user\" role can subscribe to the channel."
           example:
             - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
             - "user.roles.dsb.apps.energyweb.iam.ewc"
@@ -139,14 +139,14 @@ components:
           items:
             type: "string"
         admins:
-          description: "Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin."
+          description: "Array of DIDs that have permission to edit the channel. If it is omitted, creator of the channel will be the default admin."
           example:
             - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
           type: "array"
           items:
             type: "string"
         publishers:
-          description: "A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with \"user\" role can publish messages to the channel."
+          description: "A mixed array of DIDs and roles that have permission to publish messages to the channel. If it is omitted, any user with \"user\" role can publish messages to the channel."
           example:
             - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
             - "user.roles.dsb.apps.energyweb.iam.ewc"
@@ -154,7 +154,7 @@ components:
           items:
             type: "string"
         subscribers:
-          description: "A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with \"user\" role can subscribe to the channel."
+          description: "A mixed array of DIDs and roles that have permission to subscribe to the channel. If it is omitted, any user with \"user\" role can subscribe to the channel."
           example:
             - "did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52"
             - "user.roles.dsb.apps.energyweb.iam.ewc"
@@ -185,16 +185,20 @@ components:
     LoginReturnDataDTO:
       type: "object"
       properties:
+        token:
+          type: "string"
+          description: "Bearer token"
         did:
           type: "string"
-          description: "DID of messagebroker which is the DID identifier corresponding to env.PRIVATE_KEY"
+          description: "DID of the Message Broker"
         address:
           type: "string"
-          description: "address of the env.PRIVATE_KEY for signature recovery purposes"
+          description: "Address of the Message Broker for signature recovery purposes"
         signature:
           type: "string"
-          description: "the compact hex signature which is ECDSA hash(address of privatekey+messagebrokerDID+userDID)"
+          description: "The compact hex ECDSA signature of keccak256(address+did+userDID)"
       required:
+        - "token"
         - "did"
         - "address"
         - "signature"

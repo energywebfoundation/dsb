@@ -61,7 +61,7 @@ export class CreateChannelDto {
 
     @ApiPropertyOptional({
         description:
-            'Array of DIDs that have permision to edit the channel. If it is ommited, creator of the channel will be the default admin.',
+            'Array of DIDs that have permission to edit the channel. If it is omitted, creator of the channel will be the default admin.',
         example: ['did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52']
     })
     @IsOptional()
@@ -72,7 +72,7 @@ export class CreateChannelDto {
 
     @ApiPropertyOptional({
         description:
-            'A mixed array of DIDs and roles that have permision to publish messages to the channel. If it is ommited, any user with "user" role can publish messages to the channel.',
+            'A mixed array of DIDs and roles that have permission to publish messages to the channel. If it is omitted, any user with "user" role can publish messages to the channel.',
         example: [
             'did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52',
             'user.roles.dsb.apps.energyweb.iam.ewc'
@@ -86,7 +86,7 @@ export class CreateChannelDto {
 
     @ApiPropertyOptional({
         description:
-            'A mixed array of DIDs and roles that have permision to subscribe to the channel. If it is ommited, any user with "user" role can subscribe to the channel.',
+            'A mixed array of DIDs and roles that have permission to subscribe to the channel. If it is omitted, any user with "user" role can subscribe to the channel.',
         example: [
             'did:ethr:0x5aEa5Bf5c5b341A0BFhryv5b51b77Fb9807F1b52',
             'user.roles.dsb.apps.energyweb.iam.ewc'

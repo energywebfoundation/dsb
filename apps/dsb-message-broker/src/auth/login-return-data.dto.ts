@@ -1,32 +1,27 @@
-import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginReturnDataDTO {
+    @ApiProperty({
+        type: String,
+        description: 'Bearer token'
+    })
     token: string;
 
     @ApiProperty({
         type: String,
-        description:
-            'DID of messagebroker which is the DID identifier corresponding to env.PRIVATE_KEY'
+        description: 'DID of the Message Broker'
     })
-    @IsString()
-    @IsNotEmpty()
     did: string;
 
     @ApiProperty({
         type: String,
-        description: 'address of the env.PRIVATE_KEY for signature recovery purposes'
+        description: 'Address of the Message Broker for signature recovery purposes'
     })
-    @IsString()
-    @IsNotEmpty()
     address: string;
 
     @ApiProperty({
         type: String,
-        description:
-            'the compact hex signature which is ECDSA hash(address of privatekey+messagebrokerDID+userDID)'
+        description: 'The compact hex ECDSA signature of keccak256(address+did+userDID)'
     })
-    @IsString()
-    @IsNotEmpty()
     signature: string;
 }
