@@ -10,7 +10,6 @@ import { HealthModule } from './health/health.module';
 import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
 import { MessageModule } from './message/message.module';
 
-import { organizations } from './configs';
 import { UtilsModule } from './utils/utils.module';
 @Module({
     imports: [
@@ -29,8 +28,7 @@ import { UtilsModule } from './utils/utils.module';
                 JWT_SECRET: Joi.string().required(),
                 PRIVATE_KEY: Joi.string().required(),
                 MB_DID: Joi.string().required()
-            }),
-            load: [organizations]
+            })
         }),
         AuthModule,
         UtilsModule
