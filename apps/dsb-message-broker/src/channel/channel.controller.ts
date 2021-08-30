@@ -111,7 +111,7 @@ export class ChannelController {
     })
     @ApiResponse({
         status: HttpStatus.OK,
-        type: Array,
+        type: [Channel],
         description: 'Array of channels with their options'
     })
     public async getAccessibleChannels(@UserDecorator() user: any): Promise<Channel[]> {

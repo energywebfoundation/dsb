@@ -1,23 +1,7 @@
+import { Channel } from './channel';
 import { Message } from './message';
 
 export const ITransport = Symbol('ITransport');
-
-export { Message };
-
-export type Channel = {
-    fqcn: string;
-    topics?: {
-        namespace: string;
-        schema: string;
-    }[];
-    admins?: string[];
-    publishers?: string[];
-    subscribers?: string[];
-    maxMsgAge?: number;
-    maxMsgSize?: number;
-    createdBy?: string;
-    createdDateTime?: string;
-};
 
 export interface ITransport {
     //TODO: consider moving clientId to generic type like NATSJetstreamOptions if clientId is NATSJS specific

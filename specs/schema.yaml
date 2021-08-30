@@ -171,6 +171,9 @@ components:
           example: 1000000
       required:
         - "fqcn"
+    Channel:
+      type: "object"
+      properties: {}
     LoginDataDTO:
       type: "object"
       properties:
@@ -307,6 +310,8 @@ paths:
             application/json:
               schema:
                 type: "array"
+                items:
+                  $ref: "#/components/schemas/Channel"
       tags:
         - "channel"
       security:
