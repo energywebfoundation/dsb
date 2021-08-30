@@ -48,7 +48,7 @@ export class ChannelController {
     constructor(private readonly channelService: ChannelService) {}
 
     @Post()
-    @Role('channelCreator') // refers to role type for each org in configs/organizations.ts
+    @Role('channelcreation')
     @ApiBody({ type: CreateChannelDto })
     @ApiOperation({
         description: 'Creates a channel'

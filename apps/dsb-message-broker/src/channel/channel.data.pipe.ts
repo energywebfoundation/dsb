@@ -14,18 +14,10 @@ export class ChannelDataPipe implements PipeTransform<any> {
     ) {}
 
     async transform(channelData: Channel) {
-        const { org, app, channel } = extractFqcn(channelData.fqcn);
+        const { channel } = extractFqcn(channelData.fqcn);
 
-        const organizations = this.configService.get('ORGANIZATIONS');
+        const fqcnIsValid = new RegExp('^[a-zA-Z0-9]{1,16}$').test(channel);
 
-        const fqcnIsValid = organizations.some((_org: any) => {
-            if (_org.name !== org) return false;
-            return _org.apps.some((_app: any) => {
-                if (_app.name !== app) return false;
-
-                return new RegExp(_app.channels).test(channel);
-            });
-        });
         if (!fqcnIsValid) {
             throw new BadRequestException({
                 statusCode: 400,

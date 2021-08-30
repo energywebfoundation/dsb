@@ -1,26 +1,19 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 import { extractFqcn } from '../utils';
 
 @Injectable()
 export class DynamicRolesGuard implements CanActivate {
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly reflector: Reflector
-    ) {}
+    constructor(private readonly reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
-        const requiredRoleCategory = this.reflector.get<string>('role', context.getHandler());
-        if (!requiredRoleCategory) return true;
+        const requiredRoleTitle = this.reflector.get<string>('role', context.getHandler());
+        if (!requiredRoleTitle) return true;
+        const requiredRoles = [`${requiredRoleTitle}.roles.dsb.apps.energyweb.iam.ewc`];
 
         const user = context.switchToHttp().getRequest().user;
-
         const verifiedRoles = user.verifiedRoles?.map((role: any) => role.namespace) || [];
-
         if (!verifiedRoles.length) return false;
-
-        const organizations = this.configService.get('ORGANIZATIONS');
 
         const fqcn =
             context.switchToHttp().getRequest()?.body?.fqcn ??
@@ -28,34 +21,15 @@ export class DynamicRolesGuard implements CanActivate {
             context.switchToHttp().getRequest()?.query?.fqcn ??
             context.switchToWs().getData()?.fqcn;
 
-        let requiredRoles: string[] = [];
-        if (!fqcn) {
-            /* 
-              requiredRoles contains requiredRoleCategory roles from all apps in all orgs 
-            */
-            organizations.forEach((_org: any) => {
-                _org.apps.forEach((_app: any) => {
-                    _app?.roles[requiredRoleCategory].forEach((role: string) => {
-                        requiredRoles.push(`${role}.roles.${_app.name}.apps.${_org.name}.iam.ewc`);
-                    });
-                });
-            });
-        } else {
-            /* 
-              requiredRoles contains requiredRoleCategory roles from a specific app in a specific org determined by fqcn
-            */
+        if (fqcn) {
             const { org, app } = extractFqcn(fqcn);
             if (!org || !app) return true; // it will be handled in FqcnValidationPipe. Otherwise this method will returns false which results in an irrelevant 403 error.
-
-            requiredRoles = (
-                organizations
-                    .find((_org: any) => _org.name === org)
-                    ?.apps.find((_app: any) => _app.name === app)?.roles[requiredRoleCategory] || []
-            ).map((role: string) => `${role}.roles.${app}.apps.${org}.iam.ewc`);
+            const organizationRole = `${requiredRoleTitle}.roles.${app}.apps.${org}.iam.ewc`;
+            if (!requiredRoles.includes(organizationRole)) requiredRoles.push(organizationRole);
         }
 
-        return verifiedRoles.some((verified: string) =>
-            requiredRoles.some((required: string) => required === verified)
+        return requiredRoles.every((req: string) =>
+            verifiedRoles.some((ver: string) => ver === req)
         );
     }
 }
