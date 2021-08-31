@@ -17,6 +17,7 @@ export const bootstrap = async () => {
     const options = new DocumentBuilder()
         .setTitle('DSB Message Broker API')
         .setDescription('Swagger documentation for the DSB Message Broker API')
+        .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
         .setVersion('0.1')
         .build();
 

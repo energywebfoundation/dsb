@@ -10,7 +10,7 @@ import {
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 
 import { LoginDataDTO } from './login-data.dto';
@@ -19,7 +19,6 @@ import { LoginGuard } from './login.guard';
 import { LoginService } from './login.service';
 
 @ApiTags('auth')
-@ApiBearerAuth('access-token')
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
