@@ -3,13 +3,18 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import Ajv, { JSONSchemaType, AnySchema, ValidateFunction } from 'ajv';
 
+import { AddressBookService } from '../addressbook/addressbook.service';
+
 @Injectable()
 export class TopicSchemaService implements OnModuleInit {
     private transport: ITransport;
     private readonly ajv = new Ajv();
     private readonly _validators = new Map<string, Record<string, ValidateFunction<unknown>>>();
 
-    constructor(private readonly moduleRef: ModuleRef) {}
+    constructor(
+        private readonly moduleRef: ModuleRef,
+        private readonly addressbook: AddressBookService
+    ) {}
 
     public async onModuleInit(): Promise<void> {
         this.transport = this.moduleRef.get<ITransport>(ITransport, {
@@ -22,7 +27,7 @@ export class TopicSchemaService implements OnModuleInit {
         if (!validators) validators = {};
 
         if (!validators[topic]) {
-            const channel = this.transport.getChannel(fqcn);
+            const channel = this.addressbook.getChannel(fqcn);
 
             const schema = channel?.topics?.find(
                 (_topic: any) => _topic.namespace === topic

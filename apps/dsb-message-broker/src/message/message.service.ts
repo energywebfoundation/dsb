@@ -4,6 +4,7 @@ import { Server as WsServer } from 'socket.io';
 
 import { ITransport, Message } from '@energyweb/dsb-transport-core';
 import { TopicSchemaService } from '../utils/topic.schema.service';
+import { AddressBookService } from '../addressbook/addressbook.service';
 
 import { MessageDto, PublishMessageDto } from './dto';
 import {
@@ -20,7 +21,8 @@ export class MessageService implements OnModuleInit {
 
     constructor(
         private readonly moduleRef: ModuleRef,
-        private readonly topicSchemaService: TopicSchemaService
+        private readonly topicSchemaService: TopicSchemaService,
+        private readonly addressbook: AddressBookService
     ) {}
 
     public async onModuleInit(): Promise<void> {
@@ -112,7 +114,7 @@ export class MessageService implements OnModuleInit {
     }
 
     private ensureCanPublish(fqcn: string, pubDID: string, pubVRs: string[]) {
-        const channel = this.transport.getChannel(fqcn);
+        const channel = this.addressbook.getChannel(fqcn);
         let canPublish = channel?.publishers?.some((pub: string) =>
             [pubDID, ...pubVRs].some((per: string) => per === pub)
         );
@@ -121,7 +123,7 @@ export class MessageService implements OnModuleInit {
         return;
     }
     private ensureCanSubscribe(fqcn: string, subDID: string, subVRs: string[]) {
-        const channel = this.transport.getChannel(fqcn);
+        const channel = this.addressbook.getChannel(fqcn);
         let canSubscribe = channel?.subscribers?.some((sub: string) =>
             [subDID, ...subVRs].some((per: string) => per === sub)
         );

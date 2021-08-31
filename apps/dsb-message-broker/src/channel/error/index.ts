@@ -1,3 +1,5 @@
+export { ChannelNotFoundError } from '@energyweb/dsb-transport-core';
+
 export class FqcnNotQualifiedError extends Error {
     constructor() {
         super('fqcn is not a fully qualified channel name.');
