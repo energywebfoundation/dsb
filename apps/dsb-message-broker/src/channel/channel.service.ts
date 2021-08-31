@@ -4,12 +4,14 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ITransport, Channel } from '@energyweb/dsb-transport-core';
 
 import { TopicSchemaService } from '../utils/topic.schema.service';
+import { AddressBookService } from '../addressbook/addressbook.service';
 
 import { CreateChannelDto, UpdateChannelDto, RemoveChannelDto, ReadChannelDto } from './dto';
 import {
     UnauthorizedToModifyError,
     UnauthorizedToRemoveError,
-    UnauthorizedToGetError
+    UnauthorizedToGetError,
+    ChannelNotFoundError
 } from './error';
 
 @Injectable()
@@ -18,7 +20,8 @@ export class ChannelService implements OnModuleInit {
 
     constructor(
         private readonly moduleRef: ModuleRef,
-        private readonly topicSchemaService: TopicSchemaService
+        private readonly topicSchemaService: TopicSchemaService,
+        private readonly addressbook: AddressBookService
     ) {}
 
     public async onModuleInit(): Promise<void> {
@@ -32,7 +35,11 @@ export class ChannelService implements OnModuleInit {
     ): Promise<string> {
         if (!createDto.admins) createDto.admins = [createDto.createdBy];
 
-        return this.transport.createChannel(createDto);
+        const result = await this.transport.createChannel(createDto);
+
+        this.addressbook.registerChannel(createDto);
+
+        return result;
     }
 
     public async updateChannel(
@@ -40,16 +47,22 @@ export class ChannelService implements OnModuleInit {
     ): Promise<string> {
         this.ensureCanModifyOrRemove(updateDto.fqcn, updateDto.modifiedBy, 'modify');
 
+        const currentchannel = this.addressbook.getChannel(updateDto.fqcn);
+
+        const updatedChannel = { ...currentchannel, ...updateDto };
+
+        const result = this.transport.updateChannel(updatedChannel);
+
         this.topicSchemaService.removeValidators(updateDto.fqcn);
 
-        const _channel = this.transport.getChannel(updateDto.fqcn);
+        this.addressbook.registerChannel(updatedChannel);
 
-        return this.transport.updateChannel({ ..._channel, ...updateDto });
+        return result;
     }
 
     public async getAccessibleChannels(userDID: string, userVRs: string[]): Promise<Channel[]> {
-        const channelsToPublish = this.transport.channelsToPublish(userDID, userVRs);
-        const channelsToSubscribe = this.transport.channelsToSubscribe(userDID, userVRs);
+        const channelsToPublish = this.addressbook.channelsToPublish(userDID, userVRs);
+        const channelsToSubscribe = this.addressbook.channelsToSubscribe(userDID, userVRs);
 
         const uniqueChannels = [...channelsToPublish, ...channelsToSubscribe].filter(
             (channel, index, self) => {
@@ -67,7 +80,9 @@ export class ChannelService implements OnModuleInit {
     }: ReadChannelDto & { usrDID: string; usrVRs: string[] }): Promise<Channel> {
         this.ensureCanPublishOrSubscribe(fqcn, usrDID, usrVRs);
 
-        return this.transport.getChannel(fqcn);
+        const channel = this.addressbook.getChannel(fqcn);
+        if (!channel) throw new ChannelNotFoundError(fqcn);
+        return channel;
     }
 
     public async remove({ fqcn, usrDID }: RemoveChannelDto & { usrDID: string }): Promise<string> {
@@ -77,11 +92,13 @@ export class ChannelService implements OnModuleInit {
 
         this.topicSchemaService.removeValidators(fqcn);
 
+        this.addressbook.removeChannel(fqcn);
+
         return result;
     }
 
     private ensureCanPublishOrSubscribe(fqcn: string, usrDID: string, usrVRs: string[]) {
-        const channel = this.transport.getChannel(fqcn);
+        const channel = this.addressbook.getChannel(fqcn);
 
         let canPublish = channel?.publishers?.some((pub: string) =>
             [usrDID, ...usrVRs].some((usr: string) => usr === pub)
@@ -99,7 +116,7 @@ export class ChannelService implements OnModuleInit {
     }
 
     private ensureCanModifyOrRemove(fqcn: string, modDID: string, mode: 'modify' | 'remove'): void {
-        const channel = this.transport.getChannel(fqcn);
+        const channel = this.addressbook.getChannel(fqcn);
         let canModify = channel?.admins?.some((admin: string) => admin === modDID);
         if (!channel || !channel.admins || !channel.admins.length) canModify = true;
         if (!canModify && mode === 'modify') throw new UnauthorizedToModifyError(fqcn);

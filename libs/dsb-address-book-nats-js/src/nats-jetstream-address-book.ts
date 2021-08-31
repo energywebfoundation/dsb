@@ -22,12 +22,9 @@ export class NatsJetstreamAddressBook implements IAddressBook {
 
         const abChannelIsAvailable = await this.transport.hasChannel(this.addressBookChannel);
         if (!abChannelIsAvailable)
-            await this.transport.createChannel(
-                {
-                    fqcn: this.addressBookChannel
-                },
-                false
-            );
+            await this.transport.createChannel({
+                fqcn: this.addressBookChannel
+            });
 
         const adConsumerIsAvaiable = await this.transport.hasConsumer(
             this.addressBookChannel,
@@ -41,7 +38,9 @@ export class NatsJetstreamAddressBook implements IAddressBook {
             'default',
             this.mbDID,
             async (err: Error, msg: any) => {
+                if (err) return;
                 const claim: any = await this.iam.decodeJWTToken({ token: msg.data });
+                if (claim.claimData.action === 'remove') return this.cache.delete(claim.sub);
                 this.cache.set(claim.sub, claim.claimData);
             }
         );
@@ -52,40 +51,29 @@ export class NatsJetstreamAddressBook implements IAddressBook {
     }
     public findByPublishers(publishers: string[]): Channel[] {
         const channels = [];
-        const iterator = this.cache.values();
-        let channel, isAvailable;
-        do {
-            channel = iterator.next();
-
-            if (!channel.value) isAvailable = false;
-            else if (!channel.value.publishers) isAvailable = true;
+        let isAvailable;
+        for (const channel of this.cache.values()) {
+            if (!channel.publishers) isAvailable = true;
             else
-                isAvailable = channel.value.publishers.some((_pub: string) =>
-                    publishers.some((pub: string) => _pub === pub)
+                isAvailable = channel.publishers.some((_pub: string) =>
+                    publishers.some((pub: string) => pub === _pub)
                 );
-
-            if (isAvailable) channels.push(channel.value);
-        } while (!channel.done);
-
+            if (isAvailable) channels.push(channel);
+        }
         return channels;
     }
     public findBySubscribers(subscribers: string[]): Channel[] {
         const channels = [];
-        const iterator = this.cache.values();
-        let channel, isAvailable;
-        do {
-            channel = iterator.next();
-
-            if (!channel.value) isAvailable = false;
-            else if (!channel.value.subscribers) isAvailable = true;
+        let isAvailable;
+        for (const channel of this.cache.values()) {
+            if (!channel.subscribers) isAvailable = true;
             else
-                isAvailable = channel.value.subscribers.some((_pub: string) =>
-                    subscribers.some((pub: string) => _pub === pub)
+                isAvailable = channel.subscribers.some((_sub: string) =>
+                    subscribers.some((sub: string) => sub === _sub)
                 );
 
-            if (isAvailable) channels.push(channel.value);
-        } while (!channel.done);
-
+            if (isAvailable) channels.push(channel);
+        }
         return channels;
     }
 
@@ -98,7 +86,12 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         await this.transport.publish(this.addressBookChannel, 'default', claim);
     }
 
-    public remove(fqcn: string): void {
-        this.cache.delete(fqcn);
+    public async remove(fqcn: string): Promise<void> {
+        const claim = await this.iam.createPublicClaim({
+            subject: fqcn,
+            data: { action: 'remove' }
+        });
+
+        await this.transport.publish(this.addressBookChannel, 'default', claim);
     }
 }

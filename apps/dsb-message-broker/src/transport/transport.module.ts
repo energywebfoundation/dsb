@@ -11,11 +11,8 @@ const transportFactory = {
     useFactory: async (configService: ConfigService) => {
         const url = configService.get('NATS_JS_URL');
         logger.log(`Creating NATS Jetstream client at ${url}`);
-        const web3Url = configService.get('WEB3_URL');
-        const privateKey = configService.get('PRIVATE_KEY');
-        const mbDID = configService.get('MB_DID');
 
-        const transport = new NATSJetstreamTransport([url], web3Url, privateKey, mbDID);
+        const transport = new NATSJetstreamTransport([url]);
 
         await transport.connect();
 

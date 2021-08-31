@@ -9,7 +9,6 @@ import {
     Channel,
     TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
-import { NatsJetstreamAddressBook } from '@energyweb/dsb-address-book-nats-js';
 
 import {
     AckPolicy,
@@ -39,18 +38,9 @@ export class NATSJetstreamTransport implements ITransport {
 
     private isTransportConnected = false;
 
-    private addressBook: NatsJetstreamAddressBook;
-
     private subcriptions = new Map<number, JetStreamSubscription>();
 
-    constructor(
-        private readonly servers: string[],
-        web3Url: string,
-        privateKey: string,
-        mbDID: string
-    ) {
-        this.addressBook = new NatsJetstreamAddressBook(this, web3Url, privateKey, mbDID);
-    }
+    constructor(private readonly servers: string[]) {}
 
     public async isConnected(): Promise<boolean> {
         return this.isTransportConnected;
@@ -68,9 +58,6 @@ export class NATSJetstreamTransport implements ITransport {
                     this.isTransportConnected = true;
                     this.logger.log(`Successfully connected to ${this.servers}`);
 
-                    await this.addressBook.init();
-                    this.logger.log('AddressBook is initialized!');
-
                     this.startConnectionMonitor();
                 });
         } catch (error) {
@@ -80,7 +67,7 @@ export class NATSJetstreamTransport implements ITransport {
         }
     }
 
-    public async createChannel(channel: Channel, saveToAB = true): Promise<string> {
+    public async createChannel(channel: Channel): Promise<string> {
         await this.ensureConnected();
 
         try {
@@ -96,8 +83,6 @@ export class NATSJetstreamTransport implements ITransport {
                 subjects,
                 ...otherOptions
             });
-
-            if (saveToAB) await this.addressBook.register(channel);
 
             return stream;
         } catch (error) {
@@ -121,8 +106,6 @@ export class NATSJetstreamTransport implements ITransport {
             ...{ ..._channel, ...updateObject }
         });
 
-        await this.addressBook.register(channel);
-
         return 'ok';
     }
 
@@ -133,8 +116,6 @@ export class NATSJetstreamTransport implements ITransport {
 
         try {
             await this.jetstreamManager.streams.delete(stream);
-
-            await this.addressBook.remove(fqcn);
         } catch (error) {
             this.logger.error(error);
             throw new ChannelNotFoundError(fqcn);
@@ -148,10 +129,6 @@ export class NATSJetstreamTransport implements ITransport {
         const stream = getStreamName(fqcn);
         const streams = await this.jetstreamManager.streams.list().next();
         return streams.some((_streamInfo) => _streamInfo.config.name === stream);
-    }
-
-    public getChannel(fqcn: string): Channel {
-        return this.addressBook.findByFqcn(fqcn);
     }
 
     public async publish(fqcn: string, topic = 'default', payload: string): Promise<string> {
@@ -308,14 +285,5 @@ export class NATSJetstreamTransport implements ITransport {
                     break;
             }
         }
-    }
-
-    public channelsToPublish(did: string, roles: string[]): Channel[] {
-        const channels = this.addressBook.findByPublishers([did, ...roles]);
-        return channels;
-    }
-    public channelsToSubscribe(did: string, roles: string[]): Channel[] {
-        const channels = this.addressBook.findBySubscribers([did, ...roles]);
-        return channels;
     }
 }
