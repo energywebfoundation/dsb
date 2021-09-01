@@ -1,0 +1,56 @@
+dsb-aemo-demo-messagebroker: 
+  replicaCount: 1
+
+  messagebroker:
+    config:
+      # -- (optional int, default 3000) Port number to be used by DSB Message Broker to listen to
+      port: 3000
+      # -- NATS Jetstream node url
+      natsClusterUrl: nats://dsb-aemo-demo-nats.aemo-demo.svc:4222
+      # -- (optional bool, default true) Boolean that enables or disables hosting Swagger API documentation alongside DSB Message Broker endpoints, if true then http://{URL}:{PORT}/swagger is available
+      withSwagger: "true"
+      # -- (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
+      webUrl: https://volta-rpc.energyweb.org/
+      # -- (optional string, default https://identitycache-dev.energyweb.org/) An URL to Identity Cache server, more info https://github.com/energywebfoundation/iam-cache-server
+      cacheServerUrl: https://identitycache-dev.energyweb.org/
+      # -- (required string) it is the DID identifier corresponding to the PRIVATE_KEY
+      mbDid: "did:ethr:0x5aEa5Bf5c5b341A0BF30Cc5b51b77Fb9807F1b52"
+
+
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/dsb/messagebroker
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
+    tag: latest
+
+  imagePullSecrets: []
+  nameOverride: "dsb-aemo-demo-messagebroker"
+  fullnameOverride: "dsb-aemo-demo-messagebroker"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: LoadBalancer
+    port: 80
