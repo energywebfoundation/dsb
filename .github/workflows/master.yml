@@ -102,4 +102,4 @@ jobs:
       id: argocd_image_tag_overwrite
       with:
         command: app set dsb-messagebroker
-        options: -p image.tag=${{needs.unique_id.outputs.unique_id}}
+        options: -p dsb-messagebroker.image.tag=${{needs.unique_id.outputs.unique_id}}
