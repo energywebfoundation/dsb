@@ -23,7 +23,7 @@ dsb-messagebroker:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
-    tag: latest
+    tag: "0050e3dd-07f0-4dce-ba7a-9587373aea80"
 
   imagePullSecrets: []
   nameOverride: "dsb-aemo-demo-messagebroker"
