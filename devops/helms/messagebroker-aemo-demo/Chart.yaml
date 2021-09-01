@@ -23,6 +23,6 @@ version: 1.0.0
 appVersion: "1.0"
 
 dependencies:
-  - name: dsb-aemo-demo-messagebroker
+  - name: dsb-messagebroker
     version: 1.0.2
     repository: https://energywebfoundation.github.io/dsb-messagebroker-helm/
