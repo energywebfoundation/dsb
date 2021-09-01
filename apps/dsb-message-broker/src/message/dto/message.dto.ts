@@ -32,6 +32,6 @@ export class MessageDto {
     })
     sender: string;
 
-    @ApiProperty({ type: String, description: 'Message published timestamp in nanoseconds' })
+    @ApiProperty({ type: Number, description: 'Message published timestamp in nanoseconds' })
     timestampNanos: number;
 }

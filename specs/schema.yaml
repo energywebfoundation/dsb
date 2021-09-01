@@ -59,7 +59,7 @@ components:
           description: "Sender of the message"
           example: "did:ethr:0x57618002cF07E53De4a5abf1e8735882169f2efB"
         timestampNanos:
-          type: "string"
+          type: "number"
           description: "Message published timestamp in nanoseconds"
       required:
         - "id"
