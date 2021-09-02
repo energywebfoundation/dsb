@@ -3,6 +3,7 @@ export class Message {
         public readonly id: string,
         public readonly subject: string,
         public readonly data: string,
-        public readonly timestampNanos: number
+        public readonly timestampNanos: number,
+        public readonly correlationId?: string
     ) {}
 }

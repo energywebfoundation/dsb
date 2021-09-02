@@ -198,4 +198,61 @@ describe('MessageController (e2e)', () => {
                 expect(messages[1].payload).to.be.equal('3');
             });
     });
+
+    it('should be able to receive the message that contains the correlation id set by sender', async () => {
+        const fqcn = 'test-correlation-id.channels.dsb.apps.energyweb.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig',
+            correlationId: 'id'
+        };
+
+        await channelManagerService.create({ fqcn });
+
+        await request(app).post('/message').send(message).expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message?fqcn=${fqcn}&amount=3`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const [receivedMessage] = res.body as MessageDto[];
+
+                expect(receivedMessage.correlationId).to.be.equal(message.correlationId);
+            });
+    });
+
+    it('should receive single message when sending with same correlation id withing 2min dedupe window', async () => {
+        const fqcn = 'test-message-dedupe.channels.dsb.apps.energyweb.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig',
+            correlationId: 'id'
+        };
+
+        await channelManagerService.create({ fqcn });
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '1' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '2' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message?fqcn=${fqcn}&amount=3`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const receivedMessages = res.body as MessageDto[];
+
+                expect(receivedMessages).to.have.lengthOf(1);
+                expect(receivedMessages[0].payload).to.be.equal('1');
+            });
+    });
 });

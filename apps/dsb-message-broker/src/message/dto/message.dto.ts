@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class MessageDto {
     @ApiProperty({
@@ -34,4 +34,11 @@ export class MessageDto {
 
     @ApiProperty({ type: Number, description: 'Message published timestamp in nanoseconds' })
     timestampNanos: number;
+
+    @ApiPropertyOptional({
+        type: String,
+        example: 'b5e2eece-b39f-486d-9513-4cadc9a59a18',
+        description: 'Correlation id used for message de duplication and correlation purposes'
+    })
+    correlationId?: string;
 }
