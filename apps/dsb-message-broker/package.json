@@ -26,6 +26,7 @@
         "test:e2e": "mocha -r ts-node/register test/*.e2e-spec.ts --timeout 60000 --exit"
     },
     "dependencies": {
+        "body-parser": "1.19.0",
         "class-validator": "0.13.1",
         "class-transformer": "0.4.0",
         "@energyweb/dsb-transport-core": "~0.0.1",
@@ -58,6 +59,7 @@
         "@nestjs/cli": "7.6.0",
         "@nestjs/schematics": "7.3.0",
         "@nestjs/testing": "7.6.15",
+        "@types/body-parser": "1.19.1",
         "@types/express": "4.17.11",
         "@types/mocha": "8.2.2",
         "@types/node": "14.14.36",

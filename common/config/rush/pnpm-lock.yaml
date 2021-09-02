@@ -18,6 +18,7 @@ dependencies:
   '@rush-temp/dsb-message-broker': file:projects/dsb-message-broker.tgz
   '@rush-temp/dsb-transport-core': file:projects/dsb-transport-core.tgz
   '@rush-temp/dsb-transport-nats-js': file:projects/dsb-transport-nats-js.tgz_72c71fae9438f0c01bf19f98b0b41cfb
+  '@types/body-parser': 1.19.1
   '@types/chai': 4.2.18
   '@types/express': 4.17.11
   '@types/mocha': 8.2.2
@@ -28,6 +29,7 @@ dependencies:
   '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
   ajv: 8.6.2
   base64url: 3.0.1
+  body-parser: 1.19.0
   chai: 4.3.4
   class-transformer: 0.4.0
   class-validator: 0.13.1
@@ -38,7 +40,6 @@ dependencies:
   json-to-pretty-yaml: 1.2.2
   mocha: 9.0.0
   nats: 2.0.4
-  nestjs-asyncapi: 0.1.1_9fd6e0bfa07394257724f1365e45c273
   passport-did-auth: 1.1.0
   passport-jwt: 4.0.0
   polly-js: 1.8.2
@@ -12331,6 +12332,7 @@ packages:
       '@nestjs/terminus': 7.2.0_9ee6cf753c1e51110bb632376ef45ec0
       '@nestjs/testing': 7.6.15_ba5f4d8d026a9e713d04bfe7d31f240c
       '@nestjs/websockets': 8.0.6_eb538ba4e5cfa0bded40035f146af724
+      '@types/body-parser': 1.19.1
       '@types/chai': 4.2.18
       '@types/express': 4.17.11
       '@types/mocha': 8.2.2
@@ -12342,6 +12344,7 @@ packages:
       '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
       ajv: 8.6.2
       base64url: 3.0.1
+      body-parser: 1.19.0
       chai: 4.3.4
       class-transformer: 0.4.0
       class-validator: 0.13.1
@@ -12367,7 +12370,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-pvK7hLUiLHxWn/WCpoFO2O1XNbCNHmYzr2VmsKP4Mm7HWaw57CuSvch7P515QuQDtxPjVkt/rysvl0V00yLEmw==
+      integrity: sha512-USwmEs1DBhkbN07GT+LgooShUfiuVRpNJxnZG5gfgzp56YWLx91VPXE1SKVhZ0twZ5uSlWWgvhR1xjjLmpp69Q==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -12400,7 +12403,7 @@ packages:
       reflect-metadata: '*'
       rxjs: '*'
     resolution:
-      integrity: sha512-koXu858AyDAsuNI9cZEdB+waRUduqMpOXLPP6SV0iMCrH7Xoij/TqvwY86+ztjCbMJrbXpEyiG3nV3HW4tJPOQ==
+      integrity: sha512-jok9muNLofPiJnzS6Ed5C8Ozzx/pAHTVGUgHB6BYaCSzg3GLMXa42LwOpzxFw18evqM/khogy3VkQ0sSTLSmzA==
       tarball: file:projects/dsb-transport-nats-js.tgz
     version: 0.0.0
   github.com/ethereumjs/ethereumjs-abi/ee3994657fa7a427238e6ba92a84d0b529bbcde0:
@@ -12433,6 +12436,7 @@ specifiers:
   '@rush-temp/dsb-message-broker': file:./projects/dsb-message-broker.tgz
   '@rush-temp/dsb-transport-core': file:./projects/dsb-transport-core.tgz
   '@rush-temp/dsb-transport-nats-js': file:./projects/dsb-transport-nats-js.tgz
+  '@types/body-parser': 1.19.1
   '@types/chai': 4.2.18
   '@types/express': 4.17.11
   '@types/mocha': 8.2.2
@@ -12443,6 +12447,7 @@ specifiers:
   '@typescript-eslint/parser': 4.19.0
   ajv: 8.6.2
   base64url: 3.0.1
+  body-parser: 1.19.0
   chai: 4.3.4
   class-transformer: 0.4.0
   class-validator: 0.13.1
@@ -12453,7 +12458,6 @@ specifiers:
   json-to-pretty-yaml: 1.2.2
   mocha: 9.0.0
   nats: 2.0.4
-  nestjs-asyncapi: ~0.1.1
   passport-did-auth: 1.1.0
   passport-jwt: 4.0.0
   polly-js: 1.8.2
