@@ -232,9 +232,13 @@ Message DTO is defined as:
 {
   "fqcn": "test.channels.testapp.apps.testorganization.iam.ewc",
   "payload": "{\"data\": \"test\"}",
-  "signature": "string"
+  "signature": "string",
+  "topic": "string" (optional),
+  "correlationId": "string" (optional)
 }
 ```
+
+`correlationId` (if set) is used for message deduplication mechanism based on 2min window of time. For e.g in case two messages with same `correlationId` were sent within 2min window, only first will be delivered to recipients.
 
 Example code
 
@@ -247,7 +251,8 @@ curl -X 'POST' \
   -d '{
   "fqcn": "test.channels.testapp.apps.testorganization.iam.ewc",
   "payload": "{\"data\": \"test\"}",
-  "signature": "string"
+  "signature": "string",
+  "correlationId": "id"
 }'
 ```
 
