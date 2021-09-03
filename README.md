@@ -19,6 +19,15 @@ This repository is currently under development and considered early _alpha_ stag
 
 EW-DSB is the messaging service of the EW-DOS’s utility layer. Unlike any other centralised and managed pub/sub messaging systems, EW-DSB is designed and implemented to be fully decentralised and scalable. Messages shared on EW-DSB can be traced back to its original sender using cryptographic signatures; it adds extra security to data exchanges. One of the key benefits of the EW-DSB is to be schema agnostic, meaning any type of schema can be shared as a message between users/systems.
 
+## Key features
+
+- Per channel DID based authentication and authorization system
+- At-least-once delivery; exactly once within a window
+- Channels persistency and replayability using consumers
+- Per topic payload schema definitions
+
+_Current DSB implementation is using NATS Jetstream as default transport layer and thus inherits it's characteristics._
+
 ## Preparation
 
 1. Make sure you are using Node 14.x.x
