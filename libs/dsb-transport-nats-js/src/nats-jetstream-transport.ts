@@ -131,13 +131,21 @@ export class NATSJetstreamTransport implements ITransport {
         return streams.some((_streamInfo) => _streamInfo.config.name === stream);
     }
 
-    public async publish(fqcn: string, topic = 'default', payload: string): Promise<string> {
+    public async publish(
+        fqcn: string,
+        topic = 'default',
+        payload: string,
+        correlationId?: string
+    ): Promise<string> {
         await this.ensureConnected();
         try {
             const subject = getSubjectName(fqcn, topic);
             const publishAck = await this.jetstreamClient.publish(
                 subject,
-                this.stringCodec.encode(payload)
+                this.stringCodec.encode(payload),
+                {
+                    msgID: correlationId
+                }
             );
 
             return publishAck.seq.toString();
@@ -173,12 +181,14 @@ export class NATSJetstreamTransport implements ITransport {
         });
         for await (const message of messageIterator) {
             message.ack();
+
             res.push(
                 new Message(
                     message.seq.toString(),
                     message.subject.split('.').pop(),
                     this.stringCodec.decode(message.data),
-                    message.info.timestampNanos
+                    message.info.timestampNanos,
+                    message.headers?.get('Nats-Msg-Id')
                 )
             );
         }

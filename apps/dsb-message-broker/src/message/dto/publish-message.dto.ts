@@ -21,6 +21,15 @@ export class PublishMessageDto {
     @IsOptional()
     topic?: string;
 
+    @ApiPropertyOptional({
+        type: String,
+        example: 'b5e2eece-b39f-486d-9513-4cadc9a59a18',
+        description: 'Correlation id used for message de duplication and correlation purposes'
+    })
+    @IsString()
+    @IsOptional()
+    correlationId?: string;
+
     @ApiProperty({
         type: String,
         description: 'Any stringified payload like JSON, BASE64 etc',

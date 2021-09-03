@@ -45,7 +45,7 @@ export class MessageService implements OnModuleInit {
     }
 
     public async publish(
-        { fqcn, topic, payload, signature }: PublishMessageDto,
+        { fqcn, topic, payload, signature, correlationId }: PublishMessageDto,
         pubDID: string,
         pubVRs: string[]
     ): Promise<string> {
@@ -57,7 +57,8 @@ export class MessageService implements OnModuleInit {
         return this.transport.publish(
             fqcn,
             topic,
-            JSON.stringify({ payload, signature, sender: pubDID })
+            JSON.stringify({ payload, signature, sender: pubDID }),
+            correlationId
         );
     }
 
@@ -77,7 +78,8 @@ export class MessageService implements OnModuleInit {
                     id: message.id,
                     topic: message.subject,
                     ...JSON.parse(message.data),
-                    timestampNanos: message.timestampNanos
+                    timestampNanos: message.timestampNanos,
+                    correlationId: message.correlationId
                 } as MessageDto)
         );
     }
