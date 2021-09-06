@@ -51,7 +51,7 @@ export class ChannelService implements OnModuleInit {
 
         const updatedChannel = { ...currentchannel, ...updateDto };
 
-        const result = this.transport.updateChannel(updatedChannel);
+        const result = await this.transport.updateChannel(updatedChannel);
 
         this.topicSchemaService.removeValidators(updateDto.fqcn);
 
@@ -75,18 +75,21 @@ export class ChannelService implements OnModuleInit {
 
     public async getChannel({
         fqcn,
-        usrDID,
-        usrVRs
-    }: ReadChannelDto & { usrDID: string; usrVRs: string[] }): Promise<Channel> {
-        this.ensureCanPublishOrSubscribe(fqcn, usrDID, usrVRs);
+        userDID,
+        userVRs
+    }: ReadChannelDto & { userDID: string; userVRs: string[] }): Promise<Channel> {
+        this.ensureCanPublishOrSubscribe(fqcn, userDID, userVRs);
 
         const channel = this.addressbook.getChannel(fqcn);
         if (!channel) throw new ChannelNotFoundError(fqcn);
         return channel;
     }
 
-    public async remove({ fqcn, usrDID }: RemoveChannelDto & { usrDID: string }): Promise<string> {
-        this.ensureCanModifyOrRemove(fqcn, usrDID, 'remove');
+    public async remove({
+        fqcn,
+        userDID
+    }: RemoveChannelDto & { userDID: string }): Promise<string> {
+        this.ensureCanModifyOrRemove(fqcn, userDID, 'remove');
 
         const result = this.transport.removeChannel(fqcn);
 
@@ -97,16 +100,16 @@ export class ChannelService implements OnModuleInit {
         return result;
     }
 
-    private ensureCanPublishOrSubscribe(fqcn: string, usrDID: string, usrVRs: string[]) {
+    private ensureCanPublishOrSubscribe(fqcn: string, userDID: string, userVRs: string[]) {
         const channel = this.addressbook.getChannel(fqcn);
 
         let canPublish = channel?.publishers?.some((pub: string) =>
-            [usrDID, ...usrVRs].some((usr: string) => usr === pub)
+            [userDID, ...userVRs].some((usr: string) => usr === pub)
         );
         if (!channel || !channel.publishers || !channel.publishers.length) canPublish = true;
 
         let canSubscribe = channel?.subscribers?.some((sub: string) =>
-            [usrDID, ...usrVRs].some((usr: string) => usr === sub)
+            [userDID, ...userVRs].some((usr: string) => usr === sub)
         );
         if (!channel || !channel.subscribers || !channel.subscribers.length) canSubscribe = true;
 
@@ -115,12 +118,20 @@ export class ChannelService implements OnModuleInit {
         return;
     }
 
-    private ensureCanModifyOrRemove(fqcn: string, modDID: string, mode: 'modify' | 'remove'): void {
+    private ensureCanModifyOrRemove(
+        fqcn: string,
+        userDID: string,
+        mode: 'modify' | 'remove'
+    ): void {
         const channel = this.addressbook.getChannel(fqcn);
-        let canModify = channel?.admins?.some((admin: string) => admin === modDID);
-        if (!channel || !channel.admins || !channel.admins.length) canModify = true;
-        if (!canModify && mode === 'modify') throw new UnauthorizedToModifyError(fqcn);
-        if (!canModify && mode === 'remove') throw new UnauthorizedToRemoveError(fqcn);
+
+        let canModifyOrRemove = channel?.admins?.some((admin: string) => admin === userDID);
+
+        if (!channel || !channel.admins || !channel.admins.length) canModifyOrRemove = true;
+
+        if (!canModifyOrRemove && mode === 'modify') throw new UnauthorizedToModifyError(fqcn);
+        if (!canModifyOrRemove && mode === 'remove') throw new UnauthorizedToRemoveError(fqcn);
+
         return;
     }
 }
