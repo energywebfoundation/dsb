@@ -18,11 +18,22 @@ describe('MessageController (e2e)', () => {
         did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
         verifiedRoles: [{ name: 'user', namespace: 'user.roles.dsb.apps.energyweb.iam.ewc' }]
     };
+    const authenticatedUser2 = {
+        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237',
+        verifiedRoles: [{ name: 'user', namespace: 'user.roles.dsb.apps.energyweb.iam.ewc' }]
+    };
+    const authenticatedUser3 = {
+        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237',
+        verifiedRoles: [] as any[]
+    };
 
     const authGuard: CanActivate = {
         canActivate: (context: ExecutionContext) => {
             const req = context.switchToHttp().getRequest();
-            req.user = authenticatedUser;
+            const userNo = req.get('User-No');
+            if (userNo === '2') req.user = authenticatedUser2;
+            else if (userNo === '3') req.user = authenticatedUser3;
+            else req.user = authenticatedUser;
 
             return true;
         }
@@ -294,5 +305,78 @@ describe('MessageController (e2e)', () => {
 
                 expect(messages).to.have.lengthOf(2);
             });
+    });
+  
+    it('should not publish a message without having user role', async () => {
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
+        const message: PublishMessageDto = {
+            fqcn,
+            topic: 'testTopic',
+            payload: '{"data": "testData"}',
+            signature: 'sig'
+        };
+
+        try {
+            await channelManagerService.update({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"type": "object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ],
+                publishers: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237'],
+                subscribers: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237']
+            });
+        } catch (e) {}
+
+        await request(app)
+            .post('/message')
+            .send(message)
+            .set('User-No', '3')
+            .expect(HttpStatus.FORBIDDEN);
+    });
+
+    it('should not receive messages without having user role', async () => {
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
+
+        await request(app)
+            .get(`/message?fqcn=${fqcn}&amount=10`)
+            .set('User-No', '3')
+            .expect(HttpStatus.FORBIDDEN);
+    });
+
+    it('should not publish a message without being publisher', async () => {
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
+        const message: PublishMessageDto = {
+            fqcn,
+            topic: 'testTopic',
+            payload: '{"data": "testData"}',
+            signature: 'sig'
+        };
+
+        await request(app).post('/message').send(message).expect(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('should not receive messages without being subscriber', async () => {
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
+
+        await request(app).get(`/message?fqcn=${fqcn}&amount=10`).expect(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('should not publish a message if message payload does not match the schema', async () => {
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
+        const message: PublishMessageDto = {
+            fqcn,
+            topic: 'testTopic',
+            payload: '{"datax": "testData"}',
+            signature: 'sig'
+        };
+
+        await request(app)
+            .post('/message')
+            .send(message)
+            .set('User-No', '2')
+            .expect(HttpStatus.BAD_REQUEST);
     });
 });

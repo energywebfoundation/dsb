@@ -145,8 +145,8 @@ export class ChannelController {
         try {
             const metadata = await this.channelService.getChannel({
                 fqcn,
-                usrDID: user.did,
-                usrVRs: user.verifiedRoles.map((role: any) => role.namespace)
+                userDID: user.did,
+                userVRs: user.verifiedRoles.map((role: any) => role.namespace)
             });
             return metadata;
         } catch (error) {
@@ -171,7 +171,7 @@ export class ChannelController {
         @Param(FqcnValidationPipe) { fqcn }: RemoveChannelDto
     ): Promise<string> {
         try {
-            const result = await this.channelService.remove({ fqcn, usrDID: user.did });
+            const result = await this.channelService.remove({ fqcn, userDID: user.did });
             return result;
         } catch (error) {
             this.logger.error(error.message);
