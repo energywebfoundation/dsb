@@ -244,6 +244,12 @@ paths:
       summary: ""
       description: "Pulls new messages from the channel."
       parameters:
+        - name: "clientId"
+          required: false
+          in: "query"
+          description: "Id of the persistent client, default value is ``"
+          example: "default"
+          schema: {}
         - name: "amount"
           required: false
           in: "query"
