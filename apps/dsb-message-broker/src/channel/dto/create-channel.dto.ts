@@ -101,7 +101,7 @@ export class CreateChannelDto {
     @ApiPropertyOptional({
         type: Number,
         description: 'Maximum age of any message in the channel, expressed in nanoseconds.',
-        example: 86400000000
+        example: 8640000000000000
     })
     @IsOptional()
     @IsInt()

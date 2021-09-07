@@ -64,13 +64,17 @@ export class MessageService implements OnModuleInit {
 
     public async pull(
         fqcn: string,
+        topic: string,
         amount: number,
+        from: string,
+        clientId: string,
         subDID: string,
         subVRs: string[]
     ): Promise<MessageDto[]> {
         this.ensureCanSubscribe(fqcn, subDID, subVRs);
 
-        const messages = await this.transport.pull(fqcn, amount, subDID);
+        const consumerId = `${from ?? ''}${clientId ?? ''}${subDID}`;
+        const messages = await this.transport.pull(fqcn, topic, amount, consumerId, from);
 
         return messages.map(
             (message) =>

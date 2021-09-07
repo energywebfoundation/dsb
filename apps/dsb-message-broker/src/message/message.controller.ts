@@ -81,10 +81,22 @@ export class MessageController {
         example: 'testChannel.channels.dsb.apps.energyweb.iam.ewc'
     })
     @ApiQuery({
+        name: 'topic',
+        required: false
+        // description: 'Fully Qualified Channel Name (fqcn)',
+        // example: 'testChannel.channels.dsb.apps.energyweb.iam.ewc'
+    })
+    @ApiQuery({
         name: 'amount',
         required: false,
         description: 'Amount of messages to be returned in the request, default value is 100',
         example: '100'
+    })
+    @ApiQuery({
+        name: 'from',
+        required: false,
+        description: 'Rewinds the channel and retruns messages from given point in time',
+        example: '2021-09-06T00:00:00.000Z'
     })
     @ApiQuery({
         name: 'clientId',
@@ -103,14 +115,16 @@ export class MessageController {
     public async getNewFromChannel(
         @UserDecorator() user: any,
         @Query(FqcnValidationPipe, MessageQueryPipe)
-        query: { fqcn: string; amount: string; clientId?: string }
+        query: { fqcn: string; topic?: string; amount?: string; from?: string; clientId?: string }
     ): Promise<MessageDto[]> {
         try {
-            const client = `${query.clientId}${user.did}`;
             const messages = await this.messageService.pull(
                 query.fqcn,
+                query.topic,
                 parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
-                client,
+                query.from,
+                query.clientId,
+                user.did,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );
             return messages;
