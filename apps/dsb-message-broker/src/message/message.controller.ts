@@ -106,11 +106,11 @@ export class MessageController {
         query: { fqcn: string; amount: string; clientId?: string }
     ): Promise<MessageDto[]> {
         try {
-            const client = `${query.clientId}${user.did}`;
             const messages = await this.messageService.pull(
                 query.fqcn,
                 parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
-                client,
+                query.clientId,
+                user.did,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );
             return messages;
