@@ -24,9 +24,7 @@ import {
     StreamConfig,
     NatsError,
     JsMsg,
-    ConsumerConfig,
-    DeliverPolicy,
-    ReplayPolicy
+    ConsumerConfig
 } from 'nats';
 import polly from 'polly-js';
 
