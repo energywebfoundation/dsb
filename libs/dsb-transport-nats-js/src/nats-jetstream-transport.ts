@@ -172,7 +172,7 @@ export class NATSJetstreamTransport implements ITransport {
         opts.durable(clientId);
         opts.manualAck();
         opts.ackExplicit();
-        opts.startTime(new Date(from));
+        if (from) opts.startTime(new Date(from));
 
         const pullSub = await this.jetstreamClient.pullSubscribe(subject, opts);
 
