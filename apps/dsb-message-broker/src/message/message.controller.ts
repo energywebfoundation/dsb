@@ -86,6 +86,12 @@ export class MessageController {
         description: 'Amount of messages to be returned in the request, default value is 100',
         example: '100'
     })
+    @ApiQuery({
+        name: 'clientId',
+        required: false,
+        description: 'Id of the persistent client, default value is ``',
+        example: 'default'
+    })
     @ApiOperation({
         description: 'Pulls new messages from the channel.'
     })
@@ -96,13 +102,15 @@ export class MessageController {
     })
     public async getNewFromChannel(
         @UserDecorator() user: any,
-        @Query(FqcnValidationPipe, MessageQueryPipe) query: { fqcn: string; amount: string }
+        @Query(FqcnValidationPipe, MessageQueryPipe)
+        query: { fqcn: string; amount: string; clientId?: string }
     ): Promise<MessageDto[]> {
         try {
+            const client = `${query.clientId}${user.did}`;
             const messages = await this.messageService.pull(
                 query.fqcn,
                 parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
-                user.did,
+                client,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );
             return messages;

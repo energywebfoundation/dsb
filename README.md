@@ -21,10 +21,10 @@ EW-DSB is the messaging service of the EW-DOS’s utility layer. Unlike any othe
 
 ## Key features
 
-- Per channel DID based authentication and authorization system
-- At-least-once delivery; exactly once within a window
-- Channels persistency and replayability using consumers
-- Per topic payload schema definitions
+-   Per channel DID based authentication and authorization system
+-   At-least-once delivery; exactly once within a window
+-   Channels persistency and replayability using consumers
+-   Per topic payload schema definitions
 
 _Current DSB implementation is using NATS Jetstream as default transport layer and thus inherits it's characteristics._
 
@@ -267,7 +267,7 @@ Every time user uses `GET /message?fqcn={fqcn}&amount=100` it receives consecuti
 Example:
 
 -   channel `test` has 10 messages `[1,2,3,4,5,6,7,8,9,10]` with order based on publishing order
--   using `GET /message?fqcn=test&amount=3` returns messages `[1,2,3]`
+-   calling `GET /message?fqcn=test&amount=3` returns messages `[1,2,3]`
 -   calling `GET /message?fqcn=test&amount=3` again returns messages `[4,5,6]`
 -   calling `GET /message?fqcn=test&amount=100` returns messages `[7,8,8,9,10]`
 
@@ -277,7 +277,15 @@ This approach of consuming channel data enables control over inflow of messages 
 -   node 2 calls `GET /message?fqcn=test&amount=1000` to get a batch of 1000 messages and repeats when done
 -   node 3 calls `GET /message?fqcn=test&amount=1000` to get a batch of 1000 messages and repeats when done
 
-Note: Currently each node would need to use the same identity to authenticate to DSB Message Broker since consumers are bound to a identity.
+In order to "restart" the stream cursor it's possible to specify `clientId={id}` query parameter.
+
+Example:
+
+-   channel `test` has 10 messages `[1,2,3,4,5,6,7,8,9,10]` with order based on publishing order
+-   calling `GET /message?fqcn=test&amount=3&clientId=1` returns messages `[1,2,3]`
+-   calling `GET /message?fqcn=test&amount=3&clientId=2` returns messages `[1,2,3]`
+-   calling `GET /message?fqcn=test&amount=3&clientId=1` again returns messages `[4,5,6]`
+-   calling `GET /message?fqcn=test&amount=100&clientId=1` returns messages `[7,8,8,9,10]`
 
 Example code:
 

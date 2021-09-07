@@ -267,6 +267,46 @@ describe('MessageController (e2e)', () => {
             });
     });
 
+    it('should be able to restart the consumer by using unique clientId', async () => {
+        const fqcn = 'restart.channels.dsb.apps.energyweb.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig'
+        };
+
+        await channelManagerService.create({ fqcn });
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '1' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '2' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message?fqcn=${fqcn}&amount=10&clientId=1`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDto[];
+
+                expect(messages).to.have.lengthOf(2);
+            });
+
+        await request(app)
+            .get(`/message?fqcn=${fqcn}&amount=10&clientId=2`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDto[];
+
+                expect(messages).to.have.lengthOf(2);
+            });
+    });
+  
     it('should not publish a message without having user role', async () => {
         const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
         const message: PublishMessageDto = {
