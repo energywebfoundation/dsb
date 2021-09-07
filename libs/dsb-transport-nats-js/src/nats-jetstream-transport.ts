@@ -165,39 +165,30 @@ export class NATSJetstreamTransport implements ITransport {
         clientId: string,
         from: string
     ): Promise<Message[]> {
-        const consumerIsAvailable = await this.hasConsumer(fqcn, clientId);
-        if (!consumerIsAvailable) {
-            try {
-                this.logger.log(
-                    `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
-                );
-
-                const config: Partial<ConsumerConfig> = { name: clientId };
-
-                if (from) {
-                    config['deliver_policy'] = DeliverPolicy.StartTime;
-                    config['opt_start_time'] = from;
-                }
-
-                await this.createConsumer(fqcn, config);
-            } catch (error) {
-                this.logger.log(error);
-                if (error.toString().includes('stream not found')) {
-                    throw new ChannelNotFoundError(fqcn);
-                }
-            }
-        }
-
-        const { stream } = fqcnToStream(fqcn);
+        const subject = getSubjectName(fqcn, topic);
         const res: Message[] = [];
 
-        const messageIterator = this.jetstreamClient.fetch(stream, clientId, {
-            batch: amount,
-            no_wait: true
-        });
-        console.log('messageIterator ', messageIterator);
+        const opts = consumerOpts();
+        opts.durable(clientId);
+        opts.manualAck();
+        opts.ackExplicit();
+        opts.startTime(new Date(from));
 
-        for await (const message of messageIterator) {
+        const pullSub = await this.jetstreamClient.pullSubscribe(subject, opts);
+
+        pullSub.pull({ batch: amount, no_wait: true });
+
+        /* 
+          by uncommenting following lines is expected that when there is no message after pulling or at end of the iteration
+          the value of _next be like {value: undefined, done: true}
+          but in this situation it never passes line 188
+        */
+
+        // const msgs = pullSub[Symbol.asyncIterator]();
+        // const _next = await msgs.next();
+        // console.log("_next ", _next);
+
+        for await (const message of pullSub) {
             message.ack();
 
             res.push(
@@ -210,6 +201,7 @@ export class NATSJetstreamTransport implements ITransport {
                 )
             );
         }
+
         return res;
     }
 
@@ -275,8 +267,6 @@ export class NATSJetstreamTransport implements ITransport {
 
         if (!config.durable_name) config.durable_name = config.name;
         if (!config.ack_policy) config.ack_policy = AckPolicy.Explicit;
-
-        console.log('conf ', config);
 
         return this.jetstreamManager.consumers.add(stream, config);
     }

@@ -123,7 +123,7 @@ components:
         maxMsgAge:
           type: "number"
           description: "Maximum age of any message in the channel, expressed in nanoseconds."
-          example: 86400000000
+          example: 8640000000000000
         maxMsgSize:
           type: "number"
           description: "Maximum size of any message in the channel, expressed in bytes."
@@ -177,7 +177,7 @@ components:
         maxMsgAge:
           type: "number"
           description: "Maximum age of any message in the channel, expressed in nanoseconds."
-          example: 86400000000
+          example: 8640000000000000
         maxMsgSize:
           type: "number"
           description: "Maximum size of any message in the channel, expressed in bytes."
@@ -250,11 +250,23 @@ paths:
           description: "Id of the persistent client, default value is ``"
           example: "default"
           schema: {}
+        - name: "from"
+          required: false
+          in: "query"
+          description: "Rewinds the channel and retruns messages from given point in time"
+          example: "2021-09-06T00:00:00.000Z"
+          schema: {}
         - name: "amount"
           required: false
           in: "query"
           description: "Amount of messages to be returned in the request, default value is 100"
           example: "100"
+          schema: {}
+        - name: "topic"
+          required: false
+          in: "query"
+          description: "Topic of a channel (default value is default)"
+          example: "testTopic"
           schema: {}
         - name: "fqcn"
           required: true

@@ -82,9 +82,9 @@ export class MessageController {
     })
     @ApiQuery({
         name: 'topic',
-        required: false
-        // description: 'Fully Qualified Channel Name (fqcn)',
-        // example: 'testChannel.channels.dsb.apps.energyweb.iam.ewc'
+        required: false,
+        description: 'Topic of a channel (default value is default)',
+        example: 'testTopic'
     })
     @ApiQuery({
         name: 'amount',
