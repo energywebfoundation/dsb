@@ -45,7 +45,7 @@ export class ChannelDataPipe implements PipeTransform<any> {
                 });
             }
 
-            if (typeof topic.schema !== 'string') topic.schema = JSON.stringify(_schema);
+            topic.schema = JSON.stringify(_schema);
         });
 
         return channelData;

@@ -8,6 +8,10 @@ import { ChannelService } from '../src/channel/channel.service';
 import { JwtAuthGuard } from '../src/auth/jwt.guard';
 import { expect } from 'chai';
 
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 describe('ChannelController (e2e)', () => {
     let app: INestApplication;
 
@@ -192,6 +196,43 @@ describe('ChannelController (e2e)', () => {
             })
             .set('User-No', '2')
             .expect(HttpStatus.OK);
+    });
+
+    it('should remove "$schema", "$id" and "version" from schema', async () => {
+        await request(app)
+            .patch('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"$schema":"testSchema","$id":"testId","title":"testTitle","version":"testVersion","type":"object","properties":{"data":{"type":"string"}},"required":["data"],"additionalProperties":false}'
+                    }
+                ]
+            })
+            .set('User-No', '2')
+            .expect(HttpStatus.OK);
+
+        await sleep(1000);
+
+        const channel = (
+            await request(app).get(`/channel/${fqcn}`).set('User-No', '3').expect(HttpStatus.OK)
+        ).body;
+
+        const includesSpecialProperties = channel.topics.some((topic: any) => {
+            if (topic.namespace === 'testTopic') {
+                if (
+                    topic.schema.includes('$schema') ||
+                    topic.schema.includes('$id') ||
+                    topic.schema.includes('version')
+                )
+                    return true;
+            }
+            return false;
+        });
+
+        expect(includesSpecialProperties, 'it should not include "$schema", "$id" and "version"').to
+            .be.false;
     });
 
     it('should not be able to get accessible channels without having user role', async () => {
