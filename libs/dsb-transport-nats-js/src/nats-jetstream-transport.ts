@@ -57,7 +57,11 @@ export class NATSJetstreamTransport implements ITransport {
                     this.jetstreamManager = await this.connection.jetstreamManager();
                     this.jetstreamClient = this.connection.jetstream();
                     this.isTransportConnected = true;
-                    this.logger.log(`Successfully connected to ${this.servers}`);
+                    this.logger.log(
+                        `Successfully connected to ${this.servers} with options ${JSON.stringify(
+                            this.connection.info
+                        )}`
+                    );
 
                     this.startConnectionMonitor();
                 });
