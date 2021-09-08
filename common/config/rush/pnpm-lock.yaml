@@ -28,6 +28,7 @@ dependencies:
   '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
   '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
   ajv: 8.6.2
+  ajv-formats: 2.1.1
   base64url: 3.0.1
   body-parser: 1.19.0
   chai: 4.3.4
@@ -3548,6 +3549,15 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==
+  /ajv-formats/2.1.1:
+    dependencies:
+      ajv: 8.6.2
+    dev: false
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+    resolution:
+      integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==
   /ajv-keywords/3.5.2_ajv@6.12.6:
     dependencies:
       ajv: 6.12.6
@@ -12343,6 +12353,7 @@ packages:
       '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
       '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
       ajv: 8.6.2
+      ajv-formats: 2.1.1
       base64url: 3.0.1
       body-parser: 1.19.0
       chai: 4.3.4
@@ -12370,7 +12381,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-USwmEs1DBhkbN07GT+LgooShUfiuVRpNJxnZG5gfgzp56YWLx91VPXE1SKVhZ0twZ5uSlWWgvhR1xjjLmpp69Q==
+      integrity: sha512-ZJQcFkPnuyfHoTGcBe1gV5DVkERIEfTY/kXGv16ynig9H+4aLV4YL4p/ZObHu1JDzzsI1xmfC7Bz/eRgYDnwVg==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -12446,6 +12457,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': 4.19.0
   '@typescript-eslint/parser': 4.19.0
   ajv: 8.6.2
+  ajv-formats: ~2.1.1
   base64url: 3.0.1
   body-parser: 1.19.0
   chai: 4.3.4

@@ -25,7 +25,7 @@ export const HttpMessageErrorHandler = (error: any) => {
     if (error instanceof PayloadNotValidError) {
         throw new BadRequestException({
             statusCode: 400,
-            message: error.message,
+            message: [...error.message.split('>')],
             error: 'Bad Request'
         });
     }
