@@ -11,7 +11,8 @@ import { WsException } from '@nestjs/websockets';
 import {
     ChannelNotFoundError,
     ChannelOrTopicNotFoundError,
-    TransportUnavailableError
+    TransportUnavailableError,
+    MessageExceedsMaximumSizeError
 } from '@energyweb/dsb-transport-core';
 
 import {
@@ -51,6 +52,14 @@ export const HttpMessageErrorHandler = (error: any) => {
 
     if (error instanceof TransportUnavailableError) {
         throw new ServiceUnavailableException();
+    }
+
+    if (error instanceof MessageExceedsMaximumSizeError) {
+        throw new BadRequestException({
+            statusCode: 400,
+            message: error.message,
+            error: 'Bad Request'
+        });
     }
 
     throw new InternalServerErrorException({
