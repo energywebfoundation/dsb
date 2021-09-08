@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import Ajv, { JSONSchemaType, AnySchema, ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
-import { json } from 'body-parser';
 
 import { AddressBookService } from '../addressbook/addressbook.service';
 
