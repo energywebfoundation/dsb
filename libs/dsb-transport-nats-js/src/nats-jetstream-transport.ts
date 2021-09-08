@@ -4,6 +4,7 @@ import {
     ChannelAlreadyCreatedError,
     ChannelNotFoundError,
     ChannelOrTopicNotFoundError,
+    MessageExceedsMaximumSizeError,
     ITransport,
     Message,
     Channel,
@@ -151,7 +152,14 @@ export class NATSJetstreamTransport implements ITransport {
             return publishAck.seq.toString();
         } catch (error) {
             this.logger.error(error);
-            throw new ChannelOrTopicNotFoundError(fqcn, topic);
+
+            if (error.toString().includes('503')) {
+                throw new ChannelOrTopicNotFoundError(fqcn, topic);
+            } else if (error.toString().includes('message size exceeds maximum allowed')) {
+                throw new MessageExceedsMaximumSizeError();
+            }
+
+            throw error;
         }
     }
 
