@@ -22,9 +22,10 @@ import {
 
 export const HttpMessageErrorHandler = (error: any) => {
     if (error instanceof PayloadNotValidError) {
+        const errors = error.message.split('>');
         throw new BadRequestException({
             statusCode: 400,
-            message: [...error.message.split('>')],
+            message: [errors[0], ...JSON.parse(errors[1])],
             error: 'Bad Request'
         });
     }
