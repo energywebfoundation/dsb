@@ -306,7 +306,7 @@ describe('MessageController (e2e)', () => {
                 expect(messages).to.have.lengthOf(2);
             });
     });
-  
+
     it('should not publish a message without having user role', async () => {
         const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
         const message: PublishMessageDto = {
@@ -378,5 +378,30 @@ describe('MessageController (e2e)', () => {
             .send(message)
             .set('User-No', '2')
             .expect(HttpStatus.BAD_REQUEST);
+    });
+
+    function sleep(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    it('should not publish a message that exceeds max message payload size', async () => {
+        const fqcn = 'size.channels.dsb.apps.energyweb.iam.ewc';
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: JSON.stringify({ foo: 'bar' }),
+            signature: 'sig'
+        };
+
+        await channelManagerService.create({ fqcn, maxMsgSize: 16 });
+
+        await sleep(1000);
+
+        await request(app).post('/message').send(message).expect(HttpStatus.BAD_REQUEST);
+
+        await channelManagerService.update({ fqcn, maxMsgSize: 1024 });
+
+        await sleep(1000);
+
+        await request(app).post('/message').send(message).expect(HttpStatus.CREATED);
     });
 });

@@ -18,3 +18,9 @@ export class TransportUnavailableError extends Error {
         super(`Transport unavailable!`);
     }
 }
+
+export class MessageExceedsMaximumSizeError extends Error {
+    constructor() {
+        super(`Incoming message exceeds maximum allowed size`);
+    }
+}
