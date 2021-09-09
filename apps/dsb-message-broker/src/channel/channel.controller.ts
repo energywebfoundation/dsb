@@ -65,6 +65,7 @@ export class ChannelController {
         try {
             const channelName = await this.channelService.createChannel({
                 ...createDto,
+                maxMsgSize: createDto.maxMsgSize ?? 1048576, //1Mb default
                 createdBy: user.did,
                 createdDateTime: new Date().toISOString()
             });

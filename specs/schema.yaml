@@ -126,8 +126,10 @@ components:
           example: 86400000000000
         maxMsgSize:
           type: "number"
-          description: "Maximum size of any message in the channel, expressed in bytes."
-          example: 1000000
+          description: "Maximum size of any message in the channel, expressed in bytes. Maximum value is 8388608 bytes (8Mb)"
+          default: 1048576
+          example: 1048576
+          maximum: 8388608
       required:
         - "fqcn"
     UpdateChannelDto:
@@ -180,8 +182,10 @@ components:
           example: 86400000000000
         maxMsgSize:
           type: "number"
-          description: "Maximum size of any message in the channel, expressed in bytes."
-          example: 1000000
+          description: "Maximum size of any message in the channel, expressed in bytes. Maximum value is 8388608 bytes (8Mb)"
+          default: 1048576
+          example: 1048576
+          maximum: 8388608
       required:
         - "fqcn"
     Channel:
