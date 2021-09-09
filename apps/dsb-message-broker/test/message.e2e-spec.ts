@@ -331,7 +331,7 @@ describe('MessageController (e2e)', () => {
         let now = new Date().toISOString();
         now = now.substring(0, now.indexOf('.')) + 'Z';
 
-        await sleep(1000);
+        await sleep(5000);
 
         await request(app)
             .post('/message')
