@@ -16,7 +16,7 @@
     "dependencies": {
         "@energyweb/dsb-transport-core": "~0.0.1",
         "@nestjs/common": "7.6.17",
-        "nats": "2.0.4",
+        "nats": "2.2.0",
         "polly-js": "1.8.2"
     },
     "devDependencies": {

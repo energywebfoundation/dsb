@@ -254,6 +254,12 @@ paths:
           description: "Id of the persistent client, default value is ``"
           example: "default"
           schema: {}
+        - name: "from"
+          required: false
+          in: "query"
+          description: "Rewinds the channel and retruns messages from given point in time"
+          example: "2021-09-06T00:00:00Z"
+          schema: {}
         - name: "amount"
           required: false
           in: "query"

@@ -87,6 +87,12 @@ export class MessageController {
         example: '100'
     })
     @ApiQuery({
+        name: 'from',
+        required: false,
+        description: 'Rewinds the channel and retruns messages from given point in time',
+        example: '2021-09-06T00:00:00Z'
+    })
+    @ApiQuery({
         name: 'clientId',
         required: false,
         description: 'Id of the persistent client, default value is ``',
@@ -103,13 +109,14 @@ export class MessageController {
     public async getNewFromChannel(
         @UserDecorator() user: any,
         @Query(FqcnValidationPipe, MessageQueryPipe)
-        query: { fqcn: string; amount: string; clientId?: string }
+        query: { fqcn: string; amount: string; from?: string; clientId?: string }
     ): Promise<MessageDto[]> {
         try {
             const messages = await this.messageService.pull(
                 query.fqcn,
                 parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
-                query.clientId,
+                query.from ?? '',
+                query.clientId ?? '',
                 user.did,
                 user.verifiedRoles.map((role: any) => role.namespace)
             );
