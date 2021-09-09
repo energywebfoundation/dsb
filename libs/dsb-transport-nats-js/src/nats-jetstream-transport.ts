@@ -172,33 +172,45 @@ export class NATSJetstreamTransport implements ITransport {
         opts.ackExplicit();
         if (from) opts.startTime(new Date(from));
 
+        const defer = function () {
+            const deferred: any = {};
+            deferred.promise = new Promise(function (resolve, reject) {
+                deferred.resolve = resolve;
+                deferred.reject = reject;
+            });
+            return deferred;
+        };
+
         const pullSub = await this.jetstreamClient.pullSubscribe(subject, opts);
 
-        pullSub.pull({ batch: amount, no_wait: true });
+        let delivered = 0;
+        const deferred = defer();
+        (async () => {
+            for await (const message of pullSub) {
+                delivered++;
 
-        /* 
-          by uncommenting following lines is expected that when there is no message after pulling or at end of the iteration
-          the value of _next be like {value: undefined, done: true}
-          but in this situation it never passes line 188
-        */
+                message.ack();
 
-        // const msgs = pullSub[Symbol.asyncIterator]();
-        // const _next = await msgs.next();
-        // console.log("_next ", _next);
+                res.push(
+                    new Message(
+                        message.seq.toString(),
+                        message.subject.split('.').pop(),
+                        this.stringCodec.decode(message.data),
+                        message.info.timestampNanos,
+                        message.headers?.get('Nats-Msg-Id')
+                    )
+                );
 
-        for await (const message of pullSub) {
-            message.ack();
+                if (delivered === amount || message.info.pending === 0) deferred.resolve();
+            }
+            console.log('reaches here after pullSub.unsubscribe()');
+        })();
 
-            res.push(
-                new Message(
-                    message.seq.toString(),
-                    message.subject.split('.').pop(),
-                    this.stringCodec.decode(message.data),
-                    message.info.timestampNanos,
-                    message.headers?.get('Nats-Msg-Id')
-                )
-            );
-        }
+        pullSub.pull({ batch: amount, expires: 5 });
+
+        await deferred.promise;
+
+        pullSub.unsubscribe();
 
         return res;
     }
