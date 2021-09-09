@@ -5,7 +5,8 @@ import {
     IsDefined,
     IsOptional,
     ArrayNotEmpty,
-    ValidateNested
+    ValidateNested,
+    Max
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -109,10 +110,14 @@ export class CreateChannelDto {
 
     @ApiPropertyOptional({
         type: Number,
-        description: 'Maximum size of any message in the channel, expressed in bytes.',
-        example: 1000000
+        description:
+            'Maximum size of any message in the channel, expressed in bytes. Maximum value is 8388608 bytes (8Mb)',
+        default: 1048576,
+        example: 1048576,
+        maximum: 8388608
     })
     @IsOptional()
     @IsInt()
+    @Max(8388608) //8Mb
     maxMsgSize?: number;
 }

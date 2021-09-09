@@ -159,7 +159,10 @@ export class NATSJetstreamTransport implements ITransport {
 
             if (error.toString().includes('503')) {
                 throw new ChannelOrTopicNotFoundError(fqcn, topic);
-            } else if (error.toString().includes('message size exceeds maximum allowed')) {
+            } else if (
+                error.toString().includes('message size exceeds maximum allowed') ||
+                error.toString().includes('MAX_PAYLOAD_EXCEEDED')
+            ) {
                 throw new MessageExceedsMaximumSizeError();
             }
 
