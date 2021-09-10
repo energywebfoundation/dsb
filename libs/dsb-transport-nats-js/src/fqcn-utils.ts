@@ -38,3 +38,9 @@ export const streamToFqcn = (stream: string): string => {
     const fqcn = reversed.join('.');
     return fqcn;
 };
+
+export const getDurableName = (name: string) => {
+    const split = name.split('.');
+    const durable = split.join('_');
+    return durable;
+};
