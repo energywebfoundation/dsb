@@ -26,9 +26,8 @@ import { Role } from '../auth/role.decorator';
 import { DynamicRolesGuard } from '../auth/dynamic.roles.guard';
 import { UserDecorator } from '../auth/user.decorator';
 
-import { PublishMessageDto, MessageDto } from './dto';
+import { PublishMessageDto, PullMessageDto, MessageDto } from './dto';
 import { MessageService } from './message.service';
-import { MessageQueryPipe } from './message.query.pipe';
 import { HttpMessageErrorHandler } from './error.handler';
 import { FqcnValidationPipe } from '../utils/fqcn.validation.pipe';
 
@@ -108,8 +107,8 @@ export class MessageController {
     })
     public async getNewFromChannel(
         @UserDecorator() user: any,
-        @Query(FqcnValidationPipe, MessageQueryPipe)
-        query: { fqcn: string; amount: string; from?: string; clientId?: string }
+        @Query(FqcnValidationPipe)
+        query: PullMessageDto
     ): Promise<MessageDto[]> {
         try {
             const messages = await this.messageService.pull(

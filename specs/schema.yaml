@@ -248,30 +248,35 @@ paths:
       summary: ""
       description: "Pulls new messages from the channel."
       parameters:
-        - name: "clientId"
-          required: false
-          in: "query"
-          description: "Id of the persistent client, default value is ``"
-          example: "default"
-          schema: {}
-        - name: "from"
-          required: false
-          in: "query"
-          description: "Rewinds the channel and retruns messages from given point in time"
-          example: "2021-09-06T00:00:00Z"
-          schema: {}
-        - name: "amount"
-          required: false
-          in: "query"
-          description: "Amount of messages to be returned in the request, default value is 100"
-          example: "100"
-          schema: {}
         - name: "fqcn"
           required: true
           in: "query"
-          description: "Fully Qualified Channel Name (fqcn)"
           example: "testChannel.channels.dsb.apps.energyweb.iam.ewc"
-          schema: {}
+          description: "Fully Qualified Channel Name (fqcn)"
+          schema:
+            format: "{channel_name}.channels.{app_name}.apps.{organization_name}.iam.ewc"
+            type: "string"
+        - name: "amount"
+          required: false
+          in: "query"
+          example: "100"
+          description: "Amount of messages to be returned in the request, default value is 100"
+          schema:
+            type: "string"
+        - name: "from"
+          required: false
+          in: "query"
+          example: "2021-09-06T00:00:00Z"
+          description: "Rewinds the channel and retruns messages from given point in time"
+          schema:
+            type: "string"
+        - name: "clientId"
+          required: false
+          in: "query"
+          example: "default"
+          description: "Id of the persistent client, default value is ``"
+          schema:
+            type: "string"
       responses:
         200:
           description: "Array of pulled messages from a given channel"

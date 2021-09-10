@@ -328,9 +328,8 @@ describe('MessageController (e2e)', () => {
             .send({ ...message, payload: '2' })
             .expect(HttpStatus.CREATED);
 
-        let now = new Date().toISOString();
-        now = now.substring(0, now.indexOf('.')) + 'Z';
-
+        await sleep(5000);
+        const now = new Date().toISOString();
         await sleep(5000);
 
         await request(app)

@@ -30,7 +30,13 @@ import {
 } from 'nats';
 import polly from 'polly-js';
 
-import { fqcnToStream, getStreamName, getStreamSubjects, getSubjectName } from './fqcn-utils';
+import {
+    fqcnToStream,
+    getDurableName,
+    getStreamName,
+    getStreamSubjects,
+    getSubjectName
+} from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
@@ -178,6 +184,7 @@ export class NATSJetstreamTransport implements ITransport {
         clientId: string,
         from?: string
     ): Promise<Message[]> {
+        clientId = getDurableName(clientId);
         const consumerIsAvailable = await this.hasConsumer(fqcn, clientId);
         if (!consumerIsAvailable) {
             try {
