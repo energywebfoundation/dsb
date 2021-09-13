@@ -412,6 +412,22 @@ describe('MessageController (e2e)', () => {
         await request(app).get(`/message?fqcn=${fqcn}&amount=10`).expect(HttpStatus.UNAUTHORIZED);
     });
 
+    it('should not publish a message if payload is not in JSON format', async () => {
+        const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
+        const message: PublishMessageDto = {
+            fqcn,
+            topic: 'testTopic',
+            payload: '{"data": testData}',
+            signature: 'sig'
+        };
+
+        await request(app)
+            .post('/message')
+            .send(message)
+            .set('User-No', '2')
+            .expect(HttpStatus.BAD_REQUEST);
+    });
+
     it('should not publish a message if message payload does not match the schema', async () => {
         const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
         const message: PublishMessageDto = {

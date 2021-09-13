@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import Ajv, { JSONSchemaType, AnySchema, ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 
@@ -12,10 +11,7 @@ export class TopicSchemaService {
     });
     private readonly _validators = new Map<string, Record<string, ValidateFunction<unknown>>>();
 
-    constructor(
-        private readonly moduleRef: ModuleRef,
-        private readonly addressbook: AddressBookService
-    ) {
+    constructor(private readonly addressbook: AddressBookService) {
         addFormats(this.ajv, { mode: 'fast', formats: ['date', 'time'], keywords: true });
     }
 
@@ -43,7 +39,13 @@ export class TopicSchemaService {
 
         if (validators[topic]) {
             const _validate = validators[topic];
-            const isValid = _validate(JSON.parse(payload));
+            let parsedPayload;
+            try {
+                parsedPayload = JSON.parse(payload);
+            } catch (error) {
+                throw new BadRequestException(['Payload is not in JSON format', error.message]);
+            }
+            const isValid = _validate(parsedPayload);
             return { isValid, error: JSON.stringify(_validate.errors) };
         }
 
