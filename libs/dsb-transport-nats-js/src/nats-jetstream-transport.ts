@@ -24,11 +24,19 @@ import {
     createInbox,
     StreamConfig,
     NatsError,
-    JsMsg
+    JsMsg,
+    ConsumerConfig,
+    DeliverPolicy
 } from 'nats';
 import polly from 'polly-js';
 
-import { fqcnToStream, getStreamName, getStreamSubjects, getSubjectName } from './fqcn-utils';
+import {
+    fqcnToStream,
+    getDurableName,
+    getStreamName,
+    getStreamSubjects,
+    getSubjectName
+} from './fqcn-utils';
 
 export class NATSJetstreamTransport implements ITransport {
     private stringCodec = StringCodec();
@@ -170,15 +178,24 @@ export class NATSJetstreamTransport implements ITransport {
         }
     }
 
-    public async pull(fqcn: string, amount: number, clientId: string): Promise<Message[]> {
+    public async pull(
+        fqcn: string,
+        amount: number,
+        clientId: string,
+        from?: string
+    ): Promise<Message[]> {
+        clientId = getDurableName(clientId);
         const consumerIsAvailable = await this.hasConsumer(fqcn, clientId);
         if (!consumerIsAvailable) {
             try {
-                this.logger.log(
-                    `Consumer with clientId ${clientId} does not exist. Attempting to create it.`
-                );
+                const config: Partial<ConsumerConfig> = { name: clientId };
 
-                await this.createConsumer(fqcn, clientId);
+                if (from) {
+                    config['deliver_policy'] = DeliverPolicy.StartTime;
+                    config['opt_start_time'] = new Date(from).toISOString();
+                }
+
+                await this.createConsumer(fqcn, config);
             } catch (error) {
                 this.logger.log(error);
                 if (error.toString().includes('stream not found')) {
@@ -213,11 +230,57 @@ export class NATSJetstreamTransport implements ITransport {
 
     public async subscribe(
         fqcn: string,
+        subject: string,
+        clientId: string,
+        cb: (_err: any, _data?: any) => void
+    ): Promise<any>;
+    public async subscribe(
+        fqcn: string,
+        subject: string,
+        clientId: string,
+        socketId: string,
+        cb: (_err: any, _data?: any) => void
+    ): Promise<any>;
+    public async subscribe(
+        fqcn: string,
+        subject: string,
+        clientId: string,
+        rewind: boolean,
+        cb: (_err: any, _data?: any) => void
+    ): Promise<any>;
+    public async subscribe(
+        fqcn: string,
+        subject: string,
+        clientId: string,
+        socketId: string,
+        rewind: boolean,
+        cb: (_err: any, _data?: any) => void
+    ): Promise<any>;
+    public async subscribe(
+        fqcn: string,
         topic: string,
         clientId: string,
-        cb: any,
-        socketId?: string
-    ): Promise<number> {
+        socketId: string | boolean | ((_err: any, _data?: any) => void),
+        rewind?: boolean | ((_err: any, _data?: any) => void),
+        cb?: (_err: any, _data?: any) => void
+    ): Promise<any> {
+        if (cb === undefined && rewind === undefined) {
+            cb = socketId as (_err: any, _data?: any) => void;
+            socketId = '';
+        } else if (cb === undefined && typeof socketId === 'boolean') {
+            cb = rewind as (_err: any, _data?: any) => void;
+            rewind = socketId;
+            socketId = '';
+        } else if (cb === undefined) {
+            cb = rewind as (_err: any, _data?: any) => void;
+            rewind = false;
+        }
+
+        if (rewind) {
+            const consumerIsAvaiable = await this.hasConsumer(fqcn, clientId);
+            if (consumerIsAvaiable) await this.removeConsumer(fqcn, clientId);
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const _this = this;
         const _subject = getSubjectName(fqcn, topic);
@@ -258,25 +321,27 @@ export class NATSJetstreamTransport implements ITransport {
         return;
     }
 
-    public async createConsumer(fqcn: string, clientId: string): Promise<ConsumerInfo> {
+    private async createConsumer(
+        fqcn: string,
+        config: Partial<ConsumerConfig>
+    ): Promise<ConsumerInfo> {
         await this.ensureConnected();
         const { stream } = fqcnToStream(fqcn);
 
-        return this.jetstreamManager.consumers.add(stream, {
-            name: clientId,
-            durable_name: clientId,
-            ack_policy: AckPolicy.Explicit
-        });
+        if (!config.durable_name) config.durable_name = config.name;
+        if (!config.ack_policy) config.ack_policy = AckPolicy.Explicit;
+
+        return this.jetstreamManager.consumers.add(stream, config);
     }
 
-    public async removeConsumer(fqcn: string, clientId: string): Promise<boolean> {
+    private async removeConsumer(fqcn: string, clientId: string): Promise<boolean> {
         await this.ensureConnected();
         const { stream } = fqcnToStream(fqcn);
 
         return this.jetstreamManager.consumers.delete(stream, clientId);
     }
 
-    public async hasConsumer(fqcn: string, consumer: string): Promise<boolean> {
+    private async hasConsumer(fqcn: string, consumer: string): Promise<boolean> {
         await this.ensureConnected();
         const { stream } = fqcnToStream(fqcn);
 
