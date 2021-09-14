@@ -12,7 +12,9 @@ const transportFactory = {
         const url = configService.get('NATS_JS_URL');
         logger.log(`Creating NATS Jetstream client at ${url}`);
 
-        const transport = new NATSJetstreamTransport([url]);
+        const dupWindow = configService.get('DUPLICATE_WINDOW');
+
+        const transport = new NATSJetstreamTransport([url], parseInt(dupWindow));
 
         await transport.connect();
 
