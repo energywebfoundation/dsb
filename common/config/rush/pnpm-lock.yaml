@@ -40,7 +40,7 @@ dependencies:
   joi: 17.4.1
   json-to-pretty-yaml: 1.2.2
   mocha: 9.0.0
-  nats: 2.0.4
+  nats: 2.2.0
   passport-did-auth: 1.1.0
   passport-jwt: 4.0.0
   polly-js: 1.8.2
@@ -8566,14 +8566,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-kR5mc7I/bvSJy38F8gbSYmllOAoM83xEBNlSFhTn0fJb7+fUtrrEk9OYZF+zrlFnQf3nc34dHQRuThCrVLEU5w==
-  /nats/2.0.4:
+  /nats/2.2.0:
     dependencies:
       nkeys.js: 1.0.0-9
     dev: false
     engines:
       node: '>= 10.0.0'
     resolution:
-      integrity: sha512-cICTjoL09YZnh6O4vg7PnKUH9P/w6xPs4iZns/VA6h8iPe1ZhOY6tHEdjZ/wJ1eAFZKX+gw1+CxId0RK5NUbqA==
+      integrity: sha512-XdXiMjLxoPo8ubK8noi9lWU1fHV5/hf0OjprhBPxxX6inwYUF3GskmoVEzOliJRh09IG5DZkDJntZ0bpKcpEXg==
   /natural-compare/1.4.0:
     dev: false
     resolution:
@@ -12402,7 +12402,7 @@ packages:
       '@typescript-eslint/eslint-plugin': 4.19.0_9248f5ecaa768367e17b9b642989801e
       '@typescript-eslint/parser': 4.19.0_eslint@7.27.0+typescript@4.3.5
       eslint: 7.27.0
-      nats: 2.0.4
+      nats: 2.2.0
       polly-js: 1.8.2
       typescript: 4.3.5
     dev: false
@@ -12414,7 +12414,7 @@ packages:
       reflect-metadata: '*'
       rxjs: '*'
     resolution:
-      integrity: sha512-jok9muNLofPiJnzS6Ed5C8Ozzx/pAHTVGUgHB6BYaCSzg3GLMXa42LwOpzxFw18evqM/khogy3VkQ0sSTLSmzA==
+      integrity: sha512-NaL8npLsQVHGThjEYn28OgA1bAcg3fhBe+nGUXPAKQwnTPh63lge9FZwXgfgYYwBHyRR8vABAaKL6gg3tnV/uw==
       tarball: file:projects/dsb-transport-nats-js.tgz
     version: 0.0.0
   github.com/ethereumjs/ethereumjs-abi/ee3994657fa7a427238e6ba92a84d0b529bbcde0:
@@ -12469,7 +12469,7 @@ specifiers:
   joi: 17.4.1
   json-to-pretty-yaml: 1.2.2
   mocha: 9.0.0
-  nats: 2.0.4
+  nats: 2.2.0
   passport-did-auth: 1.1.0
   passport-jwt: 4.0.0
   polly-js: 1.8.2

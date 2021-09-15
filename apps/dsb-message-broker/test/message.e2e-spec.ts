@@ -307,6 +307,54 @@ describe('MessageController (e2e)', () => {
             });
     });
 
+    it('should be able to receive messages that are published after certain point in time by using "from" parameter', async () => {
+        const fqcn = 'timed.channels.dsb.apps.energyweb.iam.ewc';
+
+        const message: PublishMessageDto = {
+            fqcn,
+            payload: 'payload',
+            signature: 'sig'
+        };
+
+        await channelManagerService.create({ fqcn });
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '1' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '2' })
+            .expect(HttpStatus.CREATED);
+
+        await sleep(5000);
+        const now = new Date().toISOString();
+        await sleep(5000);
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '3' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .post('/message')
+            .send({ ...message, payload: '4' })
+            .expect(HttpStatus.CREATED);
+
+        await request(app)
+            .get(`/message?fqcn=${fqcn}&amount=10&from=${now}`)
+            .expect(HttpStatus.OK)
+            .expect((res) => {
+                const messages = res.body as MessageDto[];
+
+                expect(messages).to.have.lengthOf(2);
+
+                expect(messages[0].payload).to.equal('3');
+                expect(messages[1].payload).to.equal('4');
+            });
+    });
+
     it('should not publish a message without having user role', async () => {
         const fqcn = 'test1.channels.dsb.apps.energyweb.iam.ewc';
         const message: PublishMessageDto = {
