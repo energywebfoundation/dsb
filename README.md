@@ -93,6 +93,8 @@ MB_DID = (required string) it is the DID identifier corresponding to the PRIVATE
 WEB3_URL = (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
 
 CACHE_SERVER_URL = (optional string, default https://identitycache-dev.energyweb.org/) An URL to Identity Cache server, more info https://github.com/energywebfoundation/iam-cache-server
+
+DUPLICATE_WINDOW = (optional number, default 120) The window (in seconds) to track duplicate messages in each channel based on correlationId
 ```
 
 You can define custom values by using `apps/dsb-message-broker/.env` file or passing them directly for e.g `PORT=5000 rush start --verbose`
