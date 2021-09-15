@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 
+import { AppController } from './app.controller';
 import { ChannelModule } from './channel/channel.module';
 import { HealthModule } from './health/health.module';
 import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
@@ -33,6 +34,7 @@ import { UtilsModule } from './utils/utils.module';
         AuthModule,
         UtilsModule
     ],
+    controllers: [AppController],
     providers: [{ provide: APP_INTERCEPTOR, useClass: HTTPLoggingInterceptor }]
 })
 export class AppModule {}
