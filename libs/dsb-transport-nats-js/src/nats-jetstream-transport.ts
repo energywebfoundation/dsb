@@ -49,7 +49,7 @@ export class NATSJetstreamTransport implements ITransport {
 
     private subcriptions = new Map<number, JetStreamSubscription>();
 
-    constructor(private readonly servers: string[]) {}
+    constructor(private readonly servers: string[], private readonly duplicateWindow: number) {}
 
     public async isConnected(): Promise<boolean> {
         return this.isTransportConnected;
@@ -90,6 +90,9 @@ export class NATSJetstreamTransport implements ITransport {
             const otherOptions: Partial<StreamConfig> = {};
             if (channel.maxMsgAge) otherOptions['max_age'] = channel.maxMsgAge;
             if (channel.maxMsgSize) otherOptions['max_msg_size'] = channel.maxMsgSize;
+
+            if (typeof this.duplicateWindow !== undefined)
+                otherOptions['duplicate_window'] = this.duplicateWindow * 1000000000;
 
             await this.jetstreamManager.streams.add({
                 name: stream,
