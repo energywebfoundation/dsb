@@ -154,6 +154,53 @@ describe('ChannelController (e2e)', () => {
             .expect(HttpStatus.BAD_REQUEST);
     });
 
+    it('should not create a channel with invalid schema', async () => {
+        // invalid json
+        await request(app)
+            .post('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"type": object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ]
+            })
+            .set('User-No', '1')
+            .expect(HttpStatus.BAD_REQUEST);
+
+        // unknown keyword
+        await request(app)
+            .post('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"typex": "object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ]
+            })
+            .set('User-No', '1')
+            .expect(HttpStatus.BAD_REQUEST);
+
+        // not allowed values
+        await request(app)
+            .post('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"type": "objectx","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ]
+            })
+            .set('User-No', '1')
+            .expect(HttpStatus.BAD_REQUEST);
+    });
+
     it('should create a channel', async () => {
         await request(app)
             .post('/channel')
@@ -184,6 +231,53 @@ describe('ChannelController (e2e)', () => {
             })
             .set('User-No', '3')
             .expect(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('should not be able to modify a channel with invalid schema', async () => {
+        // invalid json
+        await request(app)
+            .patch('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"type": object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ]
+            })
+            .set('User-No', '2')
+            .expect(HttpStatus.BAD_REQUEST);
+
+        // unknown keyword
+        await request(app)
+            .patch('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"typex": "object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ]
+            })
+            .set('User-No', '2')
+            .expect(HttpStatus.BAD_REQUEST);
+
+        // not allowed values
+        await request(app)
+            .patch('/channel')
+            .send({
+                fqcn,
+                topics: [
+                    {
+                        namespace: 'testTopic',
+                        schema: '{"type": "objectx","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
+                    }
+                ]
+            })
+            .set('User-No', '2')
+            .expect(HttpStatus.BAD_REQUEST);
     });
 
     it('should modify a channel', async () => {
@@ -222,9 +316,9 @@ describe('ChannelController (e2e)', () => {
         const includesSpecialProperties = channel.topics.some((topic: any) => {
             if (topic.namespace === 'testTopic') {
                 if (
-                    topic.schema.includes('$schema') ||
-                    topic.schema.includes('$id') ||
-                    topic.schema.includes('version')
+                    topic.schema.hasOwnProperty('$schema') ||
+                    topic.schema.hasOwnProperty('$id') ||
+                    topic.schema.hasOwnProperty('version')
                 )
                     return true;
             }

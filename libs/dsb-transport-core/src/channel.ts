@@ -3,6 +3,7 @@ export class Channel {
         public readonly fqcn: string,
         public readonly topics?: {
             namespace: string;
+            schemaType?: 'JSD-7' | 'XSD';
             schema: string;
         }[],
         public readonly admins?: string[],

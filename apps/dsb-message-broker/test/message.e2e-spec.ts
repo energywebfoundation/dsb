@@ -364,8 +364,9 @@ describe('MessageController (e2e)', () => {
             signature: 'sig'
         };
 
-        try {
-            await channelManagerService.update({
+        await request(app)
+            .patch('/channel')
+            .send({
                 fqcn,
                 topics: [
                     {
@@ -375,8 +376,9 @@ describe('MessageController (e2e)', () => {
                 ],
                 publishers: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237'],
                 subscribers: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237']
-            });
-        } catch (e) {}
+            })
+            .set('User-No', '1')
+            .expect(HttpStatus.OK);
 
         await request(app)
             .post('/message')

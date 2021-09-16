@@ -53,8 +53,6 @@ export class ChannelService implements OnModuleInit {
 
         const result = await this.transport.updateChannel(updatedChannel);
 
-        this.topicSchemaService.removeValidators(updateDto.fqcn);
-
         this.addressbook.registerChannel(updatedChannel);
 
         return result;

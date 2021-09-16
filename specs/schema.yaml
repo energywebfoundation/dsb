@@ -88,11 +88,15 @@ components:
           properties:
             namespace:
               type: "string"
+            shcemaType:
+              default: "JSD-7"
+              type: "object"
             schema:
               type: "string | JSONSchemaType"
           description: "Array of topic objects that determines topics for messages."
           example:
             - namespace: "testTopic"
+              schemaType: "JSD-7"
               schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
           type: "array"
           items:
@@ -144,11 +148,15 @@ components:
           properties:
             namespace:
               type: "string"
+            shcemaType:
+              default: "JSD-7"
+              type: "object"
             schema:
               type: "string | JSONSchemaType"
           description: "Array of topic objects that determines topics for messages."
           example:
             - namespace: "testTopic"
+              schemaType: "JSD-7"
               schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
           type: "array"
           items:

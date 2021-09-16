@@ -1,5 +1,4 @@
-import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { PipeTransform, Injectable, BadRequestException, Logger } from '@nestjs/common';
 
 import { Channel } from '@energyweb/dsb-transport-core';
 
@@ -8,12 +7,12 @@ import { TopicSchemaService } from '../utils/topic.schema.service';
 
 @Injectable()
 export class ChannelDataPipe implements PipeTransform<any> {
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly topicSchemaService: TopicSchemaService
-    ) {}
+    private readonly logger = new Logger(ChannelDataPipe.name);
+
+    constructor(private readonly topicSchemaService: TopicSchemaService) {}
 
     async transform(channelData: Channel) {
+        /* validation of first part of fqcn */
         const { channel } = extractFqcn(channelData.fqcn);
 
         const fqcnIsValid = new RegExp('^[a-zA-Z0-9]{1,16}$').test(channel);
@@ -21,31 +20,45 @@ export class ChannelDataPipe implements PipeTransform<any> {
         if (!fqcnIsValid) {
             throw new BadRequestException({
                 statusCode: 400,
-                message: 'fqcn does not match the defined pattern.',
+                message:
+                    'First part of the fqcn does not match the defined pattern(^[a-zA-Z0-9]{1,16}$).',
                 error: 'Bad Request'
             });
         }
 
+        /* validation of each topic schema */
+        if (channelData.topics) this.topicSchemaService.removeValidators(channelData.fqcn);
         channelData.topics?.forEach((topic: any, index: number) => {
-            let _schema: any = topic.schema;
+            try {
+                if (topic.schemaType !== 'XSD') {
+                    if (typeof topic.schema === 'string') {
+                        topic.schema = JSON.parse(topic.schema);
+                    }
+                    if (topic.schema && topic.schema.hasOwnProperty('$schema')) {
+                        delete topic.schema['$schema'];
+                    }
+                    if (topic.schema && topic.schema.hasOwnProperty('$id')) {
+                        delete topic.schema['$id'];
+                    }
+                    if (topic.schema && topic.schema.hasOwnProperty('version')) {
+                        delete topic.schema['version'];
+                    }
+                }
 
-            if (typeof _schema === 'string') _schema = JSON.parse(_schema);
-
-            if (_schema && _schema.hasOwnProperty('$schema')) delete _schema['$schema'];
-            if (_schema && _schema.hasOwnProperty('$id')) delete _schema['$id'];
-            if (_schema && _schema.hasOwnProperty('version')) delete _schema['version'];
-
-            const isValid = this.topicSchemaService.validateSchema(_schema);
-
-            if (!isValid) {
+                this.topicSchemaService.validateSchema(
+                    channelData.fqcn,
+                    topic.namespace,
+                    topic.schemaType,
+                    topic.schema
+                );
+            } catch (error) {
+                this.logger.error(error.message);
                 throw new BadRequestException({
                     statusCode: 400,
-                    message: `topics.${index}.schema is not valid`,
+                    message: [`topics.${index}.schema is not valid`, error.message],
                     error: 'Bad Request'
                 });
             }
-
-            topic.schema = JSON.stringify(_schema);
         });
 
         return channelData;

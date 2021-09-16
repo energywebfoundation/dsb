@@ -89,7 +89,7 @@ export class ChannelController {
     })
     public async updateChannel(
         @UserDecorator() user: any,
-        @Body(ChannelDataPipe) updateDto: UpdateChannelDto
+        @Body(FqcnValidationPipe, ChannelDataPipe) updateDto: UpdateChannelDto
     ): Promise<string> {
         try {
             const result = await this.channelService.updateChannel({
