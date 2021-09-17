@@ -7,7 +7,7 @@ dsb-messagebroker:
   messagebroker:
     config:
       port: 3000
-      natsClusterUrl: nats://dsb-nats.dsb.svc:4222
+      natsClusterUrl: nats://dsb-nats.dsb-test.svc:4222
       withSwagger: "true"
       webUrl: https://volta-rpc.energyweb.org/
       cacheServerUrl: https://identitycache-dev.energyweb.org/
