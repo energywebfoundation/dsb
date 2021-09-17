@@ -1,0 +1,91 @@
+# Default values for messagebroker.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+dsb-messagebroker:
+  replicaCount: 1
+
+  messagebroker:
+    config:
+      port: 3000
+      natsClusterUrl: nats://dsb-nats.dsb.svc:4222
+      withSwagger: "true"
+      webUrl: https://volta-rpc.energyweb.org/
+      cacheServerUrl: https://identitycache-dev.energyweb.org/
+      mbDid: "did:ethr:0x5aEa5Bf5c5b341A0BF30Cc5b51b77Fb9807F1b52"
+
+
+  image:
+    # repository: 098061033856.dkr.ecr.us-east-1.amazonaws.com/ew-dos-dsb-ecr
+    repository: aemocontainerregistry.azurecr.io/dsb/messagebroker
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
+    tag: "canary"
+
+  imagePullSecrets: []
+  nameOverride: "dsb-messagebroker-test"
+  fullnameOverride: "dsb-messagebroker-test"
+
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    annotations: {kubernetes.io/ingress.class: azure/application-gateway, appgw.ingress.kubernetes.io/ssl-redirect: "true"}
+    hosts:
+      - host: dsb-test.energyweb.org
+        paths:
+        - path: "/"
+    tls:
+     - secretName: dsb-tls-secret
+       hosts:
+         - dsb-test.energyweb.org
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  #not tested yet
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
