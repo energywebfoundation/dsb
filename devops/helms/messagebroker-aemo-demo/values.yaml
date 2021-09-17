@@ -52,5 +52,17 @@ dsb-messagebroker:
     # runAsUser: 1000
 
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
+
+  ingress:
+    enabled: true
+    annotations: {kubernetes.io/ingress.class: azure/application-gateway}
+    hosts:
+      - host: dsb-demo.energyweb.org
+        paths:
+        - path: "/"
+    tls:
+     - secretName: dsb-tls-secret
+       hosts:
+         - dsb-demo.energyweb.org
