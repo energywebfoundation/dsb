@@ -49,24 +49,20 @@ dsb-messagebroker:
     # runAsUser: 1000
 
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
 
   ingress:
-    enabled: false
-    annotations: {kubernetes.io/ingress.class: "alb",alb.ingress.kubernetes.io/scheme: "internet-facing"}
-      # kubernetes.io/tls-acme: "true"
+    enabled: true
+    annotations: {kubernetes.io/ingress.class: azure/application-gateway, appgw.ingress.kubernetes.io/ssl-redirect: "true"}
     hosts:
       - host: dsb-dev.energyweb.org
         paths:
-        - path: /*
-          backend:
-            serviceName: messagebroker
-            servicePort: 80
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+        - path: "/"
+    tls:
+     - secretName: dsb-tls-secret
+       hosts:
+         - dsb-dev.energyweb.org
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
