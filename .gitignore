@@ -72,3 +72,5 @@ dist/
 .idea/
 
 index.html
+
+apps/dsb-message-broker/xsd_files/

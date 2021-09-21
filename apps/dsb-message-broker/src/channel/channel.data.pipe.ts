@@ -27,39 +27,49 @@ export class ChannelDataPipe implements PipeTransform<any> {
         }
 
         /* validation of each topic schema */
-        if (channelData.topics) this.topicSchemaService.removeValidators(channelData.fqcn);
-        channelData.topics?.forEach((topic: any, index: number) => {
-            try {
-                if (topic.schemaType !== 'XSD') {
-                    if (typeof topic.schema === 'string') {
-                        topic.schema = JSON.parse(topic.schema);
-                    }
-                    if (topic.schema && topic.schema.hasOwnProperty('$schema')) {
-                        delete topic.schema['$schema'];
-                    }
-                    if (topic.schema && topic.schema.hasOwnProperty('$id')) {
-                        delete topic.schema['$id'];
-                    }
-                    if (topic.schema && topic.schema.hasOwnProperty('version')) {
-                        delete topic.schema['version'];
-                    }
-                }
+        if (channelData.topics) {
+            this.topicSchemaService.removeValidators(channelData.fqcn);
 
-                this.topicSchemaService.validateSchema(
-                    channelData.fqcn,
-                    topic.namespace,
-                    topic.schemaType,
-                    topic.schema
-                );
-            } catch (error) {
-                this.logger.error(error.message);
-                throw new BadRequestException({
-                    statusCode: 400,
-                    message: [`topics.${index}.schema is not valid`, error.message],
-                    error: 'Bad Request'
-                });
+            for await (const [index, topic] of channelData.topics.entries()) {
+                try {
+                    let _schema = topic.schema as any;
+                    if (topic.schemaType !== 'XSD') {
+                        if (typeof _schema === 'string') {
+                            _schema = JSON.parse(_schema);
+                        }
+                        if (_schema && _schema.hasOwnProperty('$schema')) {
+                            delete _schema['$schema'];
+                        }
+                        if (_schema && _schema.hasOwnProperty('$id')) {
+                            delete _schema['$id'];
+                        }
+                        if (_schema && _schema.hasOwnProperty('version')) {
+                            delete _schema['version'];
+                        }
+                    }
+                    topic.schema = _schema;
+
+                    await this.topicSchemaService.validateSchema(
+                        channelData.fqcn,
+                        topic.namespace,
+                        topic.schemaType,
+                        topic.schema
+                    );
+                } catch (error) {
+                    this.logger.error(error.message);
+
+                    let errMsg = error.message;
+                    if (error instanceof SyntaxError) errMsg = [errMsg];
+                    else errMsg = JSON.parse(errMsg);
+
+                    throw new BadRequestException({
+                        statusCode: 400,
+                        message: [`topics.${index}.schema is not valid`, ...errMsg],
+                        error: 'Bad Request'
+                    });
+                }
             }
-        });
+        }
 
         return channelData;
     }

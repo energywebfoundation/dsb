@@ -51,8 +51,8 @@ export class MessageService implements OnModuleInit {
     ): Promise<string> {
         this.ensureCanPublish(fqcn, pubDID, pubVRs);
 
-        const { isValid, error } = this.topicSchemaService.validate(fqcn, topic, payload);
-        if (!isValid) throw new PayloadNotValidError(topic, error);
+        const { isValid, error } = await this.topicSchemaService.validate(fqcn, topic, payload);
+        if (!isValid) throw new PayloadNotValidError(topic, error ?? '[]');
 
         return this.transport.publish(
             fqcn,
