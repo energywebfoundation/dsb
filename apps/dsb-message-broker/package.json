@@ -42,7 +42,7 @@
         "reflect-metadata": "0.1.13",
         "rimraf": "3.0.2",
         "rxjs": "6.6.6",
-        "joi": "17.4.1",
+        "joi": "17.4.2",
         "passport-did-auth": "1.1.0",
         "passport-jwt": "4.0.0",
         "@ew-did-registry/jwt": "0.5.2-alpha.1057.0",
