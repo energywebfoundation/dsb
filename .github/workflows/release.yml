@@ -47,6 +47,13 @@ jobs:
 
     - name: Build containers
       run: node common/scripts/install-run-rush.js build:container --verbose
+
+    - name: Scan image
+      uses: anchore/scan-action@v3
+      with:
+        image: "energyweb/dsb-message-broker:canary"
+        fail-build: true
+        severity-cutoff: critical
         
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
