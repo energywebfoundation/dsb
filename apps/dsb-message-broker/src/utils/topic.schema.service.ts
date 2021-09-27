@@ -1,9 +1,11 @@
+import os from 'os';
 import path from 'path';
 import fs from 'fs';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import Ajv, { JSONSchemaType, ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import Libxml from 'node-libxml';
+import { v4 as uuidv4 } from 'uuid';
 
 import { AddressBookService } from '../addressbook/addressbook.service';
 
@@ -18,6 +20,7 @@ class XMLValidator {
 
 @Injectable()
 export class TopicSchemaService {
+    private readonly xsdDirectory: string;
     private readonly ajv = new Ajv({
         multipleOfPrecision: 1000000000
     });
@@ -26,10 +29,10 @@ export class TopicSchemaService {
     constructor(private readonly addressbook: AddressBookService) {
         addFormats(this.ajv, { mode: 'fast', formats: ['date', 'time'], keywords: true });
 
-        const xsdDirectory = path.resolve(__dirname, `../../../xsd_files`);
-        if (!fs.existsSync(xsdDirectory)) {
-            fs.mkdirSync(xsdDirectory);
-        }
+        const tmpDir = os.tmpdir();
+        this.xsdDirectory = path.resolve(tmpDir, `./dsb-mb/xsd_files`);
+        if (fs.existsSync(this.xsdDirectory)) fs.rmdirSync(this.xsdDirectory, { recursive: true });
+        fs.mkdirSync(this.xsdDirectory, { recursive: true });
     }
 
     public async validateSchema(
@@ -49,17 +52,19 @@ export class TopicSchemaService {
     ): Promise<{ isValid: boolean; error: any }> {
         const validator = await this.getValidator(fqcn, topic);
         if (!validator) return { isValid: true, error: null };
+
         let isValid, error;
 
         if (validator instanceof XMLValidator) {
             const isWellformed = libxml.loadXmlFromString(payload);
-            libxml.loadSchemas([validator.pathToSchema]);
-            isValid = libxml.validateAgainstSchemas();
-
             if (!isWellformed) {
                 error = JSON.stringify(libxml.wellformedErrors);
-            } else if (!isValid && libxml.validationSchemaErrors) {
-                error = JSON.stringify(Object.values(libxml.validationSchemaErrors)[0]);
+            } else {
+                libxml.loadSchemas([validator.pathToSchema]);
+                isValid = libxml.validateAgainstSchemas();
+                if (!isValid && libxml.validationSchemaErrors) {
+                    error = JSON.stringify(Object.values(libxml.validationSchemaErrors)[0]);
+                }
             }
         } else {
             try {
@@ -87,11 +92,12 @@ export class TopicSchemaService {
 
         if (schemaType === 'XSD') {
             const isWellformed = libxml.loadXmlFromString(schema);
-
-            const pathToFile = await this.saveSchemaToFile(`${topic}.${fqcn}.xsd`, schema);
-
-            if (isWellformed) validator = new XMLValidator(schema, pathToFile);
-            else error = JSON.stringify(libxml.wellformedErrors);
+            if (isWellformed) {
+                const pathToFile = await this.saveSchemaToFile(`${uuidv4()}.xsd`, schema);
+                validator = new XMLValidator(schema, pathToFile);
+            } else {
+                error = JSON.stringify(libxml.wellformedErrors);
+            }
         } else {
             try {
                 const validate = this.ajv.compile(schema);
@@ -108,7 +114,14 @@ export class TopicSchemaService {
     }
     private async getValidator(fqcn: string, topic: string) {
         const validators = this._validators.get(fqcn);
-        if (validators && validators[topic]) return validators[topic];
+        const _validator = validators ? validators[topic] : undefined;
+        if (_validator && _validator instanceof JSONValidator) {
+            return _validator;
+        }
+        if (_validator && _validator instanceof XMLValidator) {
+            const pathToFile = _validator.pathToSchema;
+            if (fs.existsSync(pathToFile)) return _validator;
+        }
 
         const channel = this.addressbook.getChannel(fqcn);
         const _topic = channel?.topics?.find((_topic: any) => _topic.namespace === topic);
@@ -125,7 +138,7 @@ export class TopicSchemaService {
 
     private saveSchemaToFile(fileName: string, schema: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            const pathStr = path.resolve(__dirname, `../../../xsd_files/${fileName}`);
+            const pathStr = path.resolve(this.xsdDirectory, `${fileName}`);
 
             fs.writeFile(pathStr, schema, 'utf-8', (err) => {
                 if (err) reject(err);
