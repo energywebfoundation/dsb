@@ -50,9 +50,3 @@ jobs:
         PRIVATE_KEY: ${{ secrets.MB_PRIVATE_KEY }}
         MB_DID: ${{ secrets.MB_DID }}
       run: node common/scripts/install-run-rush.js test:e2e --verbose
-
-    - name: Scan current project
-      uses: anchore/scan-action@v3
-      with:
-        path: "."
-        severity-cutoff: critical
