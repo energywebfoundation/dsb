@@ -91,7 +91,7 @@ export class NATSJetstreamTransport implements ITransport {
             if (channel.maxMsgAge) otherOptions['max_age'] = channel.maxMsgAge;
             if (channel.maxMsgSize) otherOptions['max_msg_size'] = channel.maxMsgSize;
 
-            if (typeof this.duplicateWindow !== undefined)
+            if (!isNaN(this.duplicateWindow))
                 otherOptions['duplicate_window'] = this.duplicateWindow * 1000000000;
 
             await this.jetstreamManager.streams.add({
