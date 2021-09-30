@@ -12,6 +12,7 @@ import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
 import { MessageModule } from './message/message.module';
 
 import { UtilsModule } from './utils/utils.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 @Module({
     imports: [
         MessageModule,
@@ -32,7 +33,8 @@ import { UtilsModule } from './utils/utils.module';
             })
         }),
         AuthModule,
-        UtilsModule
+        UtilsModule,
+        PrometheusModule.register()
     ],
     controllers: [AppController],
     providers: [{ provide: APP_INTERCEPTOR, useClass: HTTPLoggingInterceptor }]

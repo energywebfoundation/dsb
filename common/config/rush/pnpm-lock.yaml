@@ -28,6 +28,7 @@ dependencies:
   '@types/uuid': 8.3.1
   '@typescript-eslint/eslint-plugin': 4.19.0_4d44bff940222e43a8eb66110e0de81a
   '@typescript-eslint/parser': 4.19.0_eslint@7.32.0+typescript@4.4.3
+  '@willsoto/nestjs-prometheus': 4.0.0_e93638c016f3c7fe955efe9421b998ce
   ajv: 8.6.3
   ajv-formats: 2.1.1
   base64url: 3.0.1
@@ -46,6 +47,7 @@ dependencies:
   passport-did-auth: 1.1.0
   passport-jwt: 4.0.0
   polly-js: 1.8.2
+  prom-client: 14.0.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 6.6.6
@@ -3488,6 +3490,16 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Fg5OX46pRdTgB7rKIUojkh9vXaVN6sGYCnEiJN1GYkb0RPwShZXp6KTDqmoMdQPKhcroOXh3fEzmkWmCYaKYhQ==
+  /@willsoto/nestjs-prometheus/4.0.0_e93638c016f3c7fe955efe9421b998ce:
+    dependencies:
+      '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
+      prom-client: 14.0.0
+    dev: false
+    peerDependencies:
+      '@nestjs/common': ^7.0.0 || ^8.0.0
+      prom-client: ^13.0.0
+    resolution:
+      integrity: sha512-KNOA4QteplSwTseJs+weytgeYBMe7jQXBR5fL789DQvXtC0l3khyLrwybWGLx3NGBkEf6pYp5n5/vyRmYmFKyg==
   /@xtuc/ieee754/1.2.0:
     dev: false
     resolution:
@@ -4026,6 +4038,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
+  /bintrees/1.0.1:
+    dev: false
+    resolution:
+      integrity: sha1-DmVcm5wkNeqraL9AJyJtK1WjRSQ=
   /bl/4.1.0:
     dependencies:
       buffer: 5.7.1
@@ -9601,6 +9617,14 @@ packages:
       node: '>=0.4.0'
     resolution:
       integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
+  /prom-client/14.0.0:
+    dependencies:
+      tdigest: 0.1.1
+    dev: false
+    engines:
+      node: '>=10'
+    resolution:
+      integrity: sha512-etPa4SMO4j6qTn2uaSZy7+uahGK0kXUZwO7WhoDpTf3yZ837I3jqUDYmG6N0caxuU6cyqrg0xmOxh+yneczvyA==
   /promise-all-reject-late/1.0.1:
     dev: false
     resolution:
@@ -10991,6 +11015,12 @@ packages:
       node: '>= 10'
     resolution:
       integrity: sha512-kvvfiVvjGMxeUNB6MyYv5z7vhfFRwbwCXJAeL0/lnbrttBVqcMOnpHUf0X42LrPMR8mMpgapkJMchFH4FSHzNA==
+  /tdigest/0.1.1:
+    dependencies:
+      bintrees: 1.0.1
+    dev: false
+    resolution:
+      integrity: sha1-Ljyyw56kSeVdHmzZEReszKRYgCE=
   /terser-webpack-plugin/5.1.4_webpack@5.28.0:
     dependencies:
       jest-worker: 27.0.6
@@ -12573,6 +12603,7 @@ packages:
       '@types/uuid': 8.3.1
       '@typescript-eslint/eslint-plugin': 4.19.0_4d44bff940222e43a8eb66110e0de81a
       '@typescript-eslint/parser': 4.19.0_eslint@7.32.0+typescript@4.4.3
+      '@willsoto/nestjs-prometheus': 4.0.0_e93638c016f3c7fe955efe9421b998ce
       ajv: 8.6.3
       ajv-formats: 2.1.1
       base64url: 3.0.1
@@ -12590,6 +12621,7 @@ packages:
       node-libxml: 4.1.2
       passport-did-auth: 1.1.0
       passport-jwt: 4.0.0
+      prom-client: 14.0.0
       reflect-metadata: 0.1.13
       rimraf: 3.0.2
       rxjs: 6.6.6
@@ -12604,7 +12636,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-byWTj8XIZOGmoNSXcdAqq9m3wSks5VMqq4k1m6dvzU8IB62Kfpt+V1CS7ZbQce+6uj3q+EhW5E5JD3gzsnUilg==
+      integrity: sha512-OBKGGGM0ekePCG7NDi5haUkyeksAKPm3TIMMQ2w3PWUFfddeNH+bzRIYUhwJ0onOIGoOTrN/KoPR2+EX6pCFhw==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -12680,6 +12712,7 @@ specifiers:
   '@types/uuid': ~8.3.1
   '@typescript-eslint/eslint-plugin': 4.19.0
   '@typescript-eslint/parser': 4.19.0
+  '@willsoto/nestjs-prometheus': 4.0.0
   ajv: 8.6.3
   ajv-formats: 2.1.1
   base64url: 3.0.1
@@ -12698,6 +12731,7 @@ specifiers:
   passport-did-auth: 1.1.0
   passport-jwt: 4.0.0
   polly-js: 1.8.2
+  prom-client: 14.0.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   rxjs: 6.6.6

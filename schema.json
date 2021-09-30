@@ -1,0 +1,30 @@
+{
+    "type": "object",
+    "properties": {
+        "versionNumber": { "type": "integer" },
+        "bofferAggLevel": { "type": "string" },
+        "duid": { "type": "string" },
+        "accumulateBands": { "type": "string" },
+        "submissionDateTime": { "type": "string" },
+        "tradingDate": { "type": "string" },
+        "rebidExplanation": { "type": "string" },
+        "prices": { "type": "array", "items": [{ "type": "number" }] },
+        "energyPeriods": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "periodId": { "type": "integer" },
+                        "fixedLoad": { "type": "number" },
+                        "maxAvailGeneration": { "type": "number" },
+                        "maxAvailLoad": { "type": "number" },
+                        "bandAvail": { "type": "array", "items": [{ "type": "number" }] }
+                    },
+                    "required": ["periodId"]
+                }
+            ]
+        }
+    },
+    "required": ["versionNumber", "duid", "submissionDateTime", "tradingDate", "energyPeriods"]
+}
