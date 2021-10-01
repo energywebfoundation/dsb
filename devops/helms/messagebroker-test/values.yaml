@@ -1,19 +1,16 @@
-dsb-messagebroker: 
+# Default values for messagebroker.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+dsb-messagebroker:
   replicaCount: 1
 
   messagebroker:
     config:
-      # -- (optional int, default 3000) Port number to be used by DSB Message Broker to listen to
       port: 3000
-      # -- NATS Jetstream node url
-      natsClusterUrl: nats://dsb-aemo-demo-nats.aemo-demo.svc:4222
-      # -- (optional bool, default true) Boolean that enables or disables hosting Swagger API documentation alongside DSB Message Broker endpoints, if true then http://{URL}:{PORT}/swagger is available
+      natsClusterUrl: nats://dsb-nats-test.dsb-test.svc:4222
       withSwagger: "true"
-      # -- (optional string, default https://volta-rpc.energyweb.org/) An URL to EW blockchain node (default
       webUrl: https://volta-rpc.energyweb.org/
-      # -- (optional string, default https://identitycache-dev.energyweb.org/) An URL to Identity Cache server, more info https://github.com/energywebfoundation/iam-cache-server
       cacheServerUrl: https://identitycache-dev.energyweb.org/v1
-      # -- (required string) it is the DID identifier corresponding to the PRIVATE_KEY
       mbDid: "did:ethr:0x5aEa5Bf5c5b341A0BF30Cc5b51b77Fb9807F1b52"
 
 
@@ -23,11 +20,11 @@ dsb-messagebroker:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     # This is just an innitial tag -> every time there is a merge to master it is overwritten by Github actions in ArgoCD.
-    tag: "0050e3dd-07f0-4dce-ba7a-9587373aea80"
+    tag: "canary"
 
   imagePullSecrets: []
-  nameOverride: "dsb-aemo-demo-messagebroker"
-  fullnameOverride: "dsb-aemo-demo-messagebroker"
+  nameOverride: "dsb-messagebroker-test"
+  fullnameOverride: "dsb-messagebroker-test"
 
   serviceAccount:
     # Specifies whether a service account should be created
@@ -59,10 +56,36 @@ dsb-messagebroker:
     enabled: true
     annotations: {kubernetes.io/ingress.class: azure/application-gateway, appgw.ingress.kubernetes.io/ssl-redirect: "true"}
     hosts:
-      - host: dsb-demo.energyweb.org
+      - host: dsb-test.energyweb.org
         paths:
         - path: "/"
     tls:
      - secretName: dsb-tls-secret
        hosts:
-         - dsb-demo.energyweb.org
+         - dsb-test.energyweb.org
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  #not tested yet
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}

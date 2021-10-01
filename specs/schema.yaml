@@ -88,11 +88,16 @@ components:
           properties:
             namespace:
               type: "string"
+            shcemaType:
+              description: "Values are JSD-7(JSON Schema Draft-7) and XSD(XML Schema Definition)"
+              default: "JSD-7"
+              type: "enum"
             schema:
               type: "string | JSONSchemaType"
           description: "Array of topic objects that determines topics for messages."
           example:
             - namespace: "testTopic"
+              schemaType: "JSD-7"
               schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
           type: "array"
           items:
@@ -144,11 +149,16 @@ components:
           properties:
             namespace:
               type: "string"
+            shcemaType:
+              description: "Values are JSD-7(JSON Schema Draft-7) and XSD(XML Schema Definition)"
+              default: "JSD-7"
+              type: "enum"
             schema:
               type: "string | JSONSchemaType"
           description: "Array of topic objects that determines topics for messages."
           example:
             - namespace: "testTopic"
+              schemaType: "JSD-7"
               schema: "{\"type\": \"object\",\"properties\": {\"data\": {\"type\": \"string\"}},\"required\": [\"data\"],\"additionalProperties\": false}"
           type: "array"
           items:
@@ -220,6 +230,17 @@ components:
         - "address"
         - "signature"
 paths:
+  /:
+    get:
+      operationId: "AppController_getAccessibleChannels"
+      summary: ""
+      description: "Returns 200 response code with \"OK\""
+      parameters: []
+      responses:
+        200:
+          description: ""
+      tags:
+        - "root"
   /message:
     post:
       operationId: "MessageController_publish"

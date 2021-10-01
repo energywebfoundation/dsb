@@ -31,6 +31,10 @@ export const HttpMessageErrorHandler = (error: any) => {
         });
     }
 
+    if (error instanceof BadRequestException) {
+        throw error;
+    }
+
     if (
         error instanceof UnauthorizedToPublishError ||
         error instanceof UnauthorizedToSubscribeError

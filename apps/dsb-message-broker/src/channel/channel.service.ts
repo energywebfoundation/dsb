@@ -1,17 +1,17 @@
 import { ModuleRef } from '@nestjs/core';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { ITransport, Channel } from '@energyweb/dsb-transport-core';
+import { Channel, ITransport } from '@energyweb/dsb-transport-core';
 
 import { TopicSchemaService } from '../utils/topic.schema.service';
 import { AddressBookService } from '../addressbook/addressbook.service';
 
-import { CreateChannelDto, UpdateChannelDto, RemoveChannelDto, ReadChannelDto } from './dto';
+import { CreateChannelDto, ReadChannelDto, RemoveChannelDto, UpdateChannelDto } from './dto';
 import {
-    UnauthorizedToModifyError,
-    UnauthorizedToRemoveError,
+    ChannelNotFoundError,
     UnauthorizedToGetError,
-    ChannelNotFoundError
+    UnauthorizedToModifyError,
+    UnauthorizedToRemoveError
 } from './error';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class ChannelService implements OnModuleInit {
     constructor(
         private readonly moduleRef: ModuleRef,
         private readonly topicSchemaService: TopicSchemaService,
-        private readonly addressbook: AddressBookService
+        private readonly addressBook: AddressBookService
     ) {}
 
     public async onModuleInit(): Promise<void> {
@@ -37,7 +37,7 @@ export class ChannelService implements OnModuleInit {
 
         const result = await this.transport.createChannel(createDto);
 
-        this.addressbook.registerChannel(createDto);
+        await this.addressBook.registerChannel(createDto);
 
         return result;
     }
@@ -47,30 +47,24 @@ export class ChannelService implements OnModuleInit {
     ): Promise<string> {
         this.ensureCanModifyOrRemove(updateDto.fqcn, updateDto.modifiedBy, 'modify');
 
-        const currentchannel = this.addressbook.getChannel(updateDto.fqcn);
+        const currentChannel = this.addressBook.getChannel(updateDto.fqcn);
 
-        const updatedChannel = { ...currentchannel, ...updateDto };
+        const updatedChannel = { ...currentChannel, ...updateDto };
 
         const result = await this.transport.updateChannel(updatedChannel);
 
-        this.topicSchemaService.removeValidators(updateDto.fqcn);
-
-        this.addressbook.registerChannel(updatedChannel);
+        await this.addressBook.registerChannel(updatedChannel);
 
         return result;
     }
 
     public async getAccessibleChannels(userDID: string, userVRs: string[]): Promise<Channel[]> {
-        const channelsToPublish = this.addressbook.channelsToPublish(userDID, userVRs);
-        const channelsToSubscribe = this.addressbook.channelsToSubscribe(userDID, userVRs);
+        const channelsToPublish = this.addressBook.channelsToPublish(userDID, userVRs);
+        const channelsToSubscribe = this.addressBook.channelsToSubscribe(userDID, userVRs);
 
-        const uniqueChannels = [...channelsToPublish, ...channelsToSubscribe].filter(
-            (channel, index, self) => {
-                return self.findIndex((_channel: any) => _channel.fqcn === channel.fqcn) === index;
-            }
-        );
-
-        return uniqueChannels;
+        return [...channelsToPublish, ...channelsToSubscribe].filter((channel, index, self) => {
+            return self.findIndex((_channel: any) => _channel.fqcn === channel.fqcn) === index;
+        });
     }
 
     public async getChannel({
@@ -80,7 +74,7 @@ export class ChannelService implements OnModuleInit {
     }: ReadChannelDto & { userDID: string; userVRs: string[] }): Promise<Channel> {
         this.ensureCanPublishOrSubscribe(fqcn, userDID, userVRs);
 
-        const channel = this.addressbook.getChannel(fqcn);
+        const channel = this.addressBook.getChannel(fqcn);
         if (!channel) throw new ChannelNotFoundError(fqcn);
         return channel;
     }
@@ -95,13 +89,13 @@ export class ChannelService implements OnModuleInit {
 
         this.topicSchemaService.removeValidators(fqcn);
 
-        this.addressbook.removeChannel(fqcn);
+        await this.addressBook.removeChannel(fqcn);
 
         return result;
     }
 
     private ensureCanPublishOrSubscribe(fqcn: string, userDID: string, userVRs: string[]) {
-        const channel = this.addressbook.getChannel(fqcn);
+        const channel = this.addressBook.getChannel(fqcn);
 
         let canPublish = channel?.publishers?.some((pub: string) =>
             [userDID, ...userVRs].some((usr: string) => usr === pub)
@@ -123,7 +117,7 @@ export class ChannelService implements OnModuleInit {
         userDID: string,
         mode: 'modify' | 'remove'
     ): void {
-        const channel = this.addressbook.getChannel(fqcn);
+        const channel = this.addressBook.getChannel(fqcn);
 
         let canModifyOrRemove = channel?.admins?.some((admin: string) => admin === userDID);
 

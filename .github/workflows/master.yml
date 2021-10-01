@@ -103,3 +103,10 @@ jobs:
       with:
         command: app set dsb-messagebroker
         options: -p dsb-messagebroker.image.tag=${{needs.unique_id.outputs.unique_id}}
+
+    - name: ArgoCD overwrite values.yaml - dsb test
+      uses: clowdhaus/argo-cd-action/@main
+      id: argocd_image_tag_overwrite_dsb_test
+      with:
+        command: app set dsb-messagebroker-test
+        options: -p dsb-messagebroker.image.tag=${{needs.unique_id.outputs.unique_id}}

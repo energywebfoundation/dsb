@@ -1,11 +1,8 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Signer, utils, Wallet } from 'ethers';
 
 import { AppModule } from '../src/app.module';
 import { request } from './request';
-
-import assert from 'assert';
 
 describe('Root controller (e2e)', () => {
     let app: INestApplication;

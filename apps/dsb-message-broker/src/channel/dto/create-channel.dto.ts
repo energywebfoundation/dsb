@@ -6,16 +6,26 @@ import {
     IsOptional,
     ArrayNotEmpty,
     ValidateNested,
-    Max
+    Max,
+    IsEnum
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { JSONSchemaType } from 'ajv';
 
+enum SchemaType {
+    'JSD-7',
+    'XSD'
+}
+
 class Topic {
     @IsDefined()
     @IsString()
     namespace: string;
+
+    @IsOptional()
+    @IsEnum(SchemaType)
+    schemaType: SchemaType;
 
     @IsDefined()
     schema: string | Record<string, unknown>;
@@ -37,15 +47,20 @@ export class CreateChannelDto {
             namespace: {
                 type: 'string'
             },
+            shcemaType: {
+                description: 'Values are JSD-7(JSON Schema Draft-7) and XSD(XML Schema Definition)',
+                default: 'JSD-7',
+                type: 'enum'
+            },
             schema: {
                 type: 'string | JSONSchemaType'
             }
         },
-        required: false,
         description: 'Array of topic objects that determines topics for messages.',
         example: [
             {
                 namespace: 'testTopic',
+                schemaType: 'JSD-7',
                 schema: '{"type": "object","properties": {"data": {"type": "string"}},"required": ["data"],"additionalProperties": false}'
             }
         ]
@@ -57,6 +72,7 @@ export class CreateChannelDto {
     @Type(() => Topic)
     topics?: {
         namespace: string;
+
         schema: JSONSchemaType<any> | string;
     }[];
 
