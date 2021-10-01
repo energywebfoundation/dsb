@@ -1,6 +1,4 @@
 dependencies:
-  '@ew-did-registry/jwt': 0.5.2-alpha.1057.0
-  '@ew-did-registry/keys': 0.5.2-alpha.1057.0
   '@nestjs/cli': 7.6.0
   '@nestjs/common': 7.6.17_72c71fae9438f0c01bf19f98b0b41cfb
   '@nestjs/config': 0.6.3_225ac98fdd24b5acb2f93f3183a8a3cd
@@ -43,7 +41,7 @@ dependencies:
   mocha: 9.0.0
   nats: 2.2.0
   node-libxml: 4.1.2
-  passport-did-auth: 1.1.0
+  passport-did-auth: 1.0.0-alpha.21
   passport-jwt: 4.0.0
   polly-js: 1.8.2
   reflect-metadata: 0.1.13
@@ -1617,11 +1615,11 @@ packages:
     dev: false
     resolution:
       integrity: sha512-JSvpj1iNMFjK6K+uVl4unqMoa9rf5jopb8cya5UGBWz23Nw8hSNT7efgUx4BTlAPAgpNlEioUfeTyQ6J9ZvTVw==
-  /@ensdomains/resolver/0.2.4:
+  /@ensdomains/resolver/0.3.1:
     deprecated: Please use @ensdomains/ens-contracts
     dev: false
     resolution:
-      integrity: sha512-bvaTH34PMCbv6anRa9I/0zjLJgY4EuznbEMgbV77JBCQ9KNC46rzi0avuxpOfu+xDjPEtSFGqVEOr5GlUSGudA==
+      integrity: sha512-cXY7nomODddJ59pvkwkxp7StgKcv8Xb0OhQE/pCe80448T8tELPGEghf2thtjz4+4f+c7mt8XJQ04Y0Guc0lnA==
   /@ensdomains/solsha1/0.0.3:
     dependencies:
       hash-test-vectors: 1.3.2
@@ -2090,15 +2088,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-XouUMwUtLtX/Cm4NcIBd6jzOrlOjk8H2sb7RxRRbj8/yBGPoMJz0ZlX4+wpSpmlGx5QP/Fk+0CCb393CggEbHw==
-  /@ew-did-registry/did-ethr-resolver/0.5.2-alpha.1057.0:
-    dependencies:
-      '@ew-did-registry/did': 0.5.2-alpha.1057.0
-      '@ew-did-registry/did-resolver-interface': 0.5.2-alpha.1057.0
-      '@ew-did-registry/keys': 0.5.2-alpha.1057.0
-      ethers: 4.0.45
-    dev: false
-    resolution:
-      integrity: sha512-oGfAmyv+2p3bo29S14E8NGuTpGOMA6EsTq6EPD2P0YRRduRJ7qoRcG99YCrFB/0pjX6LHjSkJAsirfpGNTMztg==
   /@ew-did-registry/did-ipfs-store/0.5.2-alpha.101.0:
     dependencies:
       '@ew-did-registry/did-store-interface': 0.5.0
@@ -2107,14 +2096,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-HKksjhzkxxGZ8Bkwx2fruJA3gTWYLvfTtO6UCW05+XoKqeQFDeaLX8vNzuuDXVS1zF33SQhRahZXGAJQYZteKg==
-  /@ew-did-registry/did-ipfs-store/0.5.2-alpha.1057.0:
-    dependencies:
-      '@ew-did-registry/did-store-interface': 0.5.0
-      bl: 4.1.0
-      ipfs-http-client: 43.0.1
-    dev: false
-    resolution:
-      integrity: sha512-pNj6D4dNU9411uZGwMAOxqrmChApvm1PQT4iZoTULGDltIlPrxY6Sq1h+otEaYKi2F4GOr1/CJdRUcID3j0oZA==
   /@ew-did-registry/did-resolver-interface/0.5.2-alpha.101.0:
     dependencies:
       '@ew-did-registry/did': 0.5.2-alpha.101.0
@@ -2122,13 +2103,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Jbb/x6xhg7j1PWpk+qq4F08J8jun7LGLvoVAuk5ubJ5taeksd71nP7JMfG5DmMU3BRHfolTNG1uKhyabl7hZ2A==
-  /@ew-did-registry/did-resolver-interface/0.5.2-alpha.1057.0:
-    dependencies:
-      '@ew-did-registry/did': 0.5.2-alpha.1057.0
-      ethers: 4.0.45
-    dev: false
-    resolution:
-      integrity: sha512-oAyQLhLNHIc21OedWf0TmntpCL014x7egCRtClwJYaP1gZ2BZ2HkQMarcdNYg1H3W9Ticryi2QwaSlFMnroTzw==
   /@ew-did-registry/did-store-interface/0.5.0:
     dev: false
     resolution:
@@ -2137,10 +2111,6 @@ packages:
     dev: false
     resolution:
       integrity: sha512-X51o2KvzxN6k5TPOBGO9cvFF/0BJkzoZ0hgtKyBomk1M6mhb9BdW0U4vVImgemondGdiIeyx+hHdcaxPulju+A==
-  /@ew-did-registry/did/0.5.2-alpha.1057.0:
-    dev: false
-    resolution:
-      integrity: sha512-qnFqoiqx7p7Dc35K9lCrkufhrBEWrKb822aG5NX5qtZMKX0GXelUkJ3DrPwi1zVw0bVgixuUt69cs9HFCCDlvg==
   /@ew-did-registry/jwt/0.5.2-alpha.101.0:
     dependencies:
       '@ew-did-registry/keys': 0.5.2-alpha.101.0
@@ -6643,6 +6613,15 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-2BggwLEJOTfXzKq4Tl2bIT37p0IqqKkblH4e0cMp2sXTdmwg/ADBKMxvxaEytYYcgdxgng8+acsi3WgMVUl6CQ==
+  /ganache-cli/6.12.2:
+    bundledDependencies:
+      - source-map-support
+      - yargs
+      - ethereumjs-util
+    dev: false
+    hasBin: true
+    resolution:
+      integrity: sha512-bnmwnJDBDsOWBUP8E/BExWf85TsdDEFelQSzihSJm9VChVO1SHp94YXLP5BlA4j/OTxp0wR4R1Tje9OHOuAJVw==
   /gauge/2.7.4:
     dependencies:
       aproba: 1.2.0
@@ -9484,24 +9463,33 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==
-  /passport-did-auth/1.1.0:
+  /passport-did-auth/1.0.0-alpha.21:
     dependencies:
-      '@ensdomains/resolver': 0.2.4
-      '@ew-did-registry/did': 0.5.2-alpha.1057.0
-      '@ew-did-registry/did-ethr-resolver': 0.5.2-alpha.1057.0
-      '@ew-did-registry/did-ipfs-store': 0.5.2-alpha.1057.0
+      '@energyweb/iam-contracts': 3.1.0
+      '@ensdomains/resolver': 0.3.1
+      '@ethersproject/providers': 5.4.5
+      '@ew-did-registry/claims': 0.5.2-alpha.101.0
+      '@ew-did-registry/did': 0.5.2-alpha.101.0
+      '@ew-did-registry/did-document': 0.5.2-alpha.101.0
+      '@ew-did-registry/did-ethr-resolver': 0.5.2-alpha.101.0
+      '@ew-did-registry/did-ipfs-store': 0.5.2-alpha.101.0
+      '@ew-did-registry/did-resolver-interface': 0.5.2-alpha.101.0
+      '@ew-did-registry/jwt': 0.5.2-alpha.101.0
+      '@ew-did-registry/keys': 0.5.2-alpha.101.0
       axios: 0.21.1
       base64url: 3.0.1
       cockatiel: 2.0.2
       eth-ens-namehash: 2.0.8
-      ethers: 4.0.45
+      ethers: 5.4.7
+      ganache-cli: 6.12.2
+      js-sha3: 0.8.0
       jsonwebtoken: 8.5.1
       passport: 0.4.1
       passport-strategy: 1.0.0
-      typescript: 4.3.5
+      typescript: 4.4.3
     dev: false
     resolution:
-      integrity: sha512-/l0RXpoZOFQnzseIRO3dJawEv4lQz421xojVgRQLpdUZ40WXe12tSMRVpiz6gwHlxgNG0GHHId6p7w+EU+53nQ==
+      integrity: sha512-eDvCTYhm2/XyjnIz+q/12F9tzm3UDhxKliGI6MpzaDY97FkzNTEyK1xdASntHz28bajqrC43Y0VwRGK97mLRZA==
   /passport-jwt/4.0.0:
     dependencies:
       jsonwebtoken: 8.5.1
@@ -12730,7 +12718,7 @@ packages:
       mocha: 9.0.0
       nestjs-asyncapi: 0.1.1_9fd6e0bfa07394257724f1365e45c273
       node-libxml: 4.1.2
-      passport-did-auth: 1.1.0
+      passport-did-auth: 1.0.0-alpha.21
       passport-jwt: 4.0.0
       reflect-metadata: 0.1.13
       rimraf: 3.0.2
@@ -12746,7 +12734,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-c+pp7Xk6PUr5FXUtCH9CUDIoYcmOmRhN1aRafo6qrwXJ5/c9qm/y5UR8jQzM3r4CVvbuNozADqESn5xrwMiXPQ==
+      integrity: sha512-48aaPBJRaKFP1GDscMYGLsp3RlI9OVyUNrBkXWwjD3PkFhxg9Y1ao9cm9fvF44uF2IcW4KIKY7cVTrVHNtnAiw==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -12793,8 +12781,6 @@ packages:
     version: 0.6.8
 registry: ''
 specifiers:
-  '@ew-did-registry/jwt': 0.5.2-alpha.1057.0
-  '@ew-did-registry/keys': 0.5.2-alpha.1057.0
   '@nestjs/cli': 7.6.0
   '@nestjs/common': 7.6.17
   '@nestjs/config': 0.6.3
@@ -12837,7 +12823,7 @@ specifiers:
   mocha: 9.0.0
   nats: 2.2.0
   node-libxml: 4.1.2
-  passport-did-auth: 1.1.0
+  passport-did-auth: 1.0.0-alpha.21
   passport-jwt: 4.0.0
   polly-js: 1.8.2
   reflect-metadata: 0.1.13
