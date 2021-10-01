@@ -14,7 +14,7 @@
         "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
     },
     "dependencies": {
-        "iam-client-lib": "3.1.0-alpha.8",
+        "iam-client-lib": "3.1.0-alpha.9",
         "@energyweb/dsb-address-book-core": "~0.0.1",
         "@energyweb/dsb-transport-core": "~0.0.1"
     },
