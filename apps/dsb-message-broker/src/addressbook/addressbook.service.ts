@@ -21,8 +21,15 @@ export class AddressBookService implements OnModuleInit {
         const web3Url = this.configService.get('WEB3_URL');
         const privateKey = this.configService.get('PRIVATE_KEY');
         const mbDID = this.configService.get('MB_DID');
+        const cacheServerUrl = this.configService.get('CACHE_SERVER_URL');
 
-        this.addressBook = new NatsJetstreamAddressBook(this.transport, web3Url, privateKey, mbDID);
+        this.addressBook = new NatsJetstreamAddressBook(
+            this.transport,
+            web3Url,
+            privateKey,
+            mbDID,
+            cacheServerUrl
+        );
         await this.addressBook.init();
     }
 

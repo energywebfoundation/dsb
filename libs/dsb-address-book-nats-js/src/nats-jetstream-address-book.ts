@@ -1,6 +1,6 @@
 import { IAddressBook } from '@energyweb/dsb-address-book-core';
 import { ITransport, Channel } from '@energyweb/dsb-transport-core';
-import { IAM } from 'iam-client-lib';
+import { IAM, setCacheClientOptions } from 'iam-client-lib';
 
 export { IAddressBook };
 export class NatsJetstreamAddressBook implements IAddressBook {
@@ -12,8 +12,13 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         private readonly transport: ITransport,
         private readonly web3Url: string,
         private readonly privateKey: string,
-        private readonly mbDID: string
+        private readonly mbDID: string,
+        private readonly cacheServerUrl: string
     ) {
+        setCacheClientOptions(73799, {
+            url: cacheServerUrl
+        });
+
         this.iam = new IAM({ rpcUrl: this.web3Url, privateKey: this.privateKey });
     }
 
@@ -78,6 +83,8 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         });
 
         await this.transport.publish(this.addressBookChannel, 'default', claim);
+
+        this.cache.set(channel.fqcn, channel);
     }
 
     public async remove(fqcn: string): Promise<void> {

@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IAM } from 'iam-client-lib';
+import { IAM, setCacheClientOptions } from 'iam-client-lib';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -12,6 +12,11 @@ export class AuthService implements OnModuleInit {
         const privateKey = this.configService.get<string>('PRIVATE_KEY');
         const mbDID = this.configService.get<string>('MB_DID');
         const rpcUrl = this.configService.get<string>('WEB3_URL');
+        const cacheServerUrl = this.configService.get<string>('CACHE_SERVER_URL');
+
+        setCacheClientOptions(73799, {
+            url: cacheServerUrl
+        });
 
         const iam = new IAM({ rpcUrl, privateKey });
         const init = await iam.initializeConnection({ initCacheServer: true });
