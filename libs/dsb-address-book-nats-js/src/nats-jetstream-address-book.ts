@@ -1,8 +1,9 @@
 import { IAddressBook } from '@energyweb/dsb-address-book-core';
 import { ITransport, Channel } from '@energyweb/dsb-transport-core';
-import { IAM, setCacheClientOptions } from 'iam-client-lib';
+import { IAM } from 'iam-client-lib';
 
 export { IAddressBook };
+
 export class NatsJetstreamAddressBook implements IAddressBook {
     private readonly addressBookChannel = 'channels.dsb.apps.energyweb.iam.ewc';
     private readonly cache = new Map<string, Channel>();
@@ -12,13 +13,8 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         private readonly transport: ITransport,
         private readonly web3Url: string,
         private readonly privateKey: string,
-        private readonly mbDID: string,
-        private readonly cacheServerUrl: string
+        private readonly mbDID: string
     ) {
-        setCacheClientOptions(73799, {
-            url: cacheServerUrl
-        });
-
         this.iam = new IAM({ rpcUrl: this.web3Url, privateKey: this.privateKey });
     }
 
@@ -31,7 +27,7 @@ export class NatsJetstreamAddressBook implements IAddressBook {
                 fqcn: this.addressBookChannel
             });
 
-        this.transport.subscribe(
+        await this.transport.subscribe(
             this.addressBookChannel,
             'default',
             this.mbDID,
@@ -48,6 +44,7 @@ export class NatsJetstreamAddressBook implements IAddressBook {
     public findByFqcn(fqcn: string): Channel {
         return this.cache.get(fqcn);
     }
+
     public findByPublishers(publishers: string[]): Channel[] {
         const channels = [];
         let isAvailable;
@@ -61,6 +58,7 @@ export class NatsJetstreamAddressBook implements IAddressBook {
         }
         return channels;
     }
+
     public findBySubscribers(subscribers: string[]): Channel[] {
         const channels = [];
         let isAvailable;
