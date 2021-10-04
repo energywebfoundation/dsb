@@ -64,7 +64,10 @@ export class ChannelDataPipe implements PipeTransform<any> {
 
                     throw new BadRequestException({
                         statusCode: 400,
-                        message: [`topics.${index}.schema is not valid`, ...errMsg],
+                        message: [
+                            `topics.${topic.namespace ?? index}.schema is not valid`,
+                            ...errMsg
+                        ],
                         error: 'Bad Request'
                     });
                 }
