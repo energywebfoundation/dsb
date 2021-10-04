@@ -30,7 +30,7 @@ export class ChannelDataPipe implements PipeTransform<any> {
         if (channelData.topics) {
             this.topicSchemaService.removeValidators(channelData.fqcn);
 
-            for await (const topic of channelData.topics) {
+            for await (const [index, topic] of channelData.topics.entries()) {
                 try {
                     let _schema = topic.schema as any;
                     if (topic.schemaType !== 'XSD') {
@@ -64,7 +64,10 @@ export class ChannelDataPipe implements PipeTransform<any> {
 
                     throw new BadRequestException({
                         statusCode: 400,
-                        message: [`topics.${topic.namespace}.schema is not valid`, ...errMsg],
+                        message: [
+                            `topics.${topic.namespace ?? index}.schema is not valid`,
+                            ...errMsg
+                        ],
                         error: 'Bad Request'
                     });
                 }
