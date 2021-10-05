@@ -27,7 +27,32 @@ export class TopicSchemaService {
     private readonly _validators = new Map<string, Record<string, JSONValidator | XMLValidator>>();
 
     constructor(private readonly addressbook: AddressBookService) {
-        addFormats(this.ajv, { mode: 'fast', formats: ['date', 'time'], keywords: true });
+        addFormats(this.ajv, {
+            mode: 'fast',
+            formats: [
+                'date',
+                'time',
+                'date-time',
+                'duration',
+                'uri',
+                'uri-reference',
+                'uri-template',
+                'email',
+                'hostname',
+                'ipv4',
+                'ipv6',
+                'uuid',
+                'json-pointer',
+                'byte',
+                'int32',
+                'int64',
+                'float',
+                'double',
+                'password',
+                'binary'
+            ],
+            keywords: true
+        });
 
         const tmpDir = os.tmpdir();
         this.xsdDirectory = path.resolve(tmpDir, `./dsb-mb/xsd_files`);
