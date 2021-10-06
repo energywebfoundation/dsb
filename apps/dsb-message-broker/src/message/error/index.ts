@@ -12,6 +12,10 @@ export class UnauthorizedToSubscribeError extends Error {
 
 export class PayloadNotValidError extends Error {
     constructor(topic: string, message: string) {
-        super(`Payload does not match the schema for the topic(${topic ?? 'default'}).>${message}`);
+        super(
+            `Payload does not match the schema for the topic(${
+                topic ?? 'default'
+            }).$reason->${message}`
+        );
     }
 }
