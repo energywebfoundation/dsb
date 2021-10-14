@@ -1,9 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IAM, setCacheClientOptions } from 'iam-client-lib';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(private readonly configService: ConfigService) {}
 
     private readonly role = 'messagebroker.roles.dsb.apps.energyweb.iam.ewc';
@@ -19,23 +21,39 @@ export class AuthService implements OnModuleInit {
         });
 
         const iam = new IAM({ rpcUrl, privateKey });
-        const init = await iam.initializeConnection({ initCacheServer: true });
-
-        if (mbDID !== init.did) {
-            throw new Error(
-                "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
-            );
+        let init;
+        try {
+            init = await iam.initializeConnection({ initCacheServer: true });
+        } catch (error) {
+            this.logger.error({
+                message: 'error in initializing connection to identity cache server'
+            });
+            process.exit(1);
         }
 
-        const claims = await iam.getUserClaims({ did: init.did });
+        if (mbDID !== init.did) {
+            this.logger.error({
+                message: "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
+            });
+            process.exit(1);
+        }
+
+        let claims;
+        try {
+            claims = await iam.getUserClaims({ did: init.did });
+        } catch (error) {
+            this.logger.error({ message: 'error in getting claims from identity cache server' });
+            process.exit(1);
+        }
 
         const role = claims.find((claim) => claim.claimType === this.role);
 
         //TODO: Add proper role verification
         if (!role) {
-            throw new Error(
-                `Message Broker ${init.did} does not have "${this.role}" role. Please check https://github.com/energywebfoundation/dsb#configuration for more details`
-            );
+            this.logger.error({
+                message: `Message Broker ${init.did} does not have "${this.role}" role. Please check https://github.com/energywebfoundation/dsb#configuration for more details`
+            });
+            process.exit(1);
         }
     }
 }
