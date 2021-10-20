@@ -4,7 +4,6 @@ import {
     Controller,
     Get,
     HttpStatus,
-    Logger,
     Post,
     Query,
     UseGuards,
@@ -28,17 +27,17 @@ import { UserDecorator } from '../auth/user.decorator';
 
 import { PublishMessageDto, PullMessageDto, MessageDto } from './dto';
 import { MessageService } from './message.service';
-import { HttpMessageErrorHandler } from './error.handler';
 import { FqcnValidationPipe } from '../utils/fqcn.validation.pipe';
+import { MessageInterceptor } from './message.interceptor';
 
 @Controller('message')
 @UseGuards(JwtAuthGuard, DynamicRolesGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
+@UseInterceptors(MessageInterceptor)
 @ApiTags('message')
 @ApiBearerAuth('access-token')
 export class MessageController {
-    private readonly logger = new Logger(MessageController.name);
     private readonly DEFAULT_AMOUNT = 100;
 
     constructor(private readonly messageService: MessageService) {}
@@ -58,17 +57,12 @@ export class MessageController {
         @UserDecorator() user: any,
         @Body(FqcnValidationPipe) message: PublishMessageDto
     ): Promise<string> {
-        try {
-            const id = await this.messageService.publish(
-                message,
-                user.did,
-                user.verifiedRoles.map((role: any) => role.namespace)
-            );
-            return `msg-#${id}`;
-        } catch (error) {
-            this.logger.error(error.message);
-            HttpMessageErrorHandler(error);
-        }
+        const id = await this.messageService.publish(
+            message,
+            user.did,
+            user.verifiedRoles.map((role: any) => role.namespace)
+        );
+        return `msg-#${id}`;
     }
 
     @Get()
@@ -110,19 +104,14 @@ export class MessageController {
         @Query(FqcnValidationPipe)
         query: PullMessageDto
     ): Promise<MessageDto[]> {
-        try {
-            const messages = await this.messageService.pull(
-                query.fqcn,
-                parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
-                query.from ?? '',
-                query.clientId ?? '',
-                user.did,
-                user.verifiedRoles.map((role: any) => role.namespace)
-            );
-            return messages;
-        } catch (error) {
-            this.logger.error(error.message);
-            HttpMessageErrorHandler(error);
-        }
+        const messages = await this.messageService.pull(
+            query.fqcn,
+            parseInt(query.amount) ?? this.DEFAULT_AMOUNT,
+            query.from ?? '',
+            query.clientId ?? '',
+            user.did,
+            user.verifiedRoles.map((role: any) => role.namespace)
+        );
+        return messages;
     }
 }

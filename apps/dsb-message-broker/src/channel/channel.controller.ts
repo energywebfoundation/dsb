@@ -3,7 +3,6 @@ import {
     ClassSerializerInterceptor,
     Controller,
     HttpStatus,
-    Logger,
     Post,
     Get,
     Patch,
@@ -33,18 +32,17 @@ import { FqcnValidationPipe } from '../utils/fqcn.validation.pipe';
 
 import { ChannelService } from './channel.service';
 import { CreateChannelDto, RemoveChannelDto, UpdateChannelDto, ReadChannelDto } from './dto';
-import { ChannelErrorHandler } from './error.handler';
-import { ChannelDataPipe } from './channel.data.pipe';
+import { ChannelDataPipe } from './channel.pipe';
+import { ChannelInterceptor } from './channel.interceptor';
 
 @Controller('channel')
 @UseGuards(JwtAuthGuard, DynamicRolesGuard)
 @UseInterceptors(ClassSerializerInterceptor)
 @UsePipes(ValidationPipe)
+@UseInterceptors(ChannelInterceptor)
 @ApiTags('channel')
 @ApiBearerAuth('access-token')
 export class ChannelController {
-    private readonly logger = new Logger(ChannelController.name);
-
     constructor(private readonly channelService: ChannelService) {}
 
     @Post()
@@ -62,18 +60,13 @@ export class ChannelController {
         @UserDecorator() user: any,
         @Body(FqcnValidationPipe, ChannelDataPipe) createDto: CreateChannelDto
     ): Promise<string> {
-        try {
-            const channelName = await this.channelService.createChannel({
-                ...createDto,
-                maxMsgSize: createDto.maxMsgSize ?? 1048576, //1Mb default
-                createdBy: user.did,
-                createdDateTime: new Date().toISOString()
-            });
-            return channelName;
-        } catch (error) {
-            this.logger.error(error.message);
-            ChannelErrorHandler(error);
-        }
+        const channelName = await this.channelService.createChannel({
+            ...createDto,
+            maxMsgSize: createDto.maxMsgSize ?? 1048576, //1Mb default
+            createdBy: user.did,
+            createdDateTime: new Date().toISOString()
+        });
+        return channelName;
     }
 
     @Patch()
@@ -91,17 +84,12 @@ export class ChannelController {
         @UserDecorator() user: any,
         @Body(FqcnValidationPipe, ChannelDataPipe) updateDto: UpdateChannelDto
     ): Promise<string> {
-        try {
-            const result = await this.channelService.updateChannel({
-                ...updateDto,
-                modifiedBy: user.did,
-                modifiedDateTime: new Date().toISOString()
-            });
-            return result;
-        } catch (error) {
-            this.logger.error(error.message);
-            ChannelErrorHandler(error);
-        }
+        const result = await this.channelService.updateChannel({
+            ...updateDto,
+            modifiedBy: user.did,
+            modifiedDateTime: new Date().toISOString()
+        });
+        return result;
     }
 
     @Get('/pubsub')
@@ -116,16 +104,11 @@ export class ChannelController {
         description: 'Array of channels with their options'
     })
     public async getAccessibleChannels(@UserDecorator() user: any): Promise<Channel[]> {
-        try {
-            const channels = await this.channelService.getAccessibleChannels(
-                user.did,
-                user.verifiedRoles.map((role: any) => role.namespace)
-            );
-            return channels;
-        } catch (error) {
-            this.logger.error(error.message);
-            ChannelErrorHandler(error);
-        }
+        const channels = await this.channelService.getAccessibleChannels(
+            user.did,
+            user.verifiedRoles.map((role: any) => role.namespace)
+        );
+        return channels;
     }
 
     @Get('/:fqcn')
@@ -143,17 +126,12 @@ export class ChannelController {
         @UserDecorator() user: any,
         @Param(FqcnValidationPipe) { fqcn }: ReadChannelDto
     ): Promise<Channel> {
-        try {
-            const metadata = await this.channelService.getChannel({
-                fqcn,
-                userDID: user.did,
-                userVRs: user.verifiedRoles.map((role: any) => role.namespace)
-            });
-            return metadata;
-        } catch (error) {
-            this.logger.error(error.message);
-            ChannelErrorHandler(error);
-        }
+        const metadata = await this.channelService.getChannel({
+            fqcn,
+            userDID: user.did,
+            userVRs: user.verifiedRoles.map((role: any) => role.namespace)
+        });
+        return metadata;
     }
 
     @Delete('/:fqcn')
@@ -171,12 +149,7 @@ export class ChannelController {
         @UserDecorator() user: any,
         @Param(FqcnValidationPipe) { fqcn }: RemoveChannelDto
     ): Promise<string> {
-        try {
-            const result = await this.channelService.remove({ fqcn, userDID: user.did });
-            return result;
-        } catch (error) {
-            this.logger.error(error.message);
-            ChannelErrorHandler(error);
-        }
+        const result = await this.channelService.remove({ fqcn, userDID: user.did });
+        return result;
     }
 }

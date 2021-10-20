@@ -1,16 +1,16 @@
 export class ChannelNotFoundError extends Error {
     constructor(fqcn: string) {
-        super(`Channel (${fqcn}) does not exist.`);
+        super(JSON.stringify(['channel does not exist', fqcn]));
     }
 }
 export class ChannelOrTopicNotFoundError extends Error {
     constructor(fqcn: string, topic: string) {
-        super(`Channel (${fqcn}) or topic (${topic}) does not exist.`);
+        super(JSON.stringify(['channel or topic does not exist', fqcn, topic]));
     }
 }
 export class ChannelAlreadyCreatedError extends Error {
     constructor(fqcn: string) {
-        super(`Channel (${fqcn}) already exists.`);
+        super(JSON.stringify(['channel already exists', fqcn]));
     }
 }
 export class TransportUnavailableError extends Error {
