@@ -7,6 +7,7 @@ import * as winston from 'winston';
 
 import { AppModule } from './app.module';
 import { ExceptionsFilter } from './exceptions.filter';
+import { ApplicationError } from './global.errors';
 import { GlobalMiddleware } from './global.middleware';
 
 const { combine, timestamp, printf } = winston.format;
@@ -32,56 +33,64 @@ const logFormat = printf((props) => {
 });
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule, {
-        logger: WinstonModule.createLogger({
-            levels: {
-                error: 0,
-                warn: 1,
-                info: 2,
-                verbose: 3,
-                debug: 4
-            },
-            format: combine(timestamp(), logFormat),
-            transports: [new winston.transports.Console()]
-        })
-    });
-    app.use(GlobalMiddleware);
-    app.useGlobalFilters(new ExceptionsFilter());
-    app.use(bodyParser.json({ limit: '50mb' }));
-    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-    app.enableShutdownHooks();
+    try {
+        const app = await NestFactory.create(AppModule, {
+            logger: WinstonModule.createLogger({
+                levels: {
+                    error: 0,
+                    warn: 1,
+                    info: 2,
+                    verbose: 3,
+                    debug: 4
+                },
+                format: combine(timestamp(), logFormat),
+                transports: [new winston.transports.Console()]
+            })
+        });
+        app.use(GlobalMiddleware);
+        app.useGlobalFilters(new ExceptionsFilter());
+        app.use(bodyParser.json({ limit: '50mb' }));
+        app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+        app.enableShutdownHooks();
 
-    const logger = app.get(Logger);
-    console.log = (...args) => logger.log.call(logger, ...args);
-    console.error = (...args) => logger.error.call(logger, ...args);
-    console.warn = (...args) => logger.warn.call(logger, ...args);
-    console.info = (...args) => logger.log.call(logger, ...args);
-    console.debug = (...args) => logger.debug.call(logger, ...args);
+        const logger = app.get(Logger);
+        console.log = (...args) => logger.log.call(logger, ...args);
+        console.error = (...args) => logger.error.call(logger, ...args);
+        console.warn = (...args) => logger.warn.call(logger, ...args);
+        console.info = (...args) => logger.log.call(logger, ...args);
+        console.debug = (...args) => logger.debug.call(logger, ...args);
 
-    const port = process.env.PORT ?? 3000;
-    logger.log({
-        context: 'Bootstrap',
-        message: `Message Broker listening on port ${port}`
-    });
-
-    if (process.env.WITH_SWAGGER === 'true') {
-        const options = new DocumentBuilder()
-            .setTitle('DSB Message Broker API')
-            .setDescription('Swagger documentation for the DSB Message Broker API')
-            .setVersion('0.1')
-            .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
-            .build();
-
-        const document = SwaggerModule.createDocument(app, options);
-        SwaggerModule.setup('swagger', app, document);
-
+        const port = process.env.PORT ?? 3000;
         logger.log({
             context: 'Bootstrap',
-            message: `Swagger documentation available on http://localhost:${port}/swagger`
+            message: `Message Broker listening on port ${port}`
         });
-    }
 
-    await app.listen(port);
+        if (process.env.WITH_SWAGGER === 'true') {
+            const options = new DocumentBuilder()
+                .setTitle('DSB Message Broker API')
+                .setDescription('Swagger documentation for the DSB Message Broker API')
+                .setVersion('0.1')
+                .addBearerAuth(
+                    { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+                    'access-token'
+                )
+                .build();
+
+            const document = SwaggerModule.createDocument(app, options);
+            SwaggerModule.setup('swagger', app, document);
+
+            logger.log({
+                context: 'Bootstrap',
+                message: `Swagger documentation available on http://localhost:${port}/swagger`
+            });
+        }
+
+        await app.listen(port);
+    } catch (error) {
+        console.error({ context: 'Bootstrap', message: error.message });
+        process.exit(1);
+    }
 }
 
 bootstrap();
