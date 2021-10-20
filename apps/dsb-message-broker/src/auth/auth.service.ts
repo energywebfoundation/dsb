@@ -28,14 +28,16 @@ export class AuthService implements OnModuleInit {
             this.logger.error({
                 message: 'error in initializing connection to identity cache server'
             });
-            process.exit(1);
+            throw error;
         }
 
         if (mbDID !== init.did) {
             this.logger.error({
                 message: "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
             });
-            process.exit(1);
+            throw new Error(
+                "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
+            );
         }
 
         let claims;
@@ -43,7 +45,7 @@ export class AuthService implements OnModuleInit {
             claims = await iam.getUserClaims({ did: init.did });
         } catch (error) {
             this.logger.error({ message: 'error in getting claims from identity cache server' });
-            process.exit(1);
+            throw error;
         }
 
         const role = claims.find((claim) => claim.claimType === this.role);
@@ -53,7 +55,7 @@ export class AuthService implements OnModuleInit {
             this.logger.error({
                 message: `Message Broker ${init.did} does not have "${this.role}" role. Please check https://github.com/energywebfoundation/dsb#configuration for more details`
             });
-            process.exit(1);
+            throw new Error('Message Broker ${init.did} does not have "${this.role}" role.');
         }
     }
 }
