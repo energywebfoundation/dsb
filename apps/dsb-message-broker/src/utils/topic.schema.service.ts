@@ -29,7 +29,7 @@ class XMLValidator {
 export class TopicSchemaService {
     private readonly xsdDirectory: string;
     private readonly ajv = new Ajv({
-        multipleOfPrecision: 1000000000
+        multipleOfPrecision: 1
     });
     private readonly _validators = new Map<string, Record<string, JSONValidator | XMLValidator>>();
 
