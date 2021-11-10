@@ -1,18 +1,10 @@
-import {
-    BadRequestException,
-    NotFoundException,
-    InternalServerErrorException,
-    ServiceUnavailableException,
-    UnauthorizedException,
-    ValidationError
-} from '@nestjs/common';
+import { ValidationError } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 
 import {
     ChannelNotFoundError,
     ChannelOrTopicNotFoundError,
-    TransportUnavailableError,
-    MessageExceedsMaximumSizeError
+    TransportUnavailableError
 } from '@energyweb/dsb-transport-core';
 
 import {
@@ -20,58 +12,6 @@ import {
     UnauthorizedToSubscribeError,
     PayloadNotValidError
 } from './error';
-
-export const HttpMessageErrorHandler = (error: any) => {
-    if (error instanceof PayloadNotValidError) {
-        const errors = error.message.split('$reason->');
-        throw new BadRequestException({
-            statusCode: 400,
-            message: [errors[0], ...JSON.parse(errors[1])],
-            error: 'Bad Request'
-        });
-    }
-
-    if (error instanceof BadRequestException) {
-        throw error;
-    }
-
-    if (
-        error instanceof UnauthorizedToPublishError ||
-        error instanceof UnauthorizedToSubscribeError
-    ) {
-        throw new UnauthorizedException({
-            statusCode: 401,
-            message: error.message,
-            error: 'Unauthorized'
-        });
-    }
-
-    if (error instanceof ChannelNotFoundError || error instanceof ChannelOrTopicNotFoundError) {
-        throw new NotFoundException({
-            statusCode: 404,
-            message: error.message,
-            error: 'Not Found'
-        });
-    }
-
-    if (error instanceof TransportUnavailableError) {
-        throw new ServiceUnavailableException();
-    }
-
-    if (error instanceof MessageExceedsMaximumSizeError) {
-        throw new BadRequestException({
-            statusCode: 400,
-            message: error.message,
-            error: 'Bad Request'
-        });
-    }
-
-    throw new InternalServerErrorException({
-        statusCode: 500,
-        message: 'Unable to publish a message due an unknown error',
-        error: 'Internal Server Error'
-    });
-};
 
 export const WsValidationErrorHandler = (error: ValidationError) => {
     throw new WsException({

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 
 import { TransportModule } from '../transport/transport.module';
 import { AddressBookModule } from '../addressbook/addressbook.module';
@@ -8,7 +8,7 @@ import { ChannelService } from './channel.service';
 @Module({
     imports: [TransportModule, AddressBookModule],
     controllers: [ChannelController],
-    providers: [ChannelService],
+    providers: [Logger, ChannelService],
     exports: [ChannelService]
 })
 export class ChannelModule {}

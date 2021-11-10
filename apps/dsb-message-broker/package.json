@@ -54,7 +54,9 @@
         "@energyweb/dsb-address-book-nats-js": "~0.0.1",
         "ajv-formats": "2.1.1",
         "node-libxml": "4.1.2",
-        "uuid": "8.3.2"
+        "uuid": "8.3.2",
+        "winston": "~3.3.3",
+        "nest-winston": "~1.6.1"
     },
     "devDependencies": {
         "@nestjs/cli": "7.6.0",

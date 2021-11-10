@@ -102,7 +102,7 @@ export class NATSJetstreamTransport implements ITransport {
 
             return stream;
         } catch (error) {
-            this.logger.error(error);
+            // this.logger.error(error);
             throw new ChannelAlreadyCreatedError(channel.fqcn);
         }
     }

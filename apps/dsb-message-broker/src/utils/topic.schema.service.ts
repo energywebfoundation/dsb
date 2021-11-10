@@ -1,13 +1,20 @@
 import os from 'os';
 import path from 'path';
 import fs from 'fs';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import Ajv, { JSONSchemaType, ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import Libxml from 'node-libxml';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AddressBookService } from '../addressbook/addressbook.service';
+
+import { TopicSchemaNotValidError } from '../channel/error';
+import {
+    PayloadNotValidError,
+    PayloadNotValidJsonError,
+    PayloadNotValidXmlError
+} from '../message/error';
 
 const libxml = new Libxml();
 
@@ -22,7 +29,7 @@ class XMLValidator {
 export class TopicSchemaService {
     private readonly xsdDirectory: string;
     private readonly ajv = new Ajv({
-        multipleOfPrecision: 1000000000
+        multipleOfPrecision: 1
     });
     private readonly _validators = new Map<string, Record<string, JSONValidator | XMLValidator>>();
 
@@ -67,7 +74,7 @@ export class TopicSchemaService {
         schema: any
     ): Promise<void> {
         const { error } = await this.setValidator(fqcn, topic, schemaType, schema);
-        if (error) throw new Error(error);
+        if (error) throw error;
         return;
     }
     public async validate(
@@ -83,23 +90,27 @@ export class TopicSchemaService {
         if (validator instanceof XMLValidator) {
             const isWellformed = libxml.loadXmlFromString(payload);
             if (!isWellformed) {
-                error = JSON.stringify(libxml.wellformedErrors);
+                error = new PayloadNotValidXmlError(topic, libxml.wellformedErrors);
             } else {
                 libxml.loadSchemas([validator.pathToSchema]);
                 isValid = libxml.validateAgainstSchemas();
-                if (!isValid && libxml.validationSchemaErrors) {
-                    error = JSON.stringify(Object.values(libxml.validationSchemaErrors)[0]);
-                }
+                if (
+                    libxml.validationSchemaErrors &&
+                    Object.keys(libxml.validationSchemaErrors).length
+                )
+                    error = new PayloadNotValidError(
+                        topic,
+                        Object.values(libxml.validationSchemaErrors)[0]
+                    );
             }
         } else {
             try {
                 payload = JSON.parse(payload);
-            } catch (error) {
-                throw new BadRequestException(['Payload is not in JSON format', error.message]);
+                isValid = validator.validate(payload);
+                error = new PayloadNotValidError(topic, validator.validate.errors);
+            } catch (err) {
+                error = new PayloadNotValidJsonError(topic, err.message);
             }
-
-            isValid = validator.validate(payload);
-            error = JSON.stringify(validator.validate.errors);
         }
 
         return { isValid, error };
@@ -121,14 +132,14 @@ export class TopicSchemaService {
                 const pathToFile = await this.saveSchemaToFile(`${uuidv4()}.xsd`, schema);
                 validator = new XMLValidator(schema, pathToFile);
             } else {
-                error = JSON.stringify(libxml.wellformedErrors);
+                error = new TopicSchemaNotValidError(topic, libxml.wellformedErrors);
             }
         } else {
             try {
                 const validate = this.ajv.compile(schema);
                 validator = new JSONValidator(validate);
             } catch (err) {
-                error = JSON.stringify([err.message]);
+                error = new TopicSchemaNotValidError(topic, err.message);
             }
         }
 

@@ -1,17 +1,17 @@
 import * as Joi from 'joi';
-import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { Module, Logger } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { AuthModule } from './auth/auth.module';
-
 import { AppController } from './app.controller';
+import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
+
+import { AuthModule } from './auth/auth.module';
 import { ChannelModule } from './channel/channel.module';
 import { HealthModule } from './health/health.module';
-import { HTTPLoggingInterceptor } from './httpLoggingInterceptor';
 import { MessageModule } from './message/message.module';
-
 import { UtilsModule } from './utils/utils.module';
+
 @Module({
     imports: [
         MessageModule,
@@ -25,7 +25,7 @@ import { UtilsModule } from './utils/utils.module';
                 PORT: Joi.number().optional().default(3000),
                 WEB3_URL: Joi.string().default('https://volta-rpc.energyweb.org/'),
                 CACHE_SERVER_URL: Joi.string().default(
-                    'https://identitycache-dev.energyweb.org/v1'
+                    'https://volta-identitycache.energyweb.org/v1'
                 ),
                 WITH_SWAGGER: Joi.boolean().optional().default(true),
                 JWT_SECRET: Joi.string().required(),
@@ -37,6 +37,12 @@ import { UtilsModule } from './utils/utils.module';
         UtilsModule
     ],
     controllers: [AppController],
-    providers: [{ provide: APP_INTERCEPTOR, useClass: HTTPLoggingInterceptor }]
+    providers: [
+        Logger,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: HTTPLoggingInterceptor
+        }
+    ]
 })
 export class AppModule {}

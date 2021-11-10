@@ -7,11 +7,7 @@ import { TopicSchemaService } from '../utils/topic.schema.service';
 import { AddressBookService } from '../addressbook/addressbook.service';
 
 import { MessageDto, PublishMessageDto } from './dto';
-import {
-    UnauthorizedToPublishError,
-    UnauthorizedToSubscribeError,
-    PayloadNotValidError
-} from './error';
+import { UnauthorizedToPublishError, UnauthorizedToSubscribeError } from './error';
 
 @Injectable()
 export class MessageService implements OnModuleInit {
@@ -52,7 +48,7 @@ export class MessageService implements OnModuleInit {
         this.ensureCanPublish(fqcn, pubDID, pubVRs);
 
         const { isValid, error } = await this.topicSchemaService.validate(fqcn, topic, payload);
-        if (!isValid) throw new PayloadNotValidError(topic, error ?? '[]');
+        if (!isValid) throw error;
 
         return this.transport.publish(
             fqcn,

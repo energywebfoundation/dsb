@@ -1,9 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { extractFqcn } from '../utils';
 
 @Injectable()
 export class DynamicRolesGuard implements CanActivate {
+    private readonly logger = new Logger();
     constructor(private readonly reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
@@ -11,9 +12,16 @@ export class DynamicRolesGuard implements CanActivate {
         if (!requiredRoleTitle) return true;
         const requiredRoles = [`${requiredRoleTitle}.roles.dsb.apps.energyweb.iam.ewc`];
 
-        const user = context.switchToHttp().getRequest().user;
+        const request = context.switchToHttp().getRequest();
+        const { app, method, url, user } = request;
         const verifiedRoles = user.verifiedRoles?.map((role: any) => role.namespace) || [];
-        if (!verifiedRoles.length) return false;
+        if (!verifiedRoles.length) {
+            this.logger.error({
+                request: { app, method, url },
+                message: ["403 - token doesn't have verified roles"]
+            });
+            return false;
+        }
 
         const fqcn =
             context.switchToHttp().getRequest()?.body?.fqcn ??
@@ -28,8 +36,15 @@ export class DynamicRolesGuard implements CanActivate {
             if (!requiredRoles.includes(organizationRole)) requiredRoles.push(organizationRole);
         }
 
-        return requiredRoles.every((req: string) =>
+        const authorized = requiredRoles.every((req: string) =>
             verifiedRoles.some((ver: string) => ver === req)
         );
+        if (!authorized) {
+            this.logger.error({
+                request: { app, method, url },
+                message: ["403 - user verified roles doesn't match with required roles"]
+            });
+        }
+        return authorized;
     }
 }

@@ -4,30 +4,33 @@ import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class HTTPLoggingInterceptor implements NestInterceptor {
-    private readonly logger = new Logger(HTTPLoggingInterceptor.name);
+    private readonly logger = new Logger();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const now = Date.now();
+        const beginning = Date.now();
         const request = context.switchToHttp().getRequest();
+        const { app, method, url } = request;
 
-        const { method } = request;
-        const url = request.originalUrl;
+        this.logger.log({
+            request: { app, method, url },
+            message: `user: ${request.user?.did}`
+        });
 
         return next.handle().pipe(
             tap(() => {
-                const response = context.switchToHttp().getResponse();
-                const delay = Date.now() - now;
-                this.logger.log(`${response.statusCode} | [${method}] ${url} - ${delay}ms`);
+                const delay = Date.now() - beginning;
+                this.logger.log({
+                    request: { app, method, url },
+                    message: `response with success - response time: ${delay}ms`
+                });
             }),
             catchError((error) => {
-                const response = context.switchToHttp().getResponse();
-                const delay = Date.now() - now;
-                this.logger.error(
-                    `${response.statusCode} | [${method}] ${url} - ${JSON.stringify(
-                        error.message
-                    )} - ${delay}ms`
-                );
+                const delay = Date.now() - beginning;
+                this.logger.log({
+                    request: { app, method, url },
+                    message: `response with error - response time: ${delay}ms`
+                });
                 return throwError(error);
             })
         );
