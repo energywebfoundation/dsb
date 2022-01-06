@@ -50,7 +50,7 @@
         "ajv": "8.6.3",
         "@nestjs/websockets": "8.0.6",
         "@nestjs/platform-socket.io": "8.0.6",
-        "socket.io": "4.1.3",
+        "socket.io": "4.4.1",
         "@energyweb/dsb-address-book-nats-js": "~0.0.1",
         "ajv-formats": "2.1.1",
         "node-libxml": "4.1.2",
