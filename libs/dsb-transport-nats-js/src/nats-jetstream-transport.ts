@@ -220,7 +220,7 @@ export class NATSJetstreamTransport implements ITransport {
             res.push(
                 new Message(
                     message.seq.toString(),
-                    message.subject.split('.').pop(),
+                    message.subject.split('.').slice(1).join('.'),
                     this.stringCodec.decode(message.data),
                     message.info.timestampNanos,
                     message.headers?.get('Nats-Msg-Id')
