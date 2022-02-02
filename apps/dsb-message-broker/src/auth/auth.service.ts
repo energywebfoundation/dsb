@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { initWithPrivateKeySigner } from 'iam-client-lib';
+import { initWithPrivateKeySigner, setCacheConfig } from 'iam-client-lib';
 import { ApplicationError } from '../global.errors';
 
 @Injectable()
@@ -16,6 +16,11 @@ export class AuthService implements OnModuleInit {
         const mbDID = this.configService.get<string>('MB_DID');
         const rpcUrl = this.configService.get<string>('WEB3_URL');
         const cacheServerUrl = this.configService.get<string>('CACHE_SERVER_URL');
+        const chainId = this.configService.get<string>('CHAIN_ID') || 73799; //73799 for Volta
+        setCacheConfig(Number(chainId), {
+            url: cacheServerUrl,
+            cacheServerSupportsAuth: true
+        });
         const { signerService, connectToCacheServer } = await initWithPrivateKeySigner(
             privateKey,
             rpcUrl
