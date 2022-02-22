@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { initWithPrivateKeySigner, setCacheConfig } from 'iam-client-lib';
 import { ApplicationError } from '../global.errors';
+import { didComparison } from '../utils';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -39,7 +40,7 @@ export class AuthService implements OnModuleInit {
             ]);
         }
 
-        if (mbDID !== signerService.did) {
+        if (!didComparison(mbDID, signerService.did)) {
             throw new ApplicationError(
                 "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
             );
