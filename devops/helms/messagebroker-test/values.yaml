@@ -10,7 +10,7 @@ dsb-messagebroker:
       natsClusterUrl: nats://dsb-nats-test.dsb-test.svc:4222
       withSwagger: "true"
       webUrl: https://volta-rpc.energyweb.org/
-      cacheServerUrl: https://identitycache-dev.energyweb.org/v1
+      cacheServerUrl: https://identitycache-staging.energyweb.org/v1
       mbDid: "did:ethr:0x5aEa5Bf5c5b341A0BF30Cc5b51b77Fb9807F1b52"
 
 

@@ -19,7 +19,7 @@ describe('ChannelController (e2e)', () => {
     let channelManagerService: ChannelManagerService;
 
     const authenticatedUser1 = {
-        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
+        did: 'did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
         verifiedRoles: [
             {
                 name: 'channelcreation',
@@ -28,7 +28,7 @@ describe('ChannelController (e2e)', () => {
         ]
     };
     const authenticatedUser2 = {
-        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
+        did: 'did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596',
         verifiedRoles: [
             {
                 name: 'channelcreation',
@@ -41,7 +41,7 @@ describe('ChannelController (e2e)', () => {
         ]
     };
     const authenticatedUser3 = {
-        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237',
+        did: 'did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237',
         verifiedRoles: [
             {
                 name: 'user',
@@ -50,7 +50,7 @@ describe('ChannelController (e2e)', () => {
         ]
     };
     const authenticatedUser4 = {
-        did: 'did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237',
+        did: 'did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237',
         verifiedRoles: [] as any[]
     };
 
@@ -375,17 +375,17 @@ describe('ChannelController (e2e)', () => {
         expect(channel).to.include({ fqcn }, 'fqcn should match');
 
         expect(channel).to.deep.include(
-            { admins: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596'] },
+            { admins: ['did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA596'] },
             'should have creator as admin'
         );
 
         expect(channel).to.deep.include(
-            { publishers: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237'] },
+            { publishers: ['did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237'] },
             'should have modified publishers'
         );
 
         expect(channel).to.deep.include(
-            { subscribers: ['did:ethr:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237'] },
+            { subscribers: ['did:ethr:volta:0x46646c919278e1Dac6ef3B02BC520A82B8FaA237'] },
             'should have modified subscribers'
         );
     });
