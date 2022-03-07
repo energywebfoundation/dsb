@@ -13,7 +13,6 @@ import {
     UnauthorizedToModifyError,
     UnauthorizedToRemoveError
 } from './error';
-import { didComparison } from '../utils';
 
 @Injectable()
 export class ChannelService implements OnModuleInit {
@@ -99,12 +98,12 @@ export class ChannelService implements OnModuleInit {
         const channel = this.addressBook.getChannel(fqcn);
 
         let canPublish = channel?.publishers?.some((pub: string) =>
-            [userDID, ...userVRs].some((usr: string) => didComparison(usr, pub))
+            [userDID, ...userVRs].some((usr: string) => usr === pub)
         );
         if (!channel || !channel.publishers || !channel.publishers.length) canPublish = true;
 
         let canSubscribe = channel?.subscribers?.some((sub: string) =>
-            [userDID, ...userVRs].some((usr: string) => didComparison(usr, sub))
+            [userDID, ...userVRs].some((usr: string) => usr === sub)
         );
         if (!channel || !channel.subscribers || !channel.subscribers.length) canSubscribe = true;
 
@@ -120,9 +119,7 @@ export class ChannelService implements OnModuleInit {
     ): void {
         const channel = this.addressBook.getChannel(fqcn);
 
-        let canModifyOrRemove = channel?.admins?.some((admin: string) =>
-            didComparison(admin, userDID)
-        );
+        let canModifyOrRemove = channel?.admins?.some((admin: string) => admin === userDID);
 
         if (!channel || !channel.admins || !channel.admins.length) canModifyOrRemove = true;
 

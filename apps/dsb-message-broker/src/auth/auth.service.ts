@@ -1,8 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { initWithPrivateKeySigner, setCacheConfig } from 'iam-client-lib';
+import { IAM, setCacheClientOptions } from 'iam-client-lib';
 import { ApplicationError } from '../global.errors';
-import { didComparison } from '../utils';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -17,22 +16,15 @@ export class AuthService implements OnModuleInit {
         const mbDID = this.configService.get<string>('MB_DID');
         const rpcUrl = this.configService.get<string>('WEB3_URL');
         const cacheServerUrl = this.configService.get<string>('CACHE_SERVER_URL');
-        const chainId = this.configService.get<string>('CHAIN_ID') || 73799; //73799 for Volta
-        setCacheConfig(Number(chainId), {
-            url: cacheServerUrl,
-            cacheServerSupportsAuth: true
-        });
-        const { signerService, connectToCacheServer } = await initWithPrivateKeySigner(
-            privateKey,
-            rpcUrl
-        );
-        const { cacheClient, connectToDidRegistry } = await connectToCacheServer();
-        const { claimsService } = await connectToDidRegistry();
 
+        setCacheClientOptions(73799, {
+            url: cacheServerUrl
+        });
+
+        const iam = new IAM({ rpcUrl, privateKey });
+        let init;
         try {
-            if (!claimsService) {
-                throw new Error('initiating claimserver error');
-            }
+            init = await iam.initializeConnection({ initCacheServer: true });
         } catch (error) {
             throw new ApplicationError([
                 'error in initializing connection to identity cache server',
@@ -40,7 +32,7 @@ export class AuthService implements OnModuleInit {
             ]);
         }
 
-        if (!didComparison(mbDID, signerService.did)) {
+        if (mbDID !== init.did) {
             throw new ApplicationError(
                 "Provided DID for the Message Broker doesn't correspond to PRIVATE_KEY"
             );
@@ -48,7 +40,7 @@ export class AuthService implements OnModuleInit {
 
         let claims;
         try {
-            claims = await claimsService.getUserClaims({ did: signerService.did });
+            claims = await iam.getUserClaims({ did: init.did });
         } catch (error) {
             throw new ApplicationError([
                 'error in getting claims from identity cache server',
@@ -61,7 +53,7 @@ export class AuthService implements OnModuleInit {
         //TODO: Add proper role verification
         if (!role) {
             throw new ApplicationError([
-                `Message Broker ${signerService.did} does not have "${this.role}" role.`,
+                `Message Broker ${init.did} does not have "${this.role}" role.`,
                 'Please check https://github.com/energywebfoundation/dsb#configuration for more details'
             ]);
         }

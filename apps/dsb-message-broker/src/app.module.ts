@@ -25,7 +25,7 @@ import { UtilsModule } from './utils/utils.module';
                 PORT: Joi.number().optional().default(3000),
                 WEB3_URL: Joi.string().default('https://volta-rpc.energyweb.org/'),
                 CACHE_SERVER_URL: Joi.string().default(
-                    'https://identitycache-staging.energyweb.org/v1'
+                    'https://volta-identitycache.energyweb.org/v1'
                 ),
                 WITH_SWAGGER: Joi.boolean().optional().default(true),
                 JWT_SECRET: Joi.string().required(),

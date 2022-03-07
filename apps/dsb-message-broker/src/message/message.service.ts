@@ -8,7 +8,6 @@ import { AddressBookService } from '../addressbook/addressbook.service';
 
 import { MessageDto, PublishMessageDto } from './dto';
 import { UnauthorizedToPublishError, UnauthorizedToSubscribeError } from './error';
-import { didComparison } from '../utils';
 
 @Injectable()
 export class MessageService implements OnModuleInit {
@@ -118,7 +117,7 @@ export class MessageService implements OnModuleInit {
     private ensureCanPublish(fqcn: string, pubDID: string, pubVRs: string[]) {
         const channel = this.addressbook.getChannel(fqcn);
         let canPublish = channel?.publishers?.some((pub: string) =>
-            [pubDID, ...pubVRs].some((per: string) => didComparison(per, pub))
+            [pubDID, ...pubVRs].some((per: string) => per === pub)
         );
         if (!channel || !channel.publishers || !channel.publishers.length) canPublish = true;
         if (!canPublish) throw new UnauthorizedToPublishError(fqcn);
@@ -127,7 +126,7 @@ export class MessageService implements OnModuleInit {
     private ensureCanSubscribe(fqcn: string, subDID: string, subVRs: string[]) {
         const channel = this.addressbook.getChannel(fqcn);
         let canSubscribe = channel?.subscribers?.some((sub: string) =>
-            [subDID, ...subVRs].some((per: string) => didComparison(per, sub))
+            [subDID, ...subVRs].some((per: string) => per === sub)
         );
         if (!channel || !channel.subscribers || !channel.subscribers.length) canSubscribe = true;
         if (!canSubscribe) throw new UnauthorizedToSubscribeError(fqcn);

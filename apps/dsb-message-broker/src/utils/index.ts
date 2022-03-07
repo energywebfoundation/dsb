@@ -15,10 +15,3 @@ export const extractFqcn = (fqcn: string) => {
         org: parts[4]
     };
 };
-
-export const didComparison = (did1: string, did2: string) => {
-    did1 = did1.includes('volta') ? did1 : did1.replace('ethr', 'ethr:volta');
-    did2 = did2.includes('volta') ? did2 : did2.replace('ethr', 'ethr:volta');
-
-    return did1 === did2;
-};
