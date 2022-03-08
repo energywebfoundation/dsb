@@ -42,7 +42,7 @@ dependencies:
   nats: 2.2.0
   nest-winston: 1.6.1_f381c2cd6dc6b29e2898609e4e9166f0
   node-libxml: 4.1.2
-  passport-did-auth: 1.3.0-alpha.6
+  passport-did-auth: 1.3.0-alpha.2
   passport-jwt: 4.0.0
   polly-js: 1.8.2
   reflect-metadata: 0.1.13
@@ -2609,23 +2609,23 @@ packages:
     dev: false
     resolution:
       integrity: sha512-QIg9cKOhnS1nCRRC9DnuJsVajlILF3imQ5WsfAG2En1a7Q7Ijv3fe/Mgqpec9GOt1H/4NUeb8mSUMAmXq5Ej3Q==
-  /@ew-did-registry/claims/0.6.3-alpha.496.0:
+  /@ew-did-registry/claims/0.6.3-alpha.479.0:
     dependencies:
-      '@ew-did-registry/did': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-document': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-ipfs-store': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-store-interface': 0.6.3-alpha.496.0
-      '@ew-did-registry/jwt': 0.6.3-alpha.496.0
-      '@ew-did-registry/keys': 0.6.3-alpha.496.0
+      '@ew-did-registry/did': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-document': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-ipfs-store': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-store-interface': 0.6.3-alpha.479.0
+      '@ew-did-registry/jwt': 0.6.3-alpha.479.0
+      '@ew-did-registry/keys': 0.6.3-alpha.479.0
       base64url: 3.0.1
       eciesjs: 0.3.11
       ethers: 5.5.3
       sjcl: /sjcl-complete/1.0.0
     dev: false
     resolution:
-      integrity: sha512-g37ku1XH4gRaILAI9m+7XkyrdD6DlJTMqdhC2MjEn5QHSCZFuVXa9aZnTRhiIIY8KT4FjH5ewfdOgOfQOiewWA==
+      integrity: sha512-koAqG2QhvtdOstDQx6/1T11WJ0wz4er28JesSuzgkNtqJ3RJLJNHLMef6zVx5gI97dSeqWvoiKjhye1RVsX5ng==
   /@ew-did-registry/did-document/0.6.3-alpha.426.0:
     dependencies:
       '@ew-did-registry/did': 0.6.3-alpha.426.0
@@ -2636,16 +2636,16 @@ packages:
     dev: false
     resolution:
       integrity: sha512-yJqFyWDtAHrSyxW3EcdHn35Z4VXFvecW5JMbgrnSEkgHB9ddlz6GDyj0NR+GJkli2NiasMcbl4BN9kvxoDkYIw==
-  /@ew-did-registry/did-document/0.6.3-alpha.496.0:
+  /@ew-did-registry/did-document/0.6.3-alpha.479.0:
     dependencies:
-      '@ew-did-registry/did': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.496.0
-      '@ew-did-registry/keys': 0.6.3-alpha.496.0
+      '@ew-did-registry/did': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.479.0
+      '@ew-did-registry/keys': 0.6.3-alpha.479.0
       ethers: 5.5.3
     dev: false
     resolution:
-      integrity: sha512-pSA99/aVXLBZuFflgprvdusFmCFRAwVGHsbQVeeZ+b/7aAOTnIPG+s+b7hlaZiN0b1kQ5eCRMYr+bh1M9xlA7w==
+      integrity: sha512-W7IruhA4ZdZ25uJijYGwPMoXbY7mlRcR1yb/aQGHxuXbhxwiymgy0CM1q1+Myd5SMYBy2D7siVhH4/5z4BjJaA==
   /@ew-did-registry/did-ethr-resolver/0.6.3-alpha.426.0:
     dependencies:
       '@ew-did-registry/did': 0.6.3-alpha.426.0
@@ -2655,15 +2655,15 @@ packages:
     dev: false
     resolution:
       integrity: sha512-t6qw8PQKXV2mfrPj6X6/jufiun+AjJ2S0R/F2LN4A2ocwj9pJgL3zEaPhoNETHg/fp+x4N5ZHi2jZRic4sdFTQ==
-  /@ew-did-registry/did-ethr-resolver/0.6.3-alpha.496.0:
+  /@ew-did-registry/did-ethr-resolver/0.6.3-alpha.479.0:
     dependencies:
-      '@ew-did-registry/did': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.496.0
-      '@ew-did-registry/keys': 0.6.3-alpha.496.0
+      '@ew-did-registry/did': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.479.0
+      '@ew-did-registry/keys': 0.6.3-alpha.479.0
       ethers: 5.5.3
     dev: false
     resolution:
-      integrity: sha512-Bnqu9DCoDOTxq/WH2AbXUJhtvsuw/nHPh0HYag85aVGfWQogrBKnVhd7ry6Y80LX4r57v5GsoFz6SPpmnoCHaA==
+      integrity: sha512-oQgXPtLPlkQXKYpDsBbNNP7PGO7nUefzIogGzmwucdfK4KTms459XEEIhd/ikc7Qmf2sYtGHqaVqoobGSEkCOw==
   /@ew-did-registry/did-ipfs-store/0.6.3-alpha.426.0:
     dependencies:
       '@ew-did-registry/did-store-interface': 0.6.3-alpha.426.0
@@ -2672,14 +2672,14 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Ts9da+5M79wbws9yQH7aCatv4Rs2dfIcXNjM8Ru4My4eNYdGA5d3v1UcGFglEVDEIDtmXwIpnyCg0rpjxNI4eQ==
-  /@ew-did-registry/did-ipfs-store/0.6.3-alpha.496.0:
+  /@ew-did-registry/did-ipfs-store/0.6.3-alpha.479.0:
     dependencies:
-      '@ew-did-registry/did-store-interface': 0.6.3-alpha.496.0
+      '@ew-did-registry/did-store-interface': 0.6.3-alpha.479.0
       bl: 4.1.0
       ipfs-http-client: 43.0.1
     dev: false
     resolution:
-      integrity: sha512-+DC9f2gZOh0t45QK8lt5WvuRhcW91e+Fb5mwNXFoitADvjmEfHZzeOrTHNVbcTlfofwJgf0SbPmHxa3+MCmyYg==
+      integrity: sha512-Glhvp7Qh+95esa6j9zRa5pnNm+mxS77hl9U7RRT/yRQRVtBzCzWt9nocvDiKc2jU65A7pe2nqXMDBflNuZ6BBw==
   /@ew-did-registry/did-resolver-interface/0.6.3-alpha.426.0:
     dependencies:
       '@ew-did-registry/did': 0.6.3-alpha.426.0
@@ -2688,30 +2688,30 @@ packages:
     dev: false
     resolution:
       integrity: sha512-+/3zFZzfjGKLbGmSwmAhQDi1KWzeE4Qi7p561JuxFciH0KI74QpIVr9VvLdRj6V7N9FRpKGCeGFmOshC59m+lg==
-  /@ew-did-registry/did-resolver-interface/0.6.3-alpha.496.0:
+  /@ew-did-registry/did-resolver-interface/0.6.3-alpha.479.0:
     dependencies:
-      '@ew-did-registry/did': 0.6.3-alpha.496.0
-      '@ew-did-registry/keys': 0.6.3-alpha.496.0
+      '@ew-did-registry/did': 0.6.3-alpha.479.0
+      '@ew-did-registry/keys': 0.6.3-alpha.479.0
       ethers: 5.5.3
     dev: false
     resolution:
-      integrity: sha512-Qp8nF6oXqhXePJivkTkN1VaeO1SQKw1EWG+lWVOBKmFC3L0wbQ0+UcB/j9kLLFJE+DgvLLE2I70MXNdizexUyA==
+      integrity: sha512-U/Qn0oO0KtUorJj3wI/mHtHqtCU6XTxTTirZutiZptgkNDtJB1796ozPkO+yQo08VqLdE+cNtKAkQwNteUVqqw==
   /@ew-did-registry/did-store-interface/0.6.3-alpha.426.0:
     dev: false
     resolution:
       integrity: sha512-jeVMYs9yy83iCO4T2xaKjVXLtrlissGEAWEIt+IDTOv3B5fPsPK05FJ03i71361/KmzTHOAJmcaTdkZbH/9yzQ==
-  /@ew-did-registry/did-store-interface/0.6.3-alpha.496.0:
+  /@ew-did-registry/did-store-interface/0.6.3-alpha.479.0:
     dev: false
     resolution:
-      integrity: sha512-jXhqfipY1HLzBPbDlcV6bt2hhFIURzZ7jF6cLtSUcLgGT7tUYxDzAkaE1mHbioW+g4RDkU+XPkRI51hyN45lyw==
+      integrity: sha512-rQ6HW8S7jNzybuRRHJjOxYVkT+SX4VCFs+7xT2fgPI2L7A5h8+4JtoPP7zGjg8Iw4jyzz8mOHuPNrYzTBhw07g==
   /@ew-did-registry/did/0.6.3-alpha.426.0:
     dev: false
     resolution:
       integrity: sha512-yrw0WcJa9+J5PhUD7GfpiTrFe5Ka6qPcyJCwTZEK2VAX90vVP04i3sSVpJgGxusU/Nwy8DoWz4Ye4t3xxwQg7Q==
-  /@ew-did-registry/did/0.6.3-alpha.496.0:
+  /@ew-did-registry/did/0.6.3-alpha.479.0:
     dev: false
     resolution:
-      integrity: sha512-xh5aWUN8lSEkVMySs8S140RaJozHOavyfXBLQ64wAce+uOomF6Gns8E/IJ6AIHXZ+ZrRTfuM1elAkK6Vkr35NQ==
+      integrity: sha512-p5miicXCVwt/6/fVdDIbfcPZ/uWcyzTOD2Co8LQRDFP4k9C6rGmnsjwISqYftlKA1acZSc588qMnLRseSuKKSg==
   /@ew-did-registry/jwt/0.5.2-alpha.1057.0:
     dependencies:
       '@ew-did-registry/keys': 0.5.2-alpha.1057.0
@@ -2740,9 +2740,9 @@ packages:
     dev: false
     resolution:
       integrity: sha512-Wo5HhfRlqwFiursCLAmOFOzMYSzZspm2ps6dkRsVxU5fEUIOwHnkS/L4Y5TQca/ek4Xvd5nP8HuPfMRRpJbzlA==
-  /@ew-did-registry/jwt/0.6.3-alpha.496.0:
+  /@ew-did-registry/jwt/0.6.3-alpha.479.0:
     dependencies:
-      '@ew-did-registry/keys': 0.6.3-alpha.496.0
+      '@ew-did-registry/keys': 0.6.3-alpha.479.0
       base64url: 3.0.1
       ec-key: 0.0.4
       ethereumjs-util: 7.1.4
@@ -2751,7 +2751,7 @@ packages:
       promise.allsettled: 1.0.4
     dev: false
     resolution:
-      integrity: sha512-Pqjuhjr2zykQO3w5O9uP7fkrKOS4kM5+6FCtaX/YY/ozCPy+wkZPkBSBU2pq2iXxNOcGGoQOMsUHiKULj5ywDw==
+      integrity: sha512-whqhjoLChFPzLzbd1Mx1SlAOa8QHGqycTQGyq7JqQe3P9y0UlBfXc87DnF9iK05BKdUvX+0WPiEf8LtT/yGlOw==
   /@ew-did-registry/keys/0.5.2-alpha.1057.0:
     dependencies:
       bn.js: 5.2.0
@@ -2772,7 +2772,7 @@ packages:
     dev: false
     resolution:
       integrity: sha512-cQC9b/F6tAHph5yzW2S0cjaCyl4PzXef0QU1R4FcjW6gx7RbXTFWpN8ZBfbNa800I76IG3ZxaaMpPCGlX10pPw==
-  /@ew-did-registry/keys/0.6.3-alpha.496.0:
+  /@ew-did-registry/keys/0.6.3-alpha.479.0:
     dependencies:
       bn.js: 5.2.0
       ec-key: 0.0.4
@@ -2782,7 +2782,7 @@ packages:
       key-encoder: 2.0.3
     dev: false
     resolution:
-      integrity: sha512-z18Y6ceALyMV1f2UQZ+KC53C5XdbSo/hnndnyAi4eo2q0gfnqb1h8ncPJSsDTcaGtXfRCSi2Hy86/l4vxPl8HQ==
+      integrity: sha512-DAiERgdI04+pbJjqVEcxtUuzKqXU6dloma9C6iAty6KERam/62Ny5U7JZnNqcdRL5id+d5DmT+0QGxky0C6CMQ==
   /@ew-did-registry/proxyidentity/0.6.3-alpha.426.0:
     dependencies:
       '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.426.0
@@ -10695,19 +10695,19 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==
-  /passport-did-auth/1.3.0-alpha.6:
+  /passport-did-auth/1.3.0-alpha.2:
     dependencies:
       '@energyweb/iam-contracts': 3.7.1
       '@ensdomains/ens-contracts': 0.0.8
       '@ethersproject/providers': 5.5.2
-      '@ew-did-registry/claims': 0.6.3-alpha.496.0
-      '@ew-did-registry/did': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-document': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-ipfs-store': 0.6.3-alpha.496.0
-      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.496.0
-      '@ew-did-registry/jwt': 0.6.3-alpha.496.0
-      '@ew-did-registry/keys': 0.6.3-alpha.496.0
+      '@ew-did-registry/claims': 0.6.3-alpha.479.0
+      '@ew-did-registry/did': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-document': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-ethr-resolver': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-ipfs-store': 0.6.3-alpha.479.0
+      '@ew-did-registry/did-resolver-interface': 0.6.3-alpha.479.0
+      '@ew-did-registry/jwt': 0.6.3-alpha.479.0
+      '@ew-did-registry/keys': 0.6.3-alpha.479.0
       axios: 0.26.0
       base64url: 3.0.1
       cockatiel: 2.0.2
@@ -10723,7 +10723,7 @@ packages:
       typescript: 4.5.5
     dev: false
     resolution:
-      integrity: sha512-xgANneyV8cCw8XDsSkyYXWx/39LdmaMNAxwCNV8YOUIsiTLy0qLOYwLhulEJIMaTVs2mAVQL7nARZdS0C/ugfA==
+      integrity: sha512-o2Q4ftPMWyOs3JwEZHLdZXHmD01VYIS11lsSmBlyx7YMltO+JKiAB32TJGQ14b9AuB5TTq5eYuTscxImh9wzsQ==
   /passport-jwt/4.0.0:
     dependencies:
       jsonwebtoken: 8.5.1
@@ -14165,12 +14165,12 @@ packages:
       '@typescript-eslint/eslint-plugin': 4.19.0_4d44bff940222e43a8eb66110e0de81a
       '@typescript-eslint/parser': 4.19.0_eslint@7.32.0+typescript@4.4.3
       eslint: 7.32.0
-      passport-did-auth: 1.3.0-alpha.6
+      passport-did-auth: 1.3.0-alpha.2
       typescript: 4.4.3
     dev: false
     name: '@rush-temp/dsb-address-book-core'
     resolution:
-      integrity: sha512-iHfEVsd7MJBaAF/jxb8UjXLVSN0yptEGrooG2oRearh5xyc3nhpe2GNZ2gsBMMdHcdfUYhAZC5gorv4y2Ie0iw==
+      integrity: sha512-dTeIqYBnZxYY0b+EmcE+Am/9fPmpeBfb6yt9TfFWbjh/LJxOqowojnaUBlyfuxymjCS+bLna/DZkIyZ8rQ/GmQ==
       tarball: file:projects/dsb-address-book-core.tgz
     version: 0.0.0
   file:projects/dsb-address-book-nats-js.tgz:
@@ -14179,12 +14179,12 @@ packages:
       '@typescript-eslint/parser': 4.19.0_eslint@7.32.0+typescript@4.4.3
       eslint: 7.32.0
       iam-client-lib: 4.0.1
-      passport-did-auth: 1.3.0-alpha.6
+      passport-did-auth: 1.3.0-alpha.2
       typescript: 4.4.3
     dev: false
     name: '@rush-temp/dsb-address-book-nats-js'
     resolution:
-      integrity: sha512-3+CusTUGT43hnrlZCYZ6xaIHqzoesG0f/Pt8nKx2uXyP8C+h7K7kMsNl0bOQfQSXnvjXCUv/82Jgnynu+NdLnQ==
+      integrity: sha512-fzXtFQwgOtVKB9rccsg+0JEz56UCvz+Dxn8bqsy7ehD9diuqgKcTc6Iww9YsZiCkPgZL8BOUJB7/w6lPuRhuwA==
       tarball: file:projects/dsb-address-book-nats-js.tgz
     version: 0.0.0
   file:projects/dsb-message-broker.tgz:
@@ -14230,7 +14230,7 @@ packages:
       nest-winston: 1.6.1_f381c2cd6dc6b29e2898609e4e9166f0
       nestjs-asyncapi: 0.1.1_9fd6e0bfa07394257724f1365e45c273
       node-libxml: 4.1.2
-      passport-did-auth: 1.3.0-alpha.6
+      passport-did-auth: 1.3.0-alpha.2
       passport-jwt: 4.0.0
       reflect-metadata: 0.1.13
       rimraf: 3.0.2
@@ -14247,7 +14247,7 @@ packages:
     dev: false
     name: '@rush-temp/dsb-message-broker'
     resolution:
-      integrity: sha512-8g3kwDaY0qITPyUIoFJnxykqReYvAR1FiEmGz6HlgCJMui7AMojMvX8kKqpEuDK/92pDvTCYTXd/vyBm05PqCw==
+      integrity: sha512-kly9dodAYO6iKOuzURPQeSosaoFX/cIS1e/MRcexqq1braPMT9be8OhSrKNFojVPETBhx3+XkCFyN4jR1V4cQw==
       tarball: file:projects/dsb-message-broker.tgz
     version: 0.0.0
   file:projects/dsb-transport-core.tgz:
@@ -14255,12 +14255,12 @@ packages:
       '@typescript-eslint/eslint-plugin': 4.19.0_4d44bff940222e43a8eb66110e0de81a
       '@typescript-eslint/parser': 4.19.0_eslint@7.32.0+typescript@4.4.3
       eslint: 7.32.0
-      passport-did-auth: 1.3.0-alpha.6
+      passport-did-auth: 1.3.0-alpha.2
       typescript: 4.4.3
     dev: false
     name: '@rush-temp/dsb-transport-core'
     resolution:
-      integrity: sha512-qEHFC2kMyIcCmGSW2lSnhsmaFBw3CF0HjYJ19kg4avKxjs8rnjFaegbZEvBSmXLHQjynm4ItOYDtw8054pzNgA==
+      integrity: sha512-FkgDX4cQxCBxb2b68mOEqCyXhHy5bxn888P5lUbCIv/zfK6K4ZzbrQmg0OKGf3Cc1tffT3Tiu/nr7VBz9GMGMA==
       tarball: file:projects/dsb-transport-core.tgz
     version: 0.0.0
   file:projects/dsb-transport-nats-js.tgz_72c71fae9438f0c01bf19f98b0b41cfb:
@@ -14270,7 +14270,7 @@ packages:
       '@typescript-eslint/parser': 4.19.0_eslint@7.32.0+typescript@4.4.3
       eslint: 7.32.0
       nats: 2.2.0
-      passport-did-auth: 1.3.0-alpha.6
+      passport-did-auth: 1.3.0-alpha.2
       polly-js: 1.8.2
       typescript: 4.4.3
     dev: false
@@ -14282,7 +14282,7 @@ packages:
       reflect-metadata: '*'
       rxjs: '*'
     resolution:
-      integrity: sha512-boVKv3pPseD/S00QzQru4qcoJBtEB1Q19yKm1WCFLRISl1oievaUWsoPYSedx9B8JuRQ0qbOKRU+yCSS3mBjGQ==
+      integrity: sha512-XEReE7qiSGvJPW/TlnB3wKciO5Hwpe9GyPGAvR5bXNL/CiDDeoJ4SOO14QA1eB7CXgpP2KNl1iuOVYi/Rissng==
       tarball: file:projects/dsb-transport-nats-js.tgz
     version: 0.0.0
 registry: ''
@@ -14330,7 +14330,7 @@ specifiers:
   nats: 2.2.0
   nest-winston: ~1.6.1
   node-libxml: 4.1.2
-  passport-did-auth: 1.3.0-alpha.6
+  passport-did-auth: 1.3.0-alpha.2
   passport-jwt: 4.0.0
   polly-js: 1.8.2
   reflect-metadata: 0.1.13
