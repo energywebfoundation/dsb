@@ -2,7 +2,7 @@ name: Build and deploy
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, IS-7-bump-ICL-PDA-deploy ]
 
 jobs:
   cancel-previous:
