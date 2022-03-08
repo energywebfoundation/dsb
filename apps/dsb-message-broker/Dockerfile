@@ -1,6 +1,5 @@
-FROM node:14-alpine
+FROM node:14
 
-RUN apk add gcompat
 RUN mkdir -p /var/deployment
 COPY ./ /var/deployment
 
