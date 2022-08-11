@@ -89,11 +89,7 @@ async function bootstrap() {
         await app.listen(port);
     } catch (error) {
         console.error({ context: 'Bootstrap', message: error.message });
-        if (error.message && error.message.indexOf('project id required') >= 0) {
-            console.log('Temprary ignoring project ID');
-        } else {
-            process.exit(1);
-        }
+        process.exit(1);
     }
 }
 

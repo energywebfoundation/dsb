@@ -17,9 +17,17 @@ export class AuthService implements OnModuleInit {
         const rpcUrl = this.configService.get<string>('WEB3_URL');
         const cacheServerUrl = this.configService.get<string>('CACHE_SERVER_URL');
 
-        setCacheClientOptions(73799, {
-            url: cacheServerUrl
-        });
+        try {
+            setCacheClientOptions(73799, {
+                url: cacheServerUrl
+            });
+        } catch (error) {
+            if (error.message && error.message.indexOf('project id required') >= 0) {
+                console.log('Temprary ignoring project ID');
+            } else {
+                throw new ApplicationError(['error in setCacheClientOptions', error.message]);
+            }
+        }
 
         const iam = new IAM({ rpcUrl, privateKey });
         let init;
