@@ -19,7 +19,16 @@ export class NatsJetstreamAddressBook implements IAddressBook {
     }
 
     public async init() {
-        await this.iam.initializeConnection({ initCacheServer: false });
+        try {
+            await this.iam.initializeConnection({ initCacheServer: false });
+        } catch (error) {
+            console.log('---', error);
+            if (error.message && error.message.indexOf('project id required') >= 0) {
+                console.log('Temprary ignoring project ID');
+            } else {
+                throw new Error(error.message);
+            }
+        }
 
         const abChannelIsAvailable = await this.transport.hasChannel(this.addressBookChannel);
         if (!abChannelIsAvailable)
