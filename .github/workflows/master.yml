@@ -48,30 +48,30 @@ jobs:
     - name: Build containers
       run: node common/scripts/install-run-rush.js build:container --verbose
         
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v1
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v1
       
-    - name: Build & push docker images
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
-      run: |
-        docker tag energyweb/dsb-message-broker:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
-        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
-        docker tag $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
-        docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
+    # - name: Build & push docker images
+    #   env:
+    #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #     BUILD_ID: ${{needs.unique_id.outputs.unique_id}}
+    #   run: |
+    #     docker tag energyweb/dsb-message-broker:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
+    #     docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary 
+    #     docker tag $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:canary $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
+    #     docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$BUILD_ID 
     
-    - name: Logout of Amazon ECR
-      if: always()
-      run: docker logout ${{ steps.login-ecr.outputs.registry }}
+    # - name: Logout of Amazon ECR
+    #   if: always()
+    #   run: docker logout ${{ steps.login-ecr.outputs.registry }}
 
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
@@ -85,9 +85,9 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker tag ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}}
+        docker tag energyweb/dsb-message-broker:canary ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}} 
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}}
-        docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:${{needs.unique_id.outputs.unique_id}} ${{ secrets.REGISTRY_LOGIN_SERVER }}/dsb/messagebroker:canary
+        
 
     # - name: ArgoCD login
     #   uses: clowdhaus/argo-cd-action/@main
