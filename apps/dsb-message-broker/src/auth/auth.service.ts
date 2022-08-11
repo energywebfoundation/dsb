@@ -22,6 +22,7 @@ export class AuthService implements OnModuleInit {
                 url: cacheServerUrl
             });
         } catch (error) {
+            console.log('1', error);
             if (error.message && error.message.indexOf('project id required') >= 0) {
                 console.log('Temprary ignoring project ID');
             } else {
@@ -34,10 +35,15 @@ export class AuthService implements OnModuleInit {
         try {
             init = await iam.initializeConnection({ initCacheServer: true });
         } catch (error) {
-            throw new ApplicationError([
-                'error in initializing connection to identity cache server',
-                error.message
-            ]);
+            console.log('2', error);
+            if (error.message && error.message.indexOf('project id required') >= 0) {
+                console.log('Temprary ignoring project ID');
+            } else {
+                throw new ApplicationError([
+                    'error in initializing connection to identity cache server',
+                    error.message
+                ]);
+            }
         }
 
         if (mbDID !== init.did) {
@@ -50,10 +56,15 @@ export class AuthService implements OnModuleInit {
         try {
             claims = await iam.getUserClaims({ did: init.did });
         } catch (error) {
-            throw new ApplicationError([
-                'error in getting claims from identity cache server',
-                error.message
-            ]);
+            console.log('3', error);
+            if (error.message && error.message.indexOf('project id required') >= 0) {
+                console.log('Temprary ignoring project ID');
+            } else {
+                throw new ApplicationError([
+                    'error in getting claims from identity cache server',
+                    error.message
+                ]);
+            }
         }
 
         const role = claims.find((claim) => claim.claimType === this.role);
